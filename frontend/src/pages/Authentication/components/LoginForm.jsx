@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserAtom } from '../../../atoms/UserAtom'
+import { useSetRecoilState } from "recoil";
 import axios from "axios";
 import useToast from '../../../hooks/useToast'
 
@@ -8,6 +10,7 @@ const LoginForm = ({ onViewChange }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { toastSuccess, toastError } = useToast();
+  const setUser = useSetRecoilState(UserAtom)
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -16,12 +19,12 @@ const LoginForm = ({ onViewChange }) => {
 
     try {
       const response = await axios.post('/auth/login', { email, password });
-      const userId = response.data.user.id; // Extract user ID from response
+      const userId = response.data.user.id;
 
+      localStorage.setItem('user', JSON.stringify(response.data.user))
+      setUser(response.data.user)
       toastSuccess(response.data.message);
-      // Redirect to dashboard with user ID
       navigate(`/dashboard/${userId}`);
-      
     } catch (error) {
       console.error('There was an error logging in:', error.response?.data || error.message);
       toastError(error.response?.data?.error || error.message);
