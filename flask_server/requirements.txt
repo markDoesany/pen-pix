@@ -1,3 +1,6 @@
 flask
-flask-sqlalchemy
-flask-bcrypt
+flask-mailman
+python-dotenv
+SQLAlchemy  
+PyJWT 
+flask-cors
