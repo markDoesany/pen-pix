@@ -13,15 +13,9 @@ const LandingPage = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <button
             onClick={() => navigate('/auth')}
-            className="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300"
+            className="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 w-full"
           >
-            Sign Up
-          </button>
-          <button
-            onClick={() => navigate('/auth')}
-            className="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 px-6 rounded-lg transition duration-300"
-          >
-            Sign In
+            Login
           </button>
         </div>
       </div>
