@@ -1,0 +1,3 @@
+.link{
+  @apply hover:underline hover:text-[#953867]
+}
