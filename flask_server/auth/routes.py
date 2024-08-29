@@ -9,7 +9,7 @@ from config import Config
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'email' not in session:
+        if 'user_id' not in session:
             return jsonify({"error": "Unauthorized access. Please log in."}), 403
         return f(*args, **kwargs)
     return decorated_function
@@ -21,7 +21,7 @@ def login():
 
     user = User.query.filter_by(email=email).first()
     if user and user.check_password(password):
-        session['email'] = email
+        session['email'] = user.id
         return jsonify({"message": "User logged in successfully", "user": user.to_dict()})
     else:
         return jsonify({"error": "Unauthorized"}), 401
@@ -47,7 +47,6 @@ def register():
 def logout():
     session.pop("email", None)
     return jsonify({"message": "User logged out successfully"})
-
 
 @auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
@@ -106,7 +105,7 @@ def verify_reset_token():
     else:
         return jsonify({"error": "Invalid or expired token"}), 400
 
-@auth_bp.route("/user/<int:user_id>", methods=["GET"])
+@auth_bp.route("/user/<string:user_id>", methods=["GET"])
 # @login_required
 def get_user(user_id):
     user = User.query.get(user_id)
