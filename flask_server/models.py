@@ -1,3 +1,4 @@
+import uuid
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
@@ -8,13 +9,13 @@ import os
 db = SQLAlchemy()
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(50), unique=True, nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    email = db.Column(db.String(50), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(150), nullable=False)
     reset_token = db.Column(db.String(100), nullable=True)
     reset_token_expiry = db.Column(db.DateTime, nullable=True)
     SECRET_KEY = os.environ.get("SECRET_KEY")
-    
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
     
@@ -31,7 +32,12 @@ class User(db.Model):
         token = jwt.encode(payload, self.SECRET_KEY, algorithm='HS256')
         self.reset_token = token
         self.reset_token_expiry = payload['exp']
-        db.session.commit()
+        
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
         
         return token
 
@@ -53,3 +59,4 @@ class User(db.Model):
             'id': self.id,
             'email': self.email,
         }
+
