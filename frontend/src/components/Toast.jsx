@@ -22,7 +22,7 @@ const Toast = ({ message, type, onClose }) => {
   }, [onClose]);
 
   return (
-    <div className={`fixed top-4 right-4 p-4 rounded-lg text-white shadow-lg ${getTypeClass()} transition-transform transform-gpu`} style={{ minWidth: '200px' }}>
+    <div className={`fixed bottom-4 right-4 p-4 rounded-lg text-white shadow-lg ${getTypeClass()} transition-transform transform-gpu`} style={{ minWidth: '200px' }}>
       <div className="flex justify-between items-center">
         <span>{message}</span>
         <button onClick={onClose} className="ml-4 text-xl font-bold">&times;</button>
