@@ -1,4 +1,5 @@
 import uuid
+# models.py
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
@@ -8,6 +9,7 @@ import os
 
 db = SQLAlchemy()
 
+# Existing User model for authentication
 class User(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = db.Column(db.String(50), unique=True, nullable=False, index=True)
@@ -60,3 +62,15 @@ class User(db.Model):
             'email': self.email,
         }
 
+# New Task model for task management
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+        }
