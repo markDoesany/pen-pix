@@ -4,7 +4,7 @@ export const TasksAtom = atom({
   key: 'TasksAtom', 
   default: [
     {
-      classNumber: 1,
+      classGroup: 1,
       title: 'Machine Learning',
       totalSubmissions: 30,
       reviewedSubmission: 15,
@@ -13,7 +13,7 @@ export const TasksAtom = atom({
       type: 'Assignment'
     },
     {
-      classNumber: 2,
+      classGroup: 2,
       title: 'Advanced Algorithms Quiz',
       totalSubmissions: 25,
       reviewedSubmission: 20,
@@ -22,7 +22,7 @@ export const TasksAtom = atom({
       type: 'Quiz'
     },
     {
-      classNumber: 3,
+      classGroup: 3,
       title: 'Database Design Project',
       totalSubmissions: 18,
       reviewedSubmission: 5,
@@ -31,7 +31,7 @@ export const TasksAtom = atom({
       type: 'Project'
     },
     {
-      classNumber: 4,
+      classGroup: 4,
       title: 'Software Engineering Midterm Exam',
       totalSubmissions: 22,
       reviewedSubmission: 12,
@@ -40,7 +40,7 @@ export const TasksAtom = atom({
       type: 'Exam'
     },
     {
-      classNumber: 5,
+      classGroup: 5,
       title: 'Operating Systems Lab Report',
       totalSubmissions: 16,
       reviewedSubmission: 8,

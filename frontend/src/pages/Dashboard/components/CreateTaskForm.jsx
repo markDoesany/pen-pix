@@ -49,9 +49,9 @@ const CreateTaskForm = ({ onClose }) => {
   };
 
   const handleSave = () => {
-    const transformedData = formData.classGroups.map((group, groupIndex) => ({
-      classNumber: groupIndex + 1,
-      title: `${formData.title} - ${groupIndex + 1}`,
+    const transformedData = formData.classGroups.map(group => ({
+      classGroup: group.name,
+      title: formData.title,
       totalSubmissions: 0, // Default value
       reviewedSubmission: 0, // Default value
       dueDate: group.dueDate, // Assuming dueDate from formData for illustration
@@ -75,8 +75,7 @@ const CreateTaskForm = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl h-4/5 flex flex-col">
-        <div className="flex-1 overflow-auto">
+      <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-4xl h-4/5 flex flex-col overflow-auto">
           <h2 className="text-xl font-bold mb-4">Create Task</h2>
           
           <div className="space-y-4">
@@ -215,7 +214,6 @@ const CreateTaskForm = ({ onClose }) => {
               </select>
             </div>
           </div>
-        </div>
 
         {/* Form Actions */}
         <div className="mt-6 flex justify-between">
