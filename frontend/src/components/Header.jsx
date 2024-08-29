@@ -30,9 +30,9 @@ const Header = () => {
         <Link> <img src="/icons/PenPix-txt.png" alt="Logo" /> </Link>
       </div>
 
-      <navbar className="navbar flex items-center">
+      <div className="navbar flex items-center">
         <Links/>
-      </navbar>
+      </div>
 
       <div className="user-menu flex items-center gap-5 font-semibold">
         <p>Hello bro!</p>
