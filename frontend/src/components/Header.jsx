@@ -13,7 +13,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.put('/auth/logout');
+      const response = await axios.post('/auth/logout');
       toastSuccess(response.data.message);
       localStorage.removeItem("user")
       setCurrentUser(null)

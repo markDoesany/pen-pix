@@ -1,18 +1,18 @@
 # auth/routes.py
-from functools import wraps
 from flask import request, session, jsonify
 from auth import auth_bp
-from models import User, db  # Use absolute import here
+from models import User, db 
 from flask_mailman import EmailMessage
 from config import Config
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            return jsonify({"error": "Unauthorized access. Please log in."}), 403
-        return f(*args, **kwargs)
-    return decorated_function
+
+@auth_bp.route('/check-session',methods=["GET"])
+def check_session():
+    if 'user_id' in session:
+        return "Session is active", 201
+    else:
+        return "Session has expired or doesn't exist", 401
+
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
@@ -21,7 +21,7 @@ def login():
 
     user = User.query.filter_by(email=email).first()
     if user and user.check_password(password):
-        session['email'] = user.id
+        session['user_id'] = user.id
         return jsonify({"message": "User logged in successfully", "user": user.to_dict()})
     else:
         return jsonify({"error": "Unauthorized"}), 401
@@ -40,13 +40,14 @@ def register():
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
-        session['email'] = email
+        session['user_id'] = new_user.id
         return jsonify({"message": "User registered successfully"})
 
-@auth_bp.route("/logout", methods=["PUT"])
+@auth_bp.route("/logout", methods=["POST"])
 def logout():
-    session.pop("email", None)
+    session.pop("user_id", None)
     return jsonify({"message": "User logged out successfully"})
+
 
 @auth_bp.route("/forgot-password", methods=["POST"])
 def forgot_password():
@@ -106,7 +107,6 @@ def verify_reset_token():
         return jsonify({"error": "Invalid or expired token"}), 400
 
 @auth_bp.route("/user/<string:user_id>", methods=["GET"])
-# @login_required
 def get_user(user_id):
     user = User.query.get(user_id)
     if user:
