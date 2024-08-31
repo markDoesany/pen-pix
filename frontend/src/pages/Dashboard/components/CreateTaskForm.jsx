@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { TasksAtom } from '../../../atoms/TasksAtom';
+import { formatDate } from '../../../utils/helpers';
 import axios from 'axios';
 
 const CreateTaskForm = ({ onClose }) => {
@@ -17,6 +18,16 @@ const CreateTaskForm = ({ onClose }) => {
 
   const currentTasks = useRecoilValue(TasksAtom);
   const setTasks = useSetRecoilState(TasksAtom);
+
+  useEffect(() => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      classGroup: {
+        ...prevFormData.classGroup,
+        dueDate: formatDate(new Date()),
+      },
+    }));
+  }, []);
 
   const handleInputChange = (e, index, field, group) => {
     const { name, value } = e.target;
@@ -260,7 +271,7 @@ const CreateTaskForm = ({ onClose }) => {
               <input
                 id="dueDate"
                 name="dueDate"
-                type="date"
+                type="datetime-local"
                 value={formData.classGroup.dueDate}
                 onChange={(e) => handleInputChange(e, null, 'dueDate', 'classGroup')}
                 className={`w-full px-3 py-2 border ${validationErrors.dueDate ? 'border-red-500' : 'border-gray-300'} rounded-md`}

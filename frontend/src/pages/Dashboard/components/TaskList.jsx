@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TaskMenu from "./TaskMenu";
+import { formatDueDateTime } from "../../../utils/helpers";
+import useDeleteTask from '../../../hooks/useDeleteTask'
 
-
-const TaskList = ({ filter, tasks }) => {
+const TaskList = ({ filter, tasks, refreshTasks }) => {
   const [openTask, setOpenTask] = useState(null); // State to track the open task
   const navigate = useNavigate()
+  const { handleDeleteTask: deleteTask } = useDeleteTask()
 
   const filteredTasks = tasks.filter(task => {
     if (filter === 'All') return true;
@@ -20,6 +22,11 @@ const TaskList = ({ filter, tasks }) => {
 
   const handleSelectedTask = ( taskId ) =>{
     navigate(`/task/${taskId}`)
+  }
+
+  const handleDeleteTask = async(taskId) =>{
+    await deleteTask(taskId)
+    refreshTasks()
   }
 
   return (
@@ -39,24 +46,24 @@ const TaskList = ({ filter, tasks }) => {
           className="grid grid-cols-9 gap-4 text-sm border-b py-5 hover:bg-gray-200 rounded-b-sm cursor-pointer items-center relative"
           onClick={ () => handleSelectedTask(task.id) }
         >
-          <div className="text-gray-500 pl-3 col-span-1">{task.class_group}</div>
-          <div className="col-span-2">{task.title}</div>
+          <div className="text-gray-500 pl-3 col-span-1 font-semibold">{task.class_group}</div>
+          <div className="col-span-2 font-semibold">{task.title}</div>
           <div className="text-center col-span-1">
             {task.reviewed_submissions}/{task.total_submissions}
           </div>
-          <div className="text-center col-span-2">{task.due_date}</div>
+          <div className="text-center col-span-2">{formatDueDateTime(task.due_date)}</div>
           <div
-            className={`text-center col-span-1 ${
+            className={`text-center col-span-1 font-semibold ${
               task.status === "Ongoing" ? "text-red-500" : "text-green-500"
             }`}
           >
             {task.status}
           </div>
-          <div className="text-center col-span-1">{task.type}</div>
+          <div className="text-center col-span-1 font-semibold">{task.type}</div>
           <button className="text-right col-span-1 pr-4" onClick={(event) => handleMenu(event, task)}>
             <img className="inline-block" src="/icons/meatballs_menu.svg" alt="Menu icon" />
           </button>
-          {openTask === task && <TaskMenu task={task}/>}
+          {openTask === task && <TaskMenu onDelete={() => handleDeleteTask(task.id)}/>}
         </div>
       ))}
     </div>
