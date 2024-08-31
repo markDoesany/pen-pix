@@ -5,6 +5,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilValue } from 'recoil';
 import { UserAtom } from '../../atoms/UserAtom';
 import FilesList from './components/FilesList';
+import { formatDueDateTime } from '../../utils/helpers';
+import useDeleteTask from '../../hooks/useDeleteTask';
 
 const TaskPage = () => {
   const [task, setTask] = useState({});
@@ -13,6 +15,7 @@ const TaskPage = () => {
   const currentUser = useRecoilValue(UserAtom);
   const { taskId } = useParams();
   const navigate = useNavigate();
+  const { handleDeleteTask: deleteTask}  = useDeleteTask()
 
   const fetchFiles = useCallback(async () => {
     try {
@@ -86,19 +89,8 @@ const TaskPage = () => {
   };
 
   const handleDeleteTask = async () => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
-      try {
-        const response = await axios.delete(`/task/delete-task/${taskId}`, {
-          withCredentials: true,
-        });
-        
-        console.log("Task deleted:", response.data);
-        navigate(`/dashboard/${currentUser.id}`);
-      } catch (error) {
-        console.error("Error deleting task:", error);
-        alert("An error occurred while deleting the task. Please try again.");
-      }
-    }
+    await deleteTask(taskId)
+    navigate(`/dashboard/${currentUser.id}`);
   };
 
   const refreshFiles = () => {
@@ -151,8 +143,19 @@ const TaskPage = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700">Class Schedule</label>
                 <input
-                  type="date"
+                  type="text"
                   value={task.class_schedule}
+                  onChange={(e) =>
+                    setTask({ ...task, class_schedule: e.target.value })
+                  }
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Due Date</label>
+                <input
+                  type="datetime-local"
+                  value={task.due_date}
                   onChange={(e) =>
                     setTask({ ...task, class_schedule: e.target.value })
                   }
@@ -201,8 +204,8 @@ const TaskPage = () => {
               <p className="text-gray-500">Class: {task.class_group}</p>
               <p className="text-gray-500">Type: {task.type}</p>
               <p className="text-gray-500">Class Schedule: {task.class_schedule}</p>
-              <p className="text-gray-500">Updated At: {task.updated_at}</p>
-              <p className="text-gray-500">Due Date: {task.due_date}</p>
+              <p className="text-gray-500">Updated At: {formatDueDateTime(task.updated_at)}</p>
+              <p className="text-gray-500">Due Date: {formatDueDateTime(task.due_date)}</p>
               <p className="text-gray-500">Status: {task.status}</p>
               <p className="text-gray-500">
                 Submissions: {task.reviewed_submissions}/{task.total_submissions}

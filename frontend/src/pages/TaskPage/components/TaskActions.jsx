@@ -27,6 +27,11 @@ const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload }
       ) : (
         <>
           <button
+            className="w-full bg-orange-700 text-white p-2 rounded"
+          >
+            Analyze Submission
+          </button>
+          <button
             className="w-full bg-blue-500 text-white p-2 rounded"
             onClick={onEdit}
           >
