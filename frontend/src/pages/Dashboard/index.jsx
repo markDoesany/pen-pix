@@ -6,31 +6,47 @@ import useErrorHandler from '../../hooks/useErrorHandler';
 import FilterCreateNav from './components/FilterCreateNav.jsx';
 import TaskList from './components/TaskList.jsx';
 import { UserAtom } from '../../atoms/UserAtom';
-import { useRecoilValue } from "recoil";
 import {TasksAtom}  from '../../atoms/TasksAtom.js'
 
 const Dashboard = () => {
   const { userId } = useParams(); 
   const [currentUser, setCurrentUser] = useRecoilState(UserAtom);
+  const [tasks, setTasks] = useRecoilState(TasksAtom)
   const [filter, setFilter] = useState('All');
   const { handleError } = useErrorHandler();
-  const tasks = useRecoilValue(TasksAtom)
+
+  const getTasks = async () => {
+    try {
+      const response = await axios.get('/task/get-tasks', { withCredentials: true })
+      const tasks = response.data
+      console.log(tasks)
+      setTasks(tasks)
+
+    } catch (error) {
+      if (error.response.status === 401) {
+        setCurrentUser(null)
+        localStorage.removeItem('user')
+        handleError('unauthorized', 'Your session has expired. Login again.');
+    }
+  }
+  }
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
         const response = await axios.get(`/auth/user/${userId}`);
         const fetchedUser = response.data.user;
-        if (currentUser && currentUser.id !== fetchedUser.id) {
+        if (currentUser?.id !== fetchedUser.id) {
           console.log("Unauthorized");
           handleError('unauthorized', "You are not authorized to access this page.")
           return;
         }
-
         setCurrentUser(fetchedUser);
+        getTasks()
+
       } catch (error) {
         if (error.response.status === 401) {
-          handleError('unauthorized', 'You are not authorized to view this page.');
+          handleError('unauthorized', 'Your session has expired. Login again.');
         } else if (error.response.status === 404) {
           handleError('404', 'The resource you are looking for could not be found.');
         } else {

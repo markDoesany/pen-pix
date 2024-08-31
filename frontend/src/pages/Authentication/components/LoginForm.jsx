@@ -18,9 +18,11 @@ const LoginForm = ({ onViewChange }) => {
     setLoading(true); // Start loading
 
     try {
-      const response = await axios.post('/auth/login', { email, password });
+      const response = await axios.post('/auth/login', { email, password }, {
+        withCredentials: true
+      });
       const userId = response.data.user.id;
-
+      console.log("response",response)
       localStorage.setItem('user', JSON.stringify(response.data.user))
       setUser(response.data.user)
       toastSuccess(response.data.message);
