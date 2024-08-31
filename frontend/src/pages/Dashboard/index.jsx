@@ -1,35 +1,23 @@
+// Dashboard.jsx
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import axios from 'axios';
 import useErrorHandler from '../../hooks/useErrorHandler';
 import FilterCreateNav from './components/FilterCreateNav.jsx';
 import TaskList from './components/TaskList.jsx';
 import { UserAtom } from '../../atoms/UserAtom';
-import {TasksAtom}  from '../../atoms/TasksAtom.js'
+import { TasksAtom } from '../../atoms/TasksAtom.js';
+import useGetTasks from '../../hooks/useGetTasks.jsx';
+import EmptyTasksPlaceholder from './components/EmptyTaskPlaceholder.jsx'
 
 const Dashboard = () => {
-  const { userId } = useParams(); 
+  const { userId } = useParams();
   const [currentUser, setCurrentUser] = useRecoilState(UserAtom);
-  const [tasks, setTasks] = useRecoilState(TasksAtom)
+  const tasks = useRecoilValue(TasksAtom);
   const [filter, setFilter] = useState('All');
   const { handleError } = useErrorHandler();
-
-  const getTasks = async () => {
-    try {
-      const response = await axios.get('/task/get-tasks', { withCredentials: true })
-      const tasks = response.data
-      console.log(tasks)
-      setTasks(tasks)
-
-    } catch (error) {
-      if (error.response.status === 401) {
-        setCurrentUser(null)
-        localStorage.removeItem('user')
-        handleError('unauthorized', 'Your session has expired. Login again.');
-    }
-  }
-  }
+  const getTasks = useGetTasks();
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -38,12 +26,10 @@ const Dashboard = () => {
         const fetchedUser = response.data.user;
         if (currentUser?.id !== fetchedUser.id) {
           console.log("Unauthorized");
-          handleError('unauthorized', "You are not authorized to access this page.")
+          handleError('unauthorized', "You are not authorized to access this page.");
           return;
         }
         setCurrentUser(fetchedUser);
-        getTasks()
-
       } catch (error) {
         if (error.response.status === 401) {
           handleError('unauthorized', 'Your session has expired. Login again.');
@@ -56,6 +42,7 @@ const Dashboard = () => {
       }
     };
     fetchCurrentUser();
+    getTasks();
   }, []);
 
   if (!currentUser) {
@@ -66,10 +53,18 @@ const Dashboard = () => {
     setFilter(filter);
   };
 
+  const refreshTasks = async () => {
+    await getTasks();
+  };
+
   return (
     <div className="mt-10 flex flex-col w-full">
       <FilterCreateNav onFilterChange={handleFilterChange} />
-      <TaskList filter={filter} tasks={tasks}/>
+      {tasks.length === 0 ? (
+        <EmptyTasksPlaceholder />
+      ) : (
+        <TaskList filter={filter} tasks={tasks} refreshTasks={refreshTasks} />
+      )}
     </div>
   );
 };
