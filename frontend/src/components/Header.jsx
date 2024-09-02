@@ -1,23 +1,16 @@
 import Links from "./Links"
 import { Link } from "react-router-dom"
-import axios from "axios";
 import useToast from "../hooks/useToast";
-import { UserAtom } from "../atoms/UserAtom";
-import { useSetRecoilState } from "recoil";
-import { useNavigate } from "react-router-dom";
+import useLogout from "../hooks/useLogoutUser";
 
 const Header = () => {
   const { toastSuccess, toastError } = useToast()
-  const setCurrentUser = useSetRecoilState(UserAtom)
-  const navigate = useNavigate()
+  const { logout } = useLogout()
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post('/auth/logout');
-      toastSuccess(response.data.message);
-      localStorage.removeItem("user")
-      setCurrentUser(null)
-      navigate('/auth'); // Redirect to login page after logout
+      logout()
+      toastSuccess('Logout Successfully')
     } catch (error) {
       console.error('Error logging out:', error);
       toastError('Logout failed');
