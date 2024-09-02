@@ -3,11 +3,11 @@ import os
 from files import files_bp
 from utils.auth_helpers import login_required
 from models import db, UploadedFile, Task
-from flask import jsonify, request, send_from_directory
+from flask import jsonify, request, send_from_directory, url_for
 
 @files_bp.route('/<int:task_id>/<filename>')
 def serve_file(task_id, filename):
-    TASK_FOLDER = os.path.join('images', str(task_id))
+    TASK_FOLDER = os.path.join('static', 'images', str(task_id))
     return send_from_directory(TASK_FOLDER, filename)
 
 @login_required
@@ -24,9 +24,8 @@ def upload_files():
         return jsonify({"message": "Task not found"}), 404
 
     uploaded_files = []
-    TASK_FOLDER = os.path.join('images', str(task_id))  # Task-specific folder
+    TASK_FOLDER = os.path.join('static', 'images', str(task_id))  # Task-specific folder
 
-    # Create the task-specific folder if it does not exist
     if not os.path.exists(TASK_FOLDER):
         os.makedirs(TASK_FOLDER)
 
@@ -42,13 +41,23 @@ def upload_files():
         except Exception as e:
             return jsonify({"message": f"File save error: {str(e)}"}), 500
 
+
         new_file = UploadedFile(
             filename=filename,
-            filepath=filepath,
+            filepath=os.path.join('images', str(task_id), filename),
             mimetype=file.mimetype,
-            task_id=task_id  # Associate with the task
+            task_id=task_id,
         )
         db.session.add(new_file)
+        
+        file_url = url_for('files.serve_file', task_id=task_id, filename=filename, _external=True)
+        uploaded_files.append({
+            'filename': filename,
+            'file_url': file_url,
+            'mimetype': file.mimetype,
+            'task_id': task_id
+        })
+        
         uploaded_files.append(new_file.to_dict())
 
     try:
@@ -81,7 +90,7 @@ def delete_file(file_id):
         return jsonify({"message": "File not found"}), 404
 
     try:
-        os.remove(file.filepath)  # Remove file from filesystem
+        os.remove(os.path.join('static', file.filepath))  # Remove file from filesystem
         db.session.delete(file)   # Remove file record from database
         db.session.commit()
     except Exception as e:

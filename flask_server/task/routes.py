@@ -46,7 +46,6 @@ def create_task():
 
     return jsonify(task.to_dict()), 201
 
-
 @login_required
 @task_bp.route('/get-tasks', methods=['GET'])
 def list_tasks():
@@ -112,7 +111,7 @@ def delete_task(task_id):
         if not task:
             return jsonify({"message": "Task not found"}), 404
 
-        TASK_FOLDER = os.path.join('images', str(task_id))
+        TASK_FOLDER = os.path.join('static', 'images', str(task_id))
         if os.path.exists(TASK_FOLDER):
             shutil.rmtree(TASK_FOLDER) 
 

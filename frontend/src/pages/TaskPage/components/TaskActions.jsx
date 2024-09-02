@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 
-const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload }) => {
+const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload, onAnalyze }) => {
   const fileInputRef = useRef(null);
 
   const handleUploadClick = () => {
@@ -28,6 +28,7 @@ const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload }
         <>
           <button
             className="w-full bg-orange-700 text-white p-2 rounded"
+            onClick={onAnalyze}
           >
             Analyze Submission
           </button>

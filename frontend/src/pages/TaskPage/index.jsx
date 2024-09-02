@@ -96,6 +96,11 @@ const TaskPage = () => {
     navigate(`/dashboard/${currentUser.id}`);
   };
 
+  const handleAnalyzeSubmission = () =>{
+    navigate('/circuit-evaluator')
+  }
+
+
   const refreshFiles = () => {
     fetchFiles();
   };
@@ -237,6 +242,7 @@ const TaskPage = () => {
           onCancel={handleCancelEdit}
           onDelete={handleDeleteTask}
           onUpload={handleUpload}
+          onAnalyze={handleAnalyzeSubmission}
         />
       </div>
 
