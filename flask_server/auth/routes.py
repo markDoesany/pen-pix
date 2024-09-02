@@ -13,7 +13,6 @@ def check_session():
     else:
         return "Session has expired or doesn't exist", 401
 
-
 @auth_bp.route("/login", methods=["POST"])
 def login():
     email = request.json.get("email")
