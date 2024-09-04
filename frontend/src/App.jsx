@@ -17,14 +17,14 @@ const App = () => {
   const location = useLocation();
   const state = location.state || {};
   const user = useRecoilValue(UserAtom);
-  const pathsWithoutNavbar = ['/auth', '/', '/reset-password'];
+  const pathsWithoutNavbar = ['/auth', '/', '/reset-password', '/circuit-evaluator'];
   const showNavbar = !pathsWithoutNavbar.includes(location.pathname);
   const isAuthOrLandingPage = pathsWithoutNavbar.includes(location.pathname);
 
   return (
     <ToastProvider> 
-      <main className={`${isAuthOrLandingPage ? '' : 'flex justify-center items-center min-h-screen bg-gray-100'}`}>
-        <div className={`${isAuthOrLandingPage ? '' : 'flex flex-col max-w-6xl w-full min-h-screen p-5'}`}>
+      <main className={`${isAuthOrLandingPage ? '' : 'flex justify-center items-center w-full min-h-screen bg-gray-100'}`}>
+        <div className={`${isAuthOrLandingPage ? '' : 'flex flex-col max-w-6xl min-h-screen p-5 w-full'}`}>
           {showNavbar && <Header />}
           <Routes>
             <Route path="/" element={<LandingPage />} />
