@@ -1,0 +1,15 @@
+.tool {
+  @apply flex flex-col items-center justify-center gap-2 w-full hover:bg-primaryColor rounded-lg py-3 px-2 cursor-pointer
+}
+
+.tool_label{
+  @apply font-light text-xs text-center
+}
+
+.assessment_tool{
+  @apply flex flex-col justify-center items-center text-center font-semibold text-sm gap-2 p-5 hover:bg-primaryColor border border-borderGray rounded-lg cursor-pointer
+}
+
+label{
+  @apply cursor-pointer
+}
