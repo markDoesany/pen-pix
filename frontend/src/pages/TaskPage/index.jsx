@@ -9,7 +9,6 @@ import FilesList from './components/FilesList';
 import { formatDueDateTime } from '../../utils/helpers';
 import useDeleteTask from '../../hooks/useDeleteTask';
 
-
 const TaskPage = () => {
   const [task, setTask] = useState({});
   const [files, setFiles] = useRecoilState(FilesAtom)
@@ -18,7 +17,6 @@ const TaskPage = () => {
   const { taskId } = useParams();
   const navigate = useNavigate();
   const { handleDeleteTask: deleteTask}  = useDeleteTask()
-
   const fetchFiles = useCallback(async () => {
     try {
       const response = await axios.get(`/files/get-files/${taskId}`);
@@ -97,7 +95,7 @@ const TaskPage = () => {
   };
 
   const handleAnalyzeSubmission = () =>{
-    navigate('/circuit-evaluator')
+    navigate(`/circuit-evaluator/${task.id}`)
   }
 
 

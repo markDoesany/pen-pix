@@ -13,7 +13,7 @@ export default {
         primaryColor: "#953867",
         primaryBg: "#242424",
         secondaryBg: "#2F2F2F",
-        thirdBg: "#33363F",
+        thirdBg: "#3E4557",
         textGray: "#D9D9D9",
         borderGray: "#686868",
 
