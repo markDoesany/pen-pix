@@ -1,10 +1,9 @@
-import { FaCircle, FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 
-const AnswerKeys = () => {
+const AnswerKeys = ({ onAdd }) => {
   return (
     <div className="bg-secondaryBg text-textGray text-sm rounded-lg w-full h-[280px] flex flex-col items overflow-hidden ">
       <div className="bg-thirdBg flex justify-center items-center relative p-2">
-        <FaCircle size={12} color="#FFEA00" className="absolute left-2"/>
         <h1 className="text-white font-semibold">Answer Keys</h1>
       </div>
       <div className="h-[180px] flex flex-col gap-2 pr-5 pl-2 py-4">
@@ -20,7 +19,7 @@ const AnswerKeys = () => {
         </div>
       </div>
       <div className="flex justify-end px-5">
-        <button className="bg-primaryColor px-8 py-2 font-semibold text-sm rounded-full">Add</button>
+        <button className="bg-primaryColor px-8 py-2 font-semibold text-sm rounded-full" onClick={onAdd}>Add</button>
       </div>
     </div>
   );
