@@ -115,7 +115,7 @@ class UploadedFile(db.Model):
     mimetype = db.Column(db.String(50), nullable=False)
     upload_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
-    
+    graded = db.Column(db.Boolean, default=False, nullable=False) 
     @property
     def file_url(self):
         return url_for('files.serve_file', task_id=self.task_id, filename=self.filename, _external=True)
@@ -126,6 +126,6 @@ class UploadedFile(db.Model):
             'filename': self.filename,
             'filepath': self.filepath,
             'mimetype': self.mimetype,
-            'file_url': self.file_url
+            'file_url': self.file_url,
+            'graded': self.graded  # Include graded in the dict
         }
-
