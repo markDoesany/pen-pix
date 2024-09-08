@@ -5,7 +5,6 @@ from models import User, db
 from flask_mailman import EmailMessage
 from config import Config
 
-
 @auth_bp.route('/check-session',methods=["GET"])
 def check_session():
     if 'user_id' in session:

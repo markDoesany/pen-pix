@@ -26,7 +26,6 @@ const CircuitInspectorPage = () => {
     
     const imageUrl = URL.createObjectURL(response.data);
     
-    // Check if the threshold value is greater than 0 before updating the state
     if (thresholdValue > 0) {
       setCurrentFile(prevFile => ({
         ...prevFile,
