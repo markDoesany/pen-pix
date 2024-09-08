@@ -16,50 +16,63 @@ const CircuitInspectorPage = () => {
   const [currentCircuitData, setCurrentCircuitData] = useState(null);
   const files = useRecoilValue(FilesAtom);
 
-  const handleApplyThreshold = async (thresholdValue, mode) => {
-    try {
-      const response = await axios.post('/detect-gates/set-filter-threshold', {
-        thresholdValue,
-        mode,
-        fileId: currentFile?.id
-      }, { responseType: 'blob' });  
-      console.log(response.data)
-      const imageUrl = URL.createObjectURL(response.data);
-
+  const handleApplyThreshold = async (thresholdValue, mode = 'single') => {
+  try {
+    const response = await axios.post('/detect-gates/set-filter-threshold', {
+      thresholdValue,
+      mode,
+      fileId: currentFile?.id
+    }, { responseType: 'blob' });
+    
+    const imageUrl = URL.createObjectURL(response.data);
+    
+    // Check if the threshold value is greater than 0 before updating the state
+    if (thresholdValue > 0) {
       setCurrentFile(prevFile => ({
         ...prevFile,
         file_url: imageUrl
       }));
-
-    } catch (error) {
-      console.error('Error applying threshold:', error);
+    } else {
+      // If threshold is not greater than 0, keep the original image
+      setCurrentFile(prevFile => prevFile);
     }
-  };
+  } catch (error) {
+    console.error('Error applying threshold:', error);
+  }
+};
 
   const handleCurrentFile = (file) => {
     setCurrentFile(file);
   };
 
+  // Effect to handle when currentFile is updated
   useEffect(() => {
     console.log("Updated current file", currentFile);
   }, [currentFile]);
 
+  // Set the first file as current file
   useEffect(() => {
     setCurrentFile(files[0]);
   }, [files]);
 
-  useEffect(()=>{
-    const getCircuitData = async() =>{
-      try {
-        const response = await axios.get(`/detect-gates/get-circuit-data/${currentFile.id}`)
-        setCurrentCircuitData(response.data.circuit_analysis)
-      } catch (error) {
-        console.log(error.message)
+  // Fetch circuit data when currentFile changes
+  useEffect(() => {
+    const getCircuitData = async () => {
+      if (currentFile?.id) {
+        try {
+          const response = await axios.get(`/detect-gates/get-circuit-data/${currentFile.id}`);
+          setCurrentCircuitData(response.data.circuit_analysis);
+        } catch (error) {
+          console.log(error.message);
+        }
       }
-    } 
-    getCircuitData()
-  }, [currentFile?.id])
+    };
+    getCircuitData();
+  }, [currentFile?.id]);
 
+  useEffect(()=>{ 
+    handleApplyThreshold(currentCircuitData?.threshold_value)
+  }, [currentCircuitData])
 
   if (loading) return <div>Loading...</div>;
 
@@ -73,7 +86,7 @@ const CircuitInspectorPage = () => {
         <div className="">
           <LeftSidebar task={task} 
                        onApplyThreshold={handleApplyThreshold} 
-                       circuitData={currentCircuitData}/>
+                       circuitData={currentCircuitData} />
         </div>
 
         <div className="flex-grow">
