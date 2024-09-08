@@ -1,33 +1,31 @@
 import { useState } from 'react'
 import ReactSlider from 'react-slider'
 
-const SetThresholdSlider = () => {
-  const [thresholdValue, SetThresholdValue] = useState(0)
+const SetThresholdSlider = ({ onApplyThreshold, value }) => {
+  const [thresholdValue, setThresholdValue] = useState(value) 
+
+  const applyThreshold = (mode) => {
+    onApplyThreshold(thresholdValue, mode) 
+  }
 
   return (
-    <div className='bg-secondaryBg p-4 rounded-lg w-[370px] flex flex-col gap-4'>
-      <h1 className='font-semibold'>Set Threshold:</h1>
+    <div className='bg-secondaryBg p-4 rounded-lg w-[250px] flex flex-col gap-4'>
+      <h1 className='font-semibold'>Set Threshold (0 - 255):</h1>
       <div className='flex items-center gap-5'>
         <ReactSlider
           className="w-full h-2 rounded-lg items-center flex" 
           thumbClassName="w-5 h-5 bg-primaryColor rounded-full" 
-          trackClassName="h-2 bg-primaryBg" // Unfilled track styling
-          onChange={(value) => SetThresholdValue(value)}
-          value={thresholdValue} // Bind value to state
-          renderTrack={(props, state) => (
-            <div
-              {...props}
-              className={`h-2 rounded-lg ${
-                state.index === 0 ? 'bg-[#65364E]' : 'bg-primaryBg'
-              }`}
-            />
-          )}
+          trackClassName="h-2 bg-primaryBg"
+          min={0}  
+          max={255} 
+          onChange={(value) => setThresholdValue(value)}
+          value={thresholdValue}
         />
-        <span className='w-[55px] bg-[#474747] text-center p-1 rounded-lg text-sm'>{thresholdValue}%</span>
+        <span className='w-[55px] bg-[#474747] text-center p-1 rounded-lg text-sm'>{thresholdValue}</span>
       </div>
-      <div className='flex justify-between text-sm'>
-        <button className='bg-primaryColor p-2 rounded-lg'>Apply to current image</button>
-        <button className='bg-thirdBg p-2 rounded-lg'>Apply to all images</button>
+      <div className='flex flex-col gap-2 justify-between text-sm'>
+        <button className='bg-primaryColor p-2 rounded-lg' onClick={() => applyThreshold('single')}>Apply to current image</button>
+        <button className='bg-thirdBg p-2 rounded-lg' onClick={() => applyThreshold('multiple')}>Apply to all images</button>
       </div>
     </div>
   )

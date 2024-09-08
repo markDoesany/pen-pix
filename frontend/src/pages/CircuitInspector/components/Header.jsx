@@ -4,12 +4,10 @@ import { Link } from "react-router-dom";
 import { UserAtom } from "../../../atoms/UserAtom";
 import { useRecoilValue } from "recoil";
 import { formatDueDateTime } from "../../../utils/helpers";
-import { useState, useEffect, useRef } from "react";
+import { useState} from "react";
 
 const Header = ({ task, files, onCurrentFileChange }) => {
   const currentUser = useRecoilValue(UserAtom);
-  const currentFileRef = useRef(null);
-
   const formattedOptions = files?.map((file) => ({
     id: file.id,
     value: file.file_url,
@@ -21,26 +19,26 @@ const Header = ({ task, files, onCurrentFileChange }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentFile = formattedOptions[currentIndex];
 
-  useEffect(() => {
-    if (currentFileRef.current && onCurrentFileChange) {
-      onCurrentFileChange(currentFileRef.current);
-    }
-  }, [currentFileRef, onCurrentFileChange]);
-
   const handleSelectedSubmission = (selectedSubmission) => {
     const newIndex = formattedOptions.findIndex(option => option.id === selectedSubmission.id);
-    setCurrentIndex(newIndex);  // Update the index
-  };
+    setCurrentIndex(newIndex); 
+    const currentFile = files[newIndex];
+    onCurrentFileChange(currentFile)
+  };  
 
   const handleArrowLeft = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
+      const currentFile = files[currentIndex-1];
+      onCurrentFileChange(currentFile)
     }
   };
 
   const handleArrowRight = () => {
     if (currentIndex < formattedOptions.length - 1) {
       setCurrentIndex(currentIndex + 1);
+      const currentFile = files[currentIndex+1];
+      onCurrentFileChange(currentFile)
     }
   };
 
@@ -54,10 +52,10 @@ const Header = ({ task, files, onCurrentFileChange }) => {
       </div>
 
       <div className="flex-1 flex justify-between items-center border-r-2 border-l-2 border-borderGray px-7">
-        <div className="flex-grow">
+        <Link to={`/task/${task.id}`} className="flex-grow">
           <h3 className="font-semibold text-sm">{task.title}</h3>
           <small>Due date: {formatDueDateTime(task.due_date)}</small>
-        </div>
+        </Link>
         <div className="flex items-center justify-between gap-10 w-[150px]">
           <div className="flex flex-col items-center">
             <p>0/{files.length}</p>
