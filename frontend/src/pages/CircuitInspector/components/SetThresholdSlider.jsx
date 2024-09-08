@@ -8,6 +8,7 @@ const SetThresholdSlider = ({ onApplyThreshold, value }) => {
     onApplyThreshold(thresholdValue, mode) 
   }
 
+
   return (
     <div className='bg-secondaryBg p-4 rounded-lg w-[250px] flex flex-col gap-4'>
       <h1 className='font-semibold'>Set Threshold (0 - 255):</h1>

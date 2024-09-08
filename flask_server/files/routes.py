@@ -66,7 +66,7 @@ def upload_files():
         
         # Create CircuitAnalysis after getting the file ID
         new_circuit_analysis = CircuitAnalysis(
-            threshold_value=180,
+            threshold_value=0,
             predictions={},
             boolean_expressions=[],
             netlist={},

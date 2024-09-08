@@ -114,6 +114,8 @@ class UploadedFile(db.Model):
     upload_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
     graded = db.Column(db.Boolean, default=False, nullable=False) 
+    circuit_analysis = db.relationship('CircuitAnalysis', backref='uploaded_file', lazy=True, cascade="all, delete-orphan")
+     
     @property
     def file_url(self):
         return url_for('files.serve_file', task_id=self.task_id, filename=self.filename, _external=True)
