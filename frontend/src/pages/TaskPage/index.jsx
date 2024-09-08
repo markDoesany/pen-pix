@@ -2,15 +2,17 @@ import TaskActions from './components/TaskActions';
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { UserAtom } from '../../atoms/UserAtom';
+import { FilesAtom } from '../../atoms/FilesAtom'
 import FilesList from './components/FilesList';
 import { formatDueDateTime } from '../../utils/helpers';
 import useDeleteTask from '../../hooks/useDeleteTask';
 
+
 const TaskPage = () => {
   const [task, setTask] = useState({});
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useRecoilState(FilesAtom)
   const [isEditing, setIsEditing] = useState(false); // State to track if in edit mode
   const currentUser = useRecoilValue(UserAtom);
   const { taskId } = useParams();
@@ -25,7 +27,7 @@ const TaskPage = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [taskId]);
+  }, [taskId, setFiles]);
 
   useEffect(() => {
     const getTask = async () => {
@@ -59,6 +61,7 @@ const TaskPage = () => {
         },
         withCredentials: true,
       });
+
       console.log('Files uploaded:', response.data);
       fetchFiles(); // Refresh the files list
     } catch (error) {
