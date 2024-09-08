@@ -4,19 +4,65 @@ import RightSideBar from "./components/RightSideBar";
 import ImageDisplay from "./components/ImageDisplay";
 import { useParams } from "react-router-dom";
 import useGetTask from '../../hooks/useGetTask';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FilesAtom } from "../../atoms/FilesAtom";
+import { useRecoilValue } from "recoil";
+import axios from "axios";
 
 const CircuitInspectorPage = () => {
   const { taskId } = useParams();
-  const { task, files, loading} = useGetTask(taskId);
-  const [ currentFile, setCurrentFile ] = useState(files[0])
+  const { task, loading } = useGetTask(taskId);
+  const [currentFile, setCurrentFile] = useState(null);
+  const [currentCircuitData, setCurrentCircuitData] = useState(null);
+  const files = useRecoilValue(FilesAtom);
 
-  const handleCurrentFile = (file) =>{
-    setCurrentFile(file)
-  }
+  const handleApplyThreshold = async (thresholdValue, mode) => {
+    try {
+      const response = await axios.post('/detect-gates/set-filter-threshold', {
+        thresholdValue,
+        mode,
+        fileId: currentFile?.id
+      }, { responseType: 'blob' });  
+      console.log(response.data)
+      const imageUrl = URL.createObjectURL(response.data);
+
+      setCurrentFile(prevFile => ({
+        ...prevFile,
+        file_url: imageUrl
+      }));
+
+    } catch (error) {
+      console.error('Error applying threshold:', error);
+    }
+  };
+
+  const handleCurrentFile = (file) => {
+    setCurrentFile(file);
+  };
+
+  useEffect(() => {
+    console.log("Updated current file", currentFile);
+  }, [currentFile]);
+
+  useEffect(() => {
+    setCurrentFile(files[0]);
+  }, [files]);
+
+  useEffect(()=>{
+    const getCircuitData = async() =>{
+      try {
+        const response = await axios.get(`/detect-gates/get-circuit-data/${currentFile.id}`)
+        setCurrentCircuitData(response.data.circuit_analysis)
+      } catch (error) {
+        console.log(error.message)
+      }
+    } 
+    getCircuitData()
+  }, [currentFile?.id])
+
 
   if (loading) return <div>Loading...</div>;
-  console.log(files[0])
+
   return (
     <div className="bg-[#242424] min-h-screen flex flex-col">
       <header className="bg-[#333]">
@@ -25,11 +71,13 @@ const CircuitInspectorPage = () => {
 
       <main className="flex flex-grow">
         <div className="">
-          <LeftSidebar task={task}/>
+          <LeftSidebar task={task} 
+                       onApplyThreshold={handleApplyThreshold} 
+                       circuitData={currentCircuitData}/>
         </div>
 
         <div className="flex-grow">
-          <ImageDisplay image={currentFile} />
+          <ImageDisplay file={currentFile} />
         </div>
 
         <div className="">

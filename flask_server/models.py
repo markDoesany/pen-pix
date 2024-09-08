@@ -66,7 +66,6 @@ class User(db.Model):
             'updated_at': self.updated_at.isoformat()
         }
 
-
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
@@ -104,9 +103,8 @@ class Task(db.Model):
             'ask_boolean': self.ask_boolean,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat(),
-            'files': [file.to_dict() for file in self.attached_files]  # Include files in the task's dictionary
+            'files': [file.to_dict() for file in self.attached_files]  
         }
-
 
 class UploadedFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -128,4 +126,30 @@ class UploadedFile(db.Model):
             'mimetype': self.mimetype,
             'file_url': self.file_url,
             'graded': self.graded  # Include graded in the dict
+        }
+        
+        
+class CircuitAnalysis(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    threshold_value = db.Column(db.Integer, nullable=False)
+    predictions = db.Column(db.JSON, nullable=False)
+    boolean_expressions = db.Column(db.JSON, nullable=False)  # Changed from ARRAY to JSON
+    netlist = db.Column(db.JSON, nullable=False)
+    verilog_url_file = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
+    
+    uploaded_file_id = db.Column(db.Integer, db.ForeignKey('uploaded_file.id'), nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'threshold_value': self.threshold_value,
+            'predictions': self.predictions,
+            'boolean_expressions': self.boolean_expressions,
+            'uploaded_file_id': self.uploaded_file_id,
+            'netlist': self.netlist,
+            'verilog_url_file': self.verilog_url_file,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
         }
