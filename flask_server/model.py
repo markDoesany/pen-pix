@@ -134,24 +134,56 @@ class UploadedFile(db.Model):
 class CircuitAnalysis(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     threshold_value = db.Column(db.Integer, nullable=False)
-    predictions = db.Column(db.JSON, nullable=False)
-    boolean_expressions = db.Column(db.JSON, nullable=False)  # Changed from ARRAY to JSON
+    predictions = db.Column(db.JSON, nullable=False)  # Revert to JSON array to hold predictions
+    boolean_expressions = db.Column(db.JSON, nullable=False)
     netlist = db.Column(db.JSON, nullable=False)
     verilog_url_file = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
-    
     uploaded_file_id = db.Column(db.Integer, db.ForeignKey('uploaded_file.id'), nullable=False)
 
     def to_dict(self):
         return {
             'id': self.id,
             'threshold_value': self.threshold_value,
-            'predictions': self.predictions,
+            'predictions':self.predictions, 
             'boolean_expressions': self.boolean_expressions,
             'uploaded_file_id': self.uploaded_file_id,
             'netlist': self.netlist,
             'verilog_url_file': self.verilog_url_file,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
+        }
+
+
+class PredictionResult(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    x = db.Column(db.Integer, nullable=False)
+    y = db.Column(db.Integer, nullable=False)
+    width = db.Column(db.Integer, nullable=False)
+    height = db.Column(db.Integer, nullable=False)
+    confidence = db.Column(db.Float, nullable=False)
+    class_name = db.Column(db.String(50), nullable=False)
+    class_id = db.Column(db.Integer, nullable=False)
+    detection_id = db.Column(db.String(36), nullable=False)
+    color = db.Column(db.JSON, nullable=False)
+    object_id = db.Column(db.String(50), nullable=False)
+    label = db.Column(db.String(50), nullable=False)
+    circuit_analysis_id = db.Column(db.Integer, db.ForeignKey('circuit_analysis.id'), nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'x': self.x,
+            'y': self.y,
+            'width': self.width,
+            'height': self.height,
+            'confidence': self.confidence,
+            'class_name': self.class_name,
+            'class_id': self.class_id,
+            'detection_id': self.detection_id,
+            'color': self.color,
+            'object_id': self.object_id,
+            'label': self.label,
+            'circuit_analysis_id': self.circuit_analysis_id
         }

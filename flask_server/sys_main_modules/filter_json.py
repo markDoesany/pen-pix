@@ -1,5 +1,3 @@
-import os
-import json
 from collections import defaultdict
 import string
 
@@ -18,7 +16,7 @@ def add_color_property_and_ids(detections):
         'or': (128, 0, 128),         # Purple
         'output': (0, 128, 128),     # Teal
         'xnor': (128, 128, 0),       # Olive
-        'xor': (148, 3, 252),      # Light violet
+        'xor': (148, 3, 252),        # Light violet
         'intersection': (0, 128, 255) # Orange-Blue for Intersection
     }
 
@@ -46,25 +44,24 @@ def add_color_property_and_ids(detections):
             id_counters['output'] += 1
         elif class_name == 'junction':
             detection['id'] = f'J{id_counters["junction"]}'
+            detection['label'] = ''
             id_counters['junction'] += 1
         elif class_name == 'intersection':
             detection['id'] = f'I{id_counters["intersection"]}'
+            detection['label'] = ''
             id_counters['intersection'] += 1
         else:  # For logic gates like and, or, nand, etc.
             detection['id'] = f'U{id_counters["other"]}'
+            detection['label'] = ''
             id_counters['other'] += 1
 
 
-def process_json_file(json_path):
-    # Read data from JSON file
-    with open(json_path, 'r') as file:
-        data = json.load(file)
-
+def filter_detections(detections):
     # Group detections by their position with a specified threshold
     grouped_detections = defaultdict(list)
     threshold = 10  # Adjust threshold as needed
 
-    for detection in data:
+    for detection in detections:
         found_group = False
         for group_key in grouped_detections.keys():
             if distance(group_key[:2], (detection["x"], detection["y"])) <= threshold:
@@ -80,17 +77,6 @@ def process_json_file(json_path):
         max_confidence_detection = max(group, key=lambda x: x["confidence"])
         filtered_data.append(max_confidence_detection)
 
-    # Add color property and IDs to each detection
     add_color_property_and_ids(filtered_data)
 
-    # Write filtered and modified data back to JSON file
-    with open(json_path, 'w') as file:
-        json.dump(filtered_data, file, indent=4)
-
-def process_folder(source_folder):
-    # Process each JSON file in the folder
-    for filename in os.listdir(source_folder):
-        if filename.endswith(".json"):
-            json_path = os.path.join(source_folder, filename)
-            process_json_file(json_path)
-
+    return filtered_data

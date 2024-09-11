@@ -2,7 +2,7 @@ from werkzeug.utils import secure_filename
 import os
 from files import files_bp
 from utils.auth_helpers import login_required
-from models import db, UploadedFile, Task, CircuitAnalysis
+from model import db, UploadedFile, Task, CircuitAnalysis
 from flask import jsonify, request, send_from_directory
 
 @files_bp.route('/<int:task_id>/<filename>')
@@ -66,8 +66,8 @@ def upload_files():
         
         # Create CircuitAnalysis after getting the file ID
         new_circuit_analysis = CircuitAnalysis(
-            threshold_value=0,
-            predictions={},
+            threshold_value=128,
+            predictions = [],
             boolean_expressions=[],
             netlist={},
             verilog_url_file='',
@@ -82,7 +82,6 @@ def upload_files():
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Database commit error (during circuit analysis save): {str(e)}"}), 500
-
     return jsonify({"message": "Files uploaded", "files": uploaded_files, "skipped_files": skipped_files})
 
 

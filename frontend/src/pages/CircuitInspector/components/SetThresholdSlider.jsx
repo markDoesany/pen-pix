@@ -1,13 +1,16 @@
-import { useState } from 'react'
-import ReactSlider from 'react-slider'
+import { useState, useEffect } from 'react';
+import ReactSlider from 'react-slider';
 
 const SetThresholdSlider = ({ onApplyThreshold, value }) => {
-  const [thresholdValue, setThresholdValue] = useState(value) 
+  const [thresholdValue, setThresholdValue] = useState(value);
+
+  useEffect(() => {
+    setThresholdValue(value);
+  }, [value]);
 
   const applyThreshold = (mode) => {
-    onApplyThreshold(thresholdValue, mode) 
-  }
-
+    onApplyThreshold(thresholdValue, mode);
+  };
 
   return (
     <div className='bg-secondaryBg p-4 rounded-lg w-[250px] flex flex-col gap-4'>
@@ -29,7 +32,7 @@ const SetThresholdSlider = ({ onApplyThreshold, value }) => {
         <button className='bg-thirdBg p-2 rounded-lg' onClick={() => applyThreshold('multiple')}>Apply to all images</button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SetThresholdSlider
+export default SetThresholdSlider;
