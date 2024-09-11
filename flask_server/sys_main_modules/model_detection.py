@@ -8,16 +8,16 @@ import torch
 import torch.backends.cudnn as cudnn
 from numpy import random
 
-from models.experimental import attempt_load
-from utils.datasets import LoadStreams, LoadImages
-from utils.general import check_img_size, check_requirements, check_imshow, non_max_suppression, apply_classifier, \
+from sys_main_modules.models.experimental import attempt_load
+from sys_main_modules.utilities.datasets import LoadStreams, LoadImages
+from sys_main_modules.utilities.general import check_img_size, check_requirements, check_imshow, non_max_suppression, apply_classifier, \
     scale_coords, xyxy2xywh, strip_optimizer, set_logging, increment_path
-from utils.plots import plot_one_box
-from utils.torch_utils import select_device, load_classifier, time_synchronized, TracedModel
+from sys_main_modules.utilities.plots import plot_one_box
+from sys_main_modules.utilities.torch_utils import select_device, load_classifier, time_synchronized, TracedModel
 
 
 def detect(weights='yolov7.pt', source='inference/images', img_size=640, conf_thres=0.25, iou_thres=0.45, device='', view_img=False, save_txt=False, save_conf=False, nosave=False, classes=None, agnostic_nms=False, augment=False, update=False, project='runs/', name='exp', exist_ok=False, no_trace=False, save_img=False):
-    
+
     source, weights, view_img, save_txt, imgsz, trace = source, weights, view_img, save_txt, img_size, not no_trace 
     save_img = not nosave and not source.endswith('.txt')  # save inference images
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
@@ -31,9 +31,9 @@ def detect(weights='yolov7.pt', source='inference/images', img_size=640, conf_th
     set_logging()
     device = select_device(device)
     half = device.type != 'cpu'  # half precision only supported on CUDA
-
+    
     # Load model
-    model = attempt_load(weights, map_location=device)  # load FP32 model
+    model = attempt_load(weights, map_location=device)  # load FP32 model\
     stride = int(model.stride.max())  # model stride
     imgsz = check_img_size(imgsz, s=stride)  # check img_size
 

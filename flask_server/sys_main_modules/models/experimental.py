@@ -3,9 +3,8 @@ import random
 import torch
 import torch.nn as nn
 
-from models.common import Conv, DWConv
-from utils.google_utils import attempt_download
-
+from sys_main_modules.models.common import Conv, DWConv
+from sys_main_modules.utilities.google_utils import attempt_download
 
 class CrossConv(nn.Module):
     # Cross Convolution Downsample
@@ -239,10 +238,6 @@ class End2End(nn.Module):
         x = self.model(x)
         x = self.end2end(x)
         return x
-
-
-
-
 
 def attempt_load(weights, map_location=None):
     # Loads an ensemble of models weights=[a,b,c] or a single model weights=[a] or weights=a

@@ -1,35 +1,31 @@
 import numpy as np
-import model_detection
-import json
-import os
+from . import model_detection
+import cv2
+import tempfile
+import sys
 
-image_extensions = ['.jpg', '.jpeg', '.png']
-os.makedirs('./annotation_data', exist_ok=True)
-weights = './weight/the_very_best.pt'
+sys.path.insert(0, './sys_main_modules')
+weights = './sys_main_modules/weight/best.pt'
 
-def infer_images(source_folder, data_output_folder):
-    for filename in os.listdir(source_folder):
-        if any(filename.lower().endswith(ext) for ext in image_extensions):
-            source = os.path.join(source_folder, filename)
-            img_size = 640 
-            data = model_detection.detect(source=source, weights=weights, img_size=img_size, 
-                        save_img=False, view_img = False, save_txt = False, no_trace=True) #false if new weight
+def infer_image(image_bytes):
+    try:
+        img_array = np.frombuffer(image_bytes.read(), np.uint8)
+        img = cv2.imdecode(img_array, cv2.IMREAD_GRAYSCALE)
+        
+        if img is None:
+            return {"error": "Invalid image data"}
 
-            with open(f'{data_output_folder}{filename}.json', 'w') as f:
-                    json.dump(data, f)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp_file:
+            temp_filepath = temp_file.name
+            cv2.imwrite(temp_filepath, img) 
 
+        img_size = 640
+        data = model_detection.detect(source=temp_filepath, weights=weights, img_size=img_size,
+                                      save_img=False, view_img=False, save_txt=False, no_trace=True)
+        if not data:
+            return {"error": "No objects detected in the image"}
 
-def infer_image(source_file, data_output_folder):
-    
-    if not os.path.exists(data_output_folder):
-        os.makedirs(data_output_folder)
+        return data
 
-    filename = os.path.basename(source_file)
-    output_file = os.path.join(data_output_folder, f"{filename}.json")
-
-    img_size = 640
-    data = model_detection.detect(source=source_file, weights=weights, img_size=img_size,
-                                  save_img=False, view_img=False, save_txt=False, no_trace=True)
-
-    with open(output_file, 'w') as f:
-        json.dump(data, f)
+    except Exception as e:
+        return {"error": str(e)}

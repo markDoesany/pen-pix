@@ -11,69 +11,85 @@ import axios from "axios";
 
 const CircuitInspectorPage = () => {
   const { taskId } = useParams();
-  const { task, loading } = useGetTask(taskId);
-  const [currentFile, setCurrentFile] = useState(null);
-  const [currentCircuitData, setCurrentCircuitData] = useState(null);
+  const { task, loading: taskLoading } = useGetTask(taskId);
+  const [currentFile, setCurrentFile] = useState({});
+  const [currentCircuitData, setCurrentCircuitData] = useState([]);
+  const [currentPredictions, setCurrentPredictions] = useState([]);
+  const [filteredImgUrl, setFilteredImgUrl] = useState('');
+  const [loading, setLoading] = useState(false); // New loading state
   const files = useRecoilValue(FilesAtom);
 
   const handleApplyThreshold = async (thresholdValue, mode = 'single') => {
-  try {
-    const response = await axios.post('/detect-gates/set-filter-threshold', {
-      thresholdValue,
-      mode,
-      fileId: currentFile?.id
-    }, { responseType: 'blob' });
-    
-    const imageUrl = URL.createObjectURL(response.data);
-    
-    if (thresholdValue > 0) {
-      setCurrentFile(prevFile => ({
-        ...prevFile,
-        file_url: imageUrl
-      }));
-    } else {
-      // If threshold is not greater than 0, keep the original image
-      setCurrentFile(prevFile => prevFile);
+    setLoading(true); // Set loading to true when fetching data
+    try {
+      const response = await axios.post('/detect-gates/set-filter-threshold', {
+        thresholdValue,
+        mode,
+        fileId: currentFile?.id,
+      }, { responseType: 'blob' });
+
+      const imageUrl = URL.createObjectURL(response.data);
+      setFilteredImgUrl(imageUrl);
+    } catch (error) {
+      console.error('Error applying threshold:', error);
+    } finally {
+      setLoading(false); // Set loading to false after fetching data
     }
-  } catch (error) {
-    console.error('Error applying threshold:', error);
-  }
-};
+  };
+
+  const handleDetectLogicGates = async (mode) => {
+    setLoading(true); // Set loading to true when fetching data
+    try {
+      const response  = await axios.post(`/detect-gates/process-detection/${currentFile.id}`, {
+        mode
+      });
+      setCurrentPredictions(response.data.predictions);
+      console.log("Predictions", response.data.predictions);
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setLoading(false); // Set loading to false after fetching data
+    }
+  };
 
   const handleCurrentFile = (file) => {
     setCurrentFile(file);
   };
 
-  // Effect to handle when currentFile is updated
   useEffect(() => {
     console.log("Updated current file", currentFile);
   }, [currentFile]);
 
-  // Set the first file as current file
   useEffect(() => {
     setCurrentFile(files[0]);
   }, [files]);
 
-  // Fetch circuit data when currentFile changes
   useEffect(() => {
     const getCircuitData = async () => {
       if (currentFile?.id) {
+        setLoading(true); // Set loading to true when fetching data
         try {
           const response = await axios.get(`/detect-gates/get-circuit-data/${currentFile.id}`);
           setCurrentCircuitData(response.data.circuit_analysis);
+          setCurrentPredictions(response.data.circuit_analysis.predictions);
+          console.log(response.data.circuit_analysis);
         } catch (error) {
           console.log(error.message);
+        } finally {
+          setLoading(false); // Set loading to false after fetching data
         }
       }
     };
     getCircuitData();
   }, [currentFile?.id]);
 
-  useEffect(()=>{ 
-    handleApplyThreshold(currentCircuitData?.threshold_value)
-  }, [currentCircuitData])
+  useEffect(() => {
+    if (currentCircuitData?.threshold_value !== undefined) {
+      handleApplyThreshold(currentCircuitData.threshold_value);
+    }
+  }, [currentCircuitData]);
 
-  if (loading) return <div>Loading...</div>;
+  if (taskLoading) return <div>Loading...</div>; // Display loading state
 
   return (
     <div className="bg-[#242424] min-h-screen flex flex-col">
@@ -83,13 +99,17 @@ const CircuitInspectorPage = () => {
 
       <main className="flex flex-grow">
         <div className="">
-          <LeftSidebar task={task} 
-                       onApplyThreshold={handleApplyThreshold} 
-                       circuitData={currentCircuitData} />
+          <LeftSidebar 
+            task={task} 
+            circuitData={currentCircuitData} 
+            onApplyThreshold={handleApplyThreshold} 
+            onDetectLogicGates={handleDetectLogicGates}
+            loading={loading} // Pass loading state to LeftSidebar
+          />
         </div>
 
         <div className="flex-grow">
-          <ImageDisplay file={currentFile} />
+          <ImageDisplay img_url={filteredImgUrl} predictions={currentPredictions} />
         </div>
 
         <div className="">

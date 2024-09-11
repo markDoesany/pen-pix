@@ -1,6 +1,6 @@
 # tasks_endpoint.py
 from flask import request, jsonify, session
-from models import db, Task
+from model import db, Task
 from task import task_bp
 from utils.auth_helpers import login_required
 from datetime import datetime
