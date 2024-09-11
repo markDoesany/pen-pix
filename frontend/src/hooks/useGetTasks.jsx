@@ -6,13 +6,14 @@ import useErrorHandler from './useErrorHandler';
 
 const useGetTasks = () => {
   const setTasks = useSetRecoilState(TasksAtom);
+
   const { handleError } = useErrorHandler();
 
   const getTasks = useCallback(async () => {
     try {
       const response = await axios.get('/task/get-tasks', { withCredentials: true });
       const tasks = response.data;
-      setTasks(tasks); // Update tasks state
+      setTasks(tasks); 
     } catch (error) {
       if (error.response.status === 401) {
         handleError('unauthorized', 'Your session has expired. Login again.');

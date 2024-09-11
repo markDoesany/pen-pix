@@ -1,10 +1,9 @@
 # auth/routes.py
 from flask import request, session, jsonify
 from auth import auth_bp
-from models import User, db 
+from model import User, db 
 from flask_mailman import EmailMessage
 from config import Config
-
 
 @auth_bp.route('/check-session',methods=["GET"])
 def check_session():
