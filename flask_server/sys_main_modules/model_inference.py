@@ -21,7 +21,7 @@ def infer_image(image_bytes):
 
         img_size = 640
         data = model_detection.detect(source=temp_filepath, weights=weights, img_size=img_size,
-                                      save_img=False, view_img=False, save_txt=False, no_trace=False)
+                                      save_img=False, view_img=False, save_txt=False, no_trace=True)
         if not data:
             return {"error": "No objects detected in the image"}
 
