@@ -4,4 +4,3 @@ runs/
 *.pyc
 static/
 runs/
-traced_model.pt
