@@ -5,7 +5,7 @@ const ImageDisplay = ({ img_url, predictions, loading }) => {
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [startDrag, setStartDrag] = useState(null);
-  const [isInside, setIsInside] = useState(false);
+  const [isInside, setIsInside] = useState(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -106,7 +106,7 @@ const ImageDisplay = ({ img_url, predictions, loading }) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {loading ? <p className='w-900 h-1000'>Loading</p> : <canvas ref={canvasRef} width={900} height={1000} />}
+    <canvas ref={canvasRef} width={900} height={1000} />
     </div>
   );
 };
