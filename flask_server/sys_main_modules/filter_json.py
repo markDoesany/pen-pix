@@ -35,23 +35,23 @@ def add_color_property_and_ids(detections):
         detection['color'] = class_colors.get(class_name, (255, 255, 255))  # Default to white if class is not found
 
         if class_name == 'input':
-            detection['id'] = f'IN{id_counters["input"]}'
+            detection['object_id'] = f'IN{id_counters["input"]}'
             detection['label'] = f'X{id_counters["input"]}'
             id_counters['input'] += 1
         elif class_name == 'output':
-            detection['id'] = f'OUT{id_counters["output"]}'
+            detection['object_id'] = f'OUT{id_counters["output"]}'
             detection['label'] = f'Y{id_counters["output"]}'
             id_counters['output'] += 1
         elif class_name == 'junction':
-            detection['id'] = f'J{id_counters["junction"]}'
+            detection['object_id'] = f'J{id_counters["junction"]}'
             detection['label'] = ''
             id_counters['junction'] += 1
         elif class_name == 'intersection':
-            detection['id'] = f'I{id_counters["intersection"]}'
+            detection['object_id'] = f'I{id_counters["intersection"]}'
             detection['label'] = ''
             id_counters['intersection'] += 1
         else:  # For logic gates like and, or, nand, etc.
-            detection['id'] = f'U{id_counters["other"]}'
+            detection['object_id'] = f'U{id_counters["other"]}'
             detection['label'] = ''
             id_counters['other'] += 1
 

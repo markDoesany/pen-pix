@@ -2,9 +2,15 @@ from flask import request, jsonify, send_file
 from utils.auth_helpers import login_required
 from detect_gates import detect_gates_bp
 from model import db, UploadedFile, CircuitAnalysis, PredictionResult
+
 from sys_main_modules.contour_tracing.threshold_image import apply_threshold_to_image
+from sys_main_modules.contour_tracing.binary_image import binarize_image
+from sys_main_modules.contour_tracing.mask_image import mask_image
+from sys_main_modules.contour_tracing.netlist import process_circuit_connection
+from sys_main_modules.contour_tracing.boolean_function import convert_to_sympy_expression, evaluate_boolean_expression, generate_truth_table
 from sys_main_modules.model_inference import infer_image
 from sys_main_modules.filter_json import filter_detections
+
 import os
 
 @login_required
@@ -76,7 +82,6 @@ def set_filter_threshold():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-
 @login_required
 @detect_gates_bp.route('/get-circuit-data/<int:file_id>', methods=['GET'])
 def get_circuit_analysis_by_file(file_id):
@@ -121,7 +126,7 @@ def detect_logic_gates(file_id):
                     class_id=obj['class_id'],
                     detection_id=obj['detection_id'],
                     color=(obj['color']),  # Empty for now
-                    object_id="",  # Empty for now
+                    object_id=obj['object_id'],  # Empty for now
                     label=obj['label'],  # Empty for now
                     circuit_analysis_id=circuit_analysis.id
                 )
@@ -182,3 +187,27 @@ def detect_logic_gates(file_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+
+@login_required
+@detect_gates_bp.route('/analyze-circuit/<int:file_id>', methods=['POST'])
+def analyze_circuit(file_id):
+    uploaded_file = UploadedFile.query.get(file_id)
+    circuit_analysis = CircuitAnalysis.query.filter_by(uploaded_file_id=file_id).first()
+    
+    if not uploaded_file:
+        return jsonify({"error": "File not found"}), 404
+    
+    source_file = os.path.join('static', uploaded_file.filepath)
+    img_io = apply_threshold_to_image(source_file, threshold_value=circuit_analysis.threshold_value)
+    binary_img_io = binarize_image(img_io)
+    mask_img_io = mask_image(binary_img_io, circuit_analysis.predictions)
+    boolean_functions, input_count = process_circuit_connection(mask_img_io, circuit_analysis.predictions)
+    
+    expressions = []
+    for key, value in boolean_functions.items():
+        symp_expression = convert_to_sympy_expression(value, input_count)
+        expressions.append({key: symp_expression})
+    
+    print(expressions)
+    return jsonify({"boolean_expressions": expressions})

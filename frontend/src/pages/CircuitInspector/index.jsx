@@ -17,10 +17,10 @@ const CircuitInspectorPage = () => {
   const [currentPredictions, setCurrentPredictions] = useState([]);
   const [filteredImgUrl, setFilteredImgUrl] = useState('');
   const [loading, setLoading] = useState(false); // New loading state
+  const [isVisibilityToggled, setIsVisibilityToggled] = useState(true); // New loading state
   const files = useRecoilValue(FilesAtom);
 
   const handleApplyThreshold = async (thresholdValue, mode = 'single') => {
-    setLoading(true); // Set loading to true when fetching data
     try {
       const response = await axios.post('/detect-gates/set-filter-threshold', {
         thresholdValue,
@@ -32,9 +32,7 @@ const CircuitInspectorPage = () => {
       setFilteredImgUrl(imageUrl);
     } catch (error) {
       console.error('Error applying threshold:', error);
-    } finally {
-      setLoading(false); // Set loading to false after fetching data
-    }
+    } 
   };
 
   const handleDetectLogicGates = async (mode) => {
@@ -56,6 +54,19 @@ const CircuitInspectorPage = () => {
     setCurrentFile(file);
   };
 
+  const handlePredictionVisibility = () => {
+    setIsVisibilityToggled(!isVisibilityToggled)
+  }
+
+  const handleAnalyzeCircuit = async() => {
+    try {
+      await axios.post(`/detect-gates/analyze-circuit/${currentFile.id}`)
+    } catch (error) {
+      console.log(error)
+    }
+    console.log("Analyzed circuit")
+  }
+
   useEffect(() => {
     console.log("Updated current file", currentFile);
   }, [currentFile]);
@@ -67,7 +78,7 @@ const CircuitInspectorPage = () => {
   useEffect(() => {
     const getCircuitData = async () => {
       if (currentFile?.id) {
-        setLoading(true); // Set loading to true when fetching data
+        // setLoading(true); // Set loading to true when fetching data
         try {
           const response = await axios.get(`/detect-gates/get-circuit-data/${currentFile.id}`);
           setCurrentCircuitData(response.data.circuit_analysis);
@@ -75,9 +86,7 @@ const CircuitInspectorPage = () => {
           console.log(response.data.circuit_analysis);
         } catch (error) {
           console.log(error.message);
-        } finally {
-          setLoading(false); // Set loading to false after fetching data
-        }
+        } 
       }
     };
     getCircuitData();
@@ -104,12 +113,14 @@ const CircuitInspectorPage = () => {
             circuitData={currentCircuitData} 
             onApplyThreshold={handleApplyThreshold} 
             onDetectLogicGates={handleDetectLogicGates}
+            onTogglePredictionVisibility={handlePredictionVisibility}
+            onAnalyzeCircuit={handleAnalyzeCircuit}
             loading={loading} // Pass loading state to LeftSidebar
           />
         </div>
 
-        <div className="flex-grow">
-          <ImageDisplay img_url={filteredImgUrl} predictions={currentPredictions} loading={loading}/>
+        <div className="flex-grow ">
+          <ImageDisplay img_url={filteredImgUrl} predictions={currentPredictions} isPredictionVisible={isVisibilityToggled} />
         </div>
 
         <div className="">

@@ -1,6 +1,5 @@
 import cv2 as cv
 import numpy as np
-import copy
 
 def line_boundary_tracing(image, start_points, stop_points, intersection_points, junction_points):
     def is_black(pixel_value):
@@ -14,14 +13,14 @@ def line_boundary_tracing(image, start_points, stop_points, intersection_points,
     for point in stop_points:
         if 'input1' in point:
             stop_coords_to_id[point['input1']] = {
-                'id': point['id'], 
+                'object_id': point['object_id'], 
                 'label': point.get('label'), 
                 'type': point['type'],
                 'pin': 'input1'
             }
         if 'input2' in point:
             stop_coords_to_id[point['input2']] = {
-                'id': point['id'], 
+                'object_id': point['object_id'], 
                 'label': point.get('label'), 
                 'type': point['type'],
                 'pin': 'input2'
@@ -33,7 +32,7 @@ def line_boundary_tracing(image, start_points, stop_points, intersection_points,
     output_coords = {}
 
     for junction in junction_points:
-        junction_id = junction['id']
+        junction_id = junction['object_id']
         for point_dict in junction['input_points']:
             for side, pt in point_dict.items():
                 junction_coords_to_id[tuple(pt)] = junction_id
@@ -44,7 +43,7 @@ def line_boundary_tracing(image, start_points, stop_points, intersection_points,
 
     # Collect start coordinates
     start_coords = {point['output']: {
-            'id': point['id'], 
+            'object_id': point['object_id'], 
             'label': point.get('label'), 
             'type': point['type']
         } for point in start_points}
@@ -53,7 +52,7 @@ def line_boundary_tracing(image, start_points, stop_points, intersection_points,
         if visited is None:
             visited = set()
 
-        start_id = start_info['id']
+        start_id = start_info['object_id']
         start_label = start_info.get('label')
         start_type = start_info.get('type')
         current_point = start_point
@@ -78,12 +77,12 @@ def line_boundary_tracing(image, start_points, stop_points, intersection_points,
                             stop_info = stop_coords_to_id[next_point]
                             connections.append({
                                 'from': {
-                                    'id': start_id, 
+                                    'object_id': start_id, 
                                     'label': start_label, 
                                     'type': start_type
                                 },
                                 'to': {
-                                    'id': stop_info['id'], 
+                                    'object_id': stop_info['object_id'], 
                                     'label': stop_info.get('label'), 
                                     'type': stop_info.get('type'),
                                     'pin': stop_info.get('pin')
@@ -116,29 +115,29 @@ def line_boundary_tracing(image, start_points, stop_points, intersection_points,
                                 
                                 entry_side = input_coords[next_point]
 
-                                # Override junction ID and type with the start component's ID and type
+                                # Override junction object_id and type with the start component's object_id and type
                                 new_start_id = start_id  # Use the start_id for outputs of the junction
                                 new_start_type = start_type  # Use the start_type for outputs of the junction
                                 
                                 for junction in junction_points:
-                                    if junction['id'] == junction_id:
+                                    if junction['object_id'] == junction_id:
                                         for point_dict in junction['output_points']:
                                             for side, out_point in point_dict.items():
                                                 if side != entry_side and tuple(out_point) not in visited:
                                                     start_coords[tuple(out_point)] = {
-                                                        'id': new_start_id,  # Use the overridden ID here
+                                                        'object_id': new_start_id,  # Use the overridden object_id here
                                                         'label': start_label, 
                                                         'type': new_start_type  # Use the overridden type here
                                                     }
 
                                 connections.append({
                                     'from': {
-                                        'id': new_start_id,  # Use the overridden ID here
+                                        'object_id': new_start_id,  # Use the overridden object_id here
                                         'label': start_label, 
                                         'type': new_start_type  # Use the overridden type here
                                     },
                                     'to': {
-                                        'id': junction_id, 
+                                        'object_id': junction_id, 
                                         'label': None, 
                                         'type': 'junction'
                                     },
@@ -190,10 +189,10 @@ def line_boundary_tracing(image, start_points, stop_points, intersection_points,
 
         # Check each connection for duplicates and add to the processed set
         for connection in connections:
-            if connection['from']['id'] not in processed_stop_points:
-                processed_stop_points.add(connection['from']['id'])
-            if connection['to']['id'] not in processed_stop_points:
-                processed_stop_points.add(connection['to']['id'])
+            if connection['from']['object_id'] not in processed_stop_points:
+                processed_stop_points.add(connection['from']['object_id'])
+            if connection['to']['object_id'] not in processed_stop_points:
+                processed_stop_points.add(connection['to']['object_id'])
 
 
     return all_boundaries, all_connections
@@ -203,9 +202,9 @@ def get_junction_points(image, data):
     points_list = []
 
     for prediction in data:
-        if prediction['class'] == 'junction':
+        if prediction['class_name'] == 'junction':
             x, y, width, height = prediction['x'], prediction['y'], prediction['width'], prediction['height']
-            points = {'id': prediction['id'], 'type': prediction['class'], 'input_points': [], 'output_points': []}
+            points = {'object_id': prediction['object_id'], 'type': prediction['class_name'], 'input_points': [], 'output_points': []}
 
             # Get left input point
             x_left_input, y_left_input = x, y
@@ -314,9 +313,9 @@ def get_intersection_points(image, data):
     points_list = []
 
     for prediction in data:
-        if prediction['class'] == 'intersection':
+        if prediction['class_name'] == 'intersection':
             x, y, width, height = prediction['x'], prediction['y'], prediction['width'], prediction['height']
-            points = {'id': prediction['id']}
+            points = {'object_id': prediction['object_id']}
 
             # Get left point
             xleft, yleft = x, y
@@ -377,25 +376,25 @@ def get_endpoints(image, data):
 
     for prediction in data:
         x, y, width, height = prediction['x'], prediction['y'], prediction['width'], prediction['height']
-        if prediction['class'] in exclude_class:
+        if prediction['class_name'] in exclude_class:
             continue
         
-        if prediction['class'] == 'not':
+        if prediction['class_name'] == 'not':
             x_copy, y_copy, width_copy, height_copy = x, y, width, height 
 
             while (True):
                 if np.all(image[y_copy + height_copy, x_copy-1] == 255):
-                    end_points.append({'id': prediction['id'], 'type': prediction['class'], 'input1': (x_copy - 1, y_copy + height_copy + 1), 'input2': None})
+                    end_points.append({'object_id': prediction['object_id'], 'type': prediction['class_name'], 'input1': (x_copy - 1, y_copy + height_copy + 1), 'input2': None})
                     break
                 else:
                     y_copy -= 1
                     
-        elif prediction['class'] == 'output':
+        elif prediction['class_name'] == 'output':
             x_copy, y_copy, width_copy, height_copy = x, y, width, height 
 
             while (True):
                 if np.all(image[y_copy + height_copy, x_copy-1] == 255):
-                    end_points.append({'id': prediction['id'], 'type': prediction['class'], 'label': prediction['label'], 'input1': (x_copy - 1, y_copy + height_copy + 1), 'input2': None})
+                    end_points.append({'object_id': prediction['object_id'], 'type': prediction['class_name'], 'label': prediction['label'], 'input1': (x_copy - 1, y_copy + height_copy + 1), 'input2': None})
                     break
                 else:
                     y_copy -= 1
@@ -407,7 +406,7 @@ def get_endpoints(image, data):
                 if y_copy == 0 :
                     break
                 if np.all(image[y_copy + height_copy, x_copy-1] == 255):
-                    end_points.append({'id': prediction['id'], 'type': prediction['class'], 'input1': None, 'input2': (x_copy - 1, y_copy + height_copy + 1)})
+                    end_points.append({'object_id': prediction['object_id'], 'type': prediction['class_name'], 'input1': None, 'input2': (x_copy - 1, y_copy + height_copy + 1)})
                     break
                 else:
                     y_copy -= 1
@@ -436,14 +435,14 @@ def get_startpoints(image, data):
     for prediction in data:
         x, y, width, height = prediction['x'], prediction['y'], prediction['width'], prediction['height']
 
-        if prediction['class'] in exclude_class:
+        if prediction['class_name'] in exclude_class:
             continue
 
-        if prediction['class'] == 'input':
+        if prediction['class_name'] == 'input':
             x_copy, y_copy, width_copy, height_copy = x, y, width, height 
             while True:
                 if np.all(image[y_copy + height_copy + 1, x_copy + 10] == 255):
-                    start_points.append({'id': prediction['id'], 'type': prediction['class'], 'label': prediction['label'], 'output': (x_copy, y_copy + height_copy)})
+                    start_points.append({'object_id': prediction['object_id'], 'type': prediction['class_name'], 'label': prediction['label'], 'output': (x_copy, y_copy + height_copy)})
                     # cv.circle(image, (x_copy, y_copy + height_copy), 1, (0, 0, 255), -1)
                     break
 
@@ -453,7 +452,7 @@ def get_startpoints(image, data):
             x_copy, y_copy, width_copy, height_copy = x, y, width, height 
             while True:
                 if np.all(image[y_copy + height_copy, x_copy+ width_copy +1] == 255):
-                    start_points.append({'id': prediction['id'], 'type': prediction['class'], 'output': (x_copy + width_copy, y_copy + height_copy)})
+                    start_points.append({'object_id': prediction['object_id'], 'type': prediction['class_name'], 'output': (x_copy + width_copy, y_copy + height_copy)})
                     break
 
                 y_copy -= 1
@@ -468,23 +467,23 @@ def get_boolean_function(data):
     for value in data:
         
         component = {
-            'id': value['to']['id'],
+            'object_id': value['to']['object_id'],
             'type': value['to']['type'],
         }
         if value['to']['type'] == 'junction': continue
 
-        existing_component = next((obj for obj in input_types if obj['id'] == component['id']), None)
+        existing_component = next((obj for obj in input_types if obj['object_id'] == component['object_id']), None)
 
         if existing_component:
             if value['to']['pin'] == 'input1':
-                existing_component['input1'] = value['from']['label'] if value['from']['type'] == 'input' else value['from']['id']
+                existing_component['input1'] = value['from']['label'] if value['from']['type'] == 'input' else value['from']['object_id']
             elif value['to']['pin'] == 'input2':
-                existing_component['input2'] = value['from']['label'] if value['from']['type'] == 'input' else value['from']['id']
+                existing_component['input2'] = value['from']['label'] if value['from']['type'] == 'input' else value['from']['object_id']
         else:
             if value['to']['pin'] == 'input1':
-                component['input1'] = value['from']['label'] if value['from']['type'] == 'input' else value['from']['id']
+                component['input1'] = value['from']['label'] if value['from']['type'] == 'input' else value['from']['object_id']
             elif value['to']['pin'] == 'input2':
-                component['input2'] = value['from']['label'] if value['from']['type'] == 'input' else value['from']['id']
+                component['input2'] = value['from']['label'] if value['from']['type'] == 'input' else value['from']['object_id']
             
             input_types.append(component)
     
@@ -507,7 +506,7 @@ def get_boolean_function(data):
             return f"{component['input1']}"
     
     for component in input_types:
-        expression_mapping[component['id']] = get_expression(component)
+        expression_mapping[component['object_id']] = get_expression(component)
     
     def resolve_expression(mapping, signal, visited=None):
         """Recursively resolve the boolean expression for a given signal."""
