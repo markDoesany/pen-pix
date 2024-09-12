@@ -24,7 +24,6 @@ const LoginForm = ({ onViewChange }) => {
       const userId = response.data.user.id;
       console.log("response",response)
       localStorage.setItem('user', JSON.stringify(response.data.user))
-      console.log("LOGIN", response)
       setUser(response.data.user)
       toastSuccess(response.data.message);
       navigate(`/dashboard/${userId}`);
