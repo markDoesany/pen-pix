@@ -15,6 +15,10 @@ dist-ssr
 venv/
 *.pyc
 __pycache__/
+/flask_server/venv/
+/flask_server/venv/Lib/site-packages/torch/lib/torch_cpu.dll
+/flask_server/venv/Lib/site-packages/torch/lib/dnnl.lib
+
 
 # Editor directories and files
 .vscode/*
