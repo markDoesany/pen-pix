@@ -38,7 +38,7 @@ const CircuitInspectorPage = () => {
   };
 
   const handleDetectLogicGates = async (mode) => {
-    setLoading(true); // Set loading to true when fetching data
+    setLoading(true); 
     try {
       const response  = await axios.post(`/detect-gates/process-detection/${currentFile.id}`, {
         mode
@@ -48,7 +48,7 @@ const CircuitInspectorPage = () => {
     } catch (error) {
       console.log(error.message);
     } finally {
-      setLoading(false); // Set loading to false after fetching data
+      setLoading(false);
     }
   };
 
@@ -109,7 +109,7 @@ const CircuitInspectorPage = () => {
         </div>
 
         <div className="flex-grow">
-          <ImageDisplay img_url={filteredImgUrl} predictions={currentPredictions} />
+          <ImageDisplay img_url={filteredImgUrl} predictions={currentPredictions} loading={loading}/>
         </div>
 
         <div className="">
