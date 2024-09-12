@@ -4,3 +4,6 @@ runs/
 *.pyc
 static/
 runs/
+flask_server/__pycache__/config.cpython-312.pyc
+flask_server/auth/__pycache__/routes.cpython-312.pyc
+flask_server/files/__pycache__/routes.cpython-312.pyc
