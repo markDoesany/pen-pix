@@ -9,7 +9,7 @@ import AddAnswerKey from "./AddAnswerKey";
 import styles from './styles/component.module.css';
 import { useState } from "react";
 
-const RightSideBar = () => {
+const RightSideBar = ({ task, circuitData, onAddAnswerKey, onDeleteExpression }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isAddAnswer, setIsAddAnswer] = useState(false);
 
@@ -23,19 +23,19 @@ const RightSideBar = () => {
 
   return (
     <div 
-      className={`relative flex flex-col justify-center ${isCollapsed ? 'w-20 bg-black' : 'w-[300px]'} h-full px-5 text-textGray transition-all duration-300 ease-in-out`}
+      className={`relative flex flex-col gap-5  ${isCollapsed ? 'w-20 bg-black' : 'w-[300px]'} h-full px-5 text-textGray transition-all duration-300 ease-in-out`}
     >
-      <div className="absolute top-4 right-7 cursor-pointer" onClick={handleToggleCollapse}>
+      <div className="mt-5 cursor-pointer" onClick={handleToggleCollapse}>
         {isCollapsed ? <GoSidebarExpand size={25} /> : <GoSidebarCollapse size={25} />}
       </div>
       
       {!isCollapsed && (
         <>
           <div>
-            <AnswerKeys onAdd={handleAddAnswerKey} />
+            <AnswerKeys onAdd={handleAddAnswerKey} task={task} onDeleteExpression={onDeleteExpression}/>
           </div>
           <div className="mt-5">
-            <ExpressionsResult />
+            <ExpressionsResult circuitData={circuitData}/>
           </div>
           <hr className="mt-8 border-borderGray" />
           <div className="flex flex-col gap-3">
@@ -61,7 +61,7 @@ const RightSideBar = () => {
           </div>
           {isAddAnswer && (
             <div className="absolute top-10 -left-96">
-              <AddAnswerKey onClose={handleAddAnswerKey} />
+              <AddAnswerKey onClose={handleAddAnswerKey} onAddAnswerKey={onAddAnswerKey}/>
             </div>
           )}
         </>

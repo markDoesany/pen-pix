@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 
-const ImageDisplay = ({ img_url, predictions, loading }) => {
+const ImageDisplay = ({ img_url, predictions, isPredictionVisible}) => {
   const canvasRef = useRef(null);
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -38,7 +38,7 @@ const ImageDisplay = ({ img_url, predictions, loading }) => {
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
       ctx.drawImage(img, x, y, drawWidth, drawHeight);
 
-      if (predictions && Array.isArray(predictions)) {
+      if (isPredictionVisible && predictions && Array.isArray(predictions)) {
         predictions.forEach(({ x: bx, y: by, width, height, class_name, confidence, color }) => {
           const scaledX = x + (bx * (drawWidth / img.width));
           const scaledY = y + (by * (drawHeight / img.height));

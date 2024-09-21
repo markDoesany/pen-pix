@@ -11,16 +11,16 @@ import axios from "axios";
 
 const CircuitInspectorPage = () => {
   const { taskId } = useParams();
-  const { task, loading: taskLoading } = useGetTask(taskId);
+  const { task, loading: taskLoading, setTask} = useGetTask(taskId);
   const [currentFile, setCurrentFile] = useState({});
   const [currentCircuitData, setCurrentCircuitData] = useState([]);
   const [currentPredictions, setCurrentPredictions] = useState([]);
   const [filteredImgUrl, setFilteredImgUrl] = useState('');
   const [loading, setLoading] = useState(false); // New loading state
+  const [isVisibilityToggled, setIsVisibilityToggled] = useState(true); // New loading state
   const files = useRecoilValue(FilesAtom);
 
   const handleApplyThreshold = async (thresholdValue, mode = 'single') => {
-    setLoading(true); // Set loading to true when fetching data
     try {
       const response = await axios.post('/detect-gates/set-filter-threshold', {
         thresholdValue,
@@ -32,9 +32,7 @@ const CircuitInspectorPage = () => {
       setFilteredImgUrl(imageUrl);
     } catch (error) {
       console.error('Error applying threshold:', error);
-    } finally {
-      setLoading(false); // Set loading to false after fetching data
-    }
+    } 
   };
 
   const handleDetectLogicGates = async (mode) => {
@@ -44,7 +42,7 @@ const CircuitInspectorPage = () => {
         mode
       });
       setCurrentPredictions(response.data.predictions);
-      console.log("Predictions", response.data.predictions);
+      setCurrentCircuitData({...currentCircuitData, predictions:response.data.predictions})
     } catch (error) {
       console.log(error.message);
     } finally {
@@ -56,6 +54,78 @@ const CircuitInspectorPage = () => {
     setCurrentFile(file);
   };
 
+  const handlePredictionVisibility = () => {
+    setIsVisibilityToggled(!isVisibilityToggled)
+  }
+
+  const handleAnalyzeCircuit = async() => {
+    setLoading(true)
+    try {
+      const response = await axios.post(`/detect-gates/analyze-circuit/${currentFile.id}`)
+      setCurrentCircuitData({...currentCircuitData, boolean_expressions:response.data.boolean_expressions})
+      console.log("Boolean Expressions:", response.data.boolean_expressions)
+    } catch (error) {
+      console.log(error)
+    }finally{
+      setLoading(false)
+    }
+  }
+
+  const handleGetTruthTable = async() =>{
+    setLoading(true)
+    try {
+      const response = await axios.get(`/detect-gates/get-truth-table/${currentFile.id}`)
+      setCurrentCircuitData({...currentCircuitData, truth_table: response.data.truth_table})
+    } catch (error) {
+      console.log(error.message)
+    }finally{
+      setLoading(false)
+    }
+  }
+  const handleExportVerilog = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`/detect-gates/export-verilog/${currentFile.id}`, {
+        responseType: 'blob', 
+      });
+  
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+  
+      link.setAttribute('download', `circuit_${currentFile.id}.v`); 
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  
+    } catch (error) {
+      console.error('Error downloading the file:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddAnswerKey = () =>{
+
+  }
+  
+  const handleDeleteExpression = async (expression_id) => {
+    try {
+      const response = await axios.post(`/task/delete-expression/${task.id}`, {
+        expression_id: expression_id,
+      });
+  
+      if (response.statusText === "OK") {
+        setTask((prevTask) => ({
+          ...prevTask,
+          answer_keys: response.data.answer_keys,
+        }));
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  
   useEffect(() => {
     console.log("Updated current file", currentFile);
   }, [currentFile]);
@@ -67,7 +137,7 @@ const CircuitInspectorPage = () => {
   useEffect(() => {
     const getCircuitData = async () => {
       if (currentFile?.id) {
-        setLoading(true); // Set loading to true when fetching data
+        // setLoading(true); // Set loading to true when fetching data
         try {
           const response = await axios.get(`/detect-gates/get-circuit-data/${currentFile.id}`);
           setCurrentCircuitData(response.data.circuit_analysis);
@@ -75,9 +145,7 @@ const CircuitInspectorPage = () => {
           console.log(response.data.circuit_analysis);
         } catch (error) {
           console.log(error.message);
-        } finally {
-          setLoading(false); // Set loading to false after fetching data
-        }
+        } 
       }
     };
     getCircuitData();
@@ -104,16 +172,25 @@ const CircuitInspectorPage = () => {
             circuitData={currentCircuitData} 
             onApplyThreshold={handleApplyThreshold} 
             onDetectLogicGates={handleDetectLogicGates}
+            onTogglePredictionVisibility={handlePredictionVisibility}
+            onAnalyzeCircuit={handleAnalyzeCircuit}
+            onGetTruthTable={handleGetTruthTable}
+            onExportVerilog={handleExportVerilog}
             loading={loading} // Pass loading state to LeftSidebar
           />
         </div>
 
-        <div className="flex-grow">
-          <ImageDisplay img_url={filteredImgUrl} predictions={currentPredictions} loading={loading}/>
+        <div className="flex-grow ">
+          <ImageDisplay img_url={filteredImgUrl} predictions={currentPredictions} isPredictionVisible={isVisibilityToggled} />
         </div>
 
         <div className="">
-          <RightSideBar />
+          <RightSideBar 
+            circuitData={currentCircuitData}
+            task={task}
+            onAddAnswerKey={handleAddAnswerKey}
+            onDeleteExpression={handleDeleteExpression}
+            />
         </div>
       </main>
     </div>

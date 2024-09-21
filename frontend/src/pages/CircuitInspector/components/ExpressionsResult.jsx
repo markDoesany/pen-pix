@@ -1,6 +1,6 @@
 import { FaTrashAlt } from "react-icons/fa";
 
-const ExpressionsResult = () => {
+const ExpressionsResult = ({circuitData}) => {
   return (
     <div className="bg-secondaryBg text-textGray text-sm rounded-lg w-full h-[200px] flex flex-col items overflow-hidden ">
       <div className="bg-thirdBg flex justify-center items-center relative p-2">

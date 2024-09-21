@@ -1,4 +1,4 @@
-const AddAnswerKey = ({onClose}) => {
+const AddAnswerKey = ({onClose, onAddAnswerKey}) => {
   return (
     <div className='bg-secondaryBg p-4 rounded-lg w-[370px] flex flex-col gap-4'>
       <h1 className='font-semibold text-sm'>Detect Logic Gates:</h1>
@@ -8,7 +8,7 @@ const AddAnswerKey = ({onClose}) => {
       </div>
       <div className='flex justify-end text-sm gap-3'>
         <button className='bg-thirdBg p-2 rounded-lg' onClick={onClose}>Cancel</button>
-        <button className='bg-primaryColor p-2 rounded-lg'>Save</button>
+        <button className='bg-primaryColor p-2 rounded-lg' onClick={onAddAnswerKey}>Save</button>
       </div>
     </div>
   )
