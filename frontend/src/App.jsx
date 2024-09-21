@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard/index.jsx';
 import TaskPage from './pages/TaskPage/index.jsx';
 import LandingPage from './pages/LandingPage/index.jsx';
 import CircuitInspectorPage from './pages/CircuitInspector/index.jsx';
+import StudentUploadLink from './pages/StudentFileUploadLink/index.jsx';
 import ErrorPage from './components/ErrorPage.jsx';
 import { ToastProvider } from './contexts/ToastContext'; 
 import 'react-toastify/dist/ReactToastify.css';
@@ -30,9 +31,10 @@ const App = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={user ? <Navigate to={`/dashboard/${user.id}`} /> : <Authentication />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/dashboard/:userId" element = {<Dashboard/>}/>
-            <Route path="/task/:taskId" element = {<TaskPage/>}/>
-            <Route path="/circuit-evaluator" element = {<CircuitInspectorPage/>}/>
+            <Route path="/dashboard/:userId" element={<Dashboard />} />
+            <Route path="/task/:taskId" element={<TaskPage />} />
+            <Route path="/circuit-evaluator" element={<CircuitInspectorPage />} />
+            <Route path="/student-upload/:taskId" element={<StudentUploadLink />} />
             <Route path="/error" element={<ErrorPage errorType={state.errorType} errorMessage={state.errorMessage} />} />
             <Route path="*" element={<ErrorPage errorType="404" errorMessage="Page not found!" />} />
           </Routes>
