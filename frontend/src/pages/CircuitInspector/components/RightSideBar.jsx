@@ -9,7 +9,7 @@ import AddAnswerKey from "./AddAnswerKey";
 import styles from './styles/component.module.css';
 import { useState } from "react";
 
-const RightSideBar = () => {
+const RightSideBar = ({ task, circuitData, onAddAnswerKey, onDeleteExpression }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isAddAnswer, setIsAddAnswer] = useState(false);
 
@@ -32,10 +32,10 @@ const RightSideBar = () => {
       {!isCollapsed && (
         <>
           <div>
-            <AnswerKeys onAdd={handleAddAnswerKey} />
+            <AnswerKeys onAdd={handleAddAnswerKey} task={task} onDeleteExpression={onDeleteExpression}/>
           </div>
           <div className="mt-5">
-            <ExpressionsResult />
+            <ExpressionsResult circuitData={circuitData}/>
           </div>
           <hr className="mt-8 border-borderGray" />
           <div className="flex flex-col gap-3">
@@ -61,7 +61,7 @@ const RightSideBar = () => {
           </div>
           {isAddAnswer && (
             <div className="absolute top-10 -left-96">
-              <AddAnswerKey onClose={handleAddAnswerKey} />
+              <AddAnswerKey onClose={handleAddAnswerKey} onAddAnswerKey={onAddAnswerKey}/>
             </div>
           )}
         </>

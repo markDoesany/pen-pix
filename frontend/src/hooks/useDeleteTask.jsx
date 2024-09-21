@@ -6,7 +6,7 @@ const useDeleteTask = () => {
   const [error, setError] = useState(null);
 
   const handleDeleteTask = async (taskId) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
+    // if (window.confirm("Are you sure you want to delete this task?")) {
       setLoading(true);
       setError(null);
       try {
@@ -21,7 +21,7 @@ const useDeleteTask = () => {
       } finally {
         setLoading(false);
       }
-    }
+    // }
   };
 
   return {

@@ -78,7 +78,7 @@ class Task(db.Model):
     due_date = db.Column(db.DateTime, nullable=False)  
     status = db.Column(db.String(50), default='Ongoing')  
     type = db.Column(db.String(50), nullable=False) 
-    answer_keys = db.Column(db.JSON, nullable=False)  
+    answer_keys = db.Column(db.JSON, nullable=True)  
     ask_boolean = db.Column(db.Boolean, nullable=False)  
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
@@ -139,6 +139,7 @@ class CircuitAnalysis(db.Model):
     netlist = db.Column(db.JSON, nullable=False)
     verilog_url_file = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+    truth_table = db.Column(db.JSON, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
     uploaded_file_id = db.Column(db.Integer, db.ForeignKey('uploaded_file.id'), nullable=False)
 
@@ -150,6 +151,7 @@ class CircuitAnalysis(db.Model):
             'boolean_expressions': self.boolean_expressions,
             'uploaded_file_id': self.uploaded_file_id,
             'netlist': self.netlist,
+            'truth_table': self.truth_table,
             'verilog_url_file': self.verilog_url_file,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()

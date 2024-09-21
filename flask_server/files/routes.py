@@ -70,6 +70,7 @@ def upload_files():
             predictions = [],
             boolean_expressions=[],
             netlist={},
+            truth_table = [],
             verilog_url_file='',
             uploaded_file_id=new_file.id
         )

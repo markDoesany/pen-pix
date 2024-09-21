@@ -1,18 +1,23 @@
 import { FaSliders, FaTable, FaEye, FaEyeSlash, FaFileExport, FaUpload } from "react-icons/fa6";
 import { GiLogicGateNor } from "react-icons/gi";
 import { PiCircuitryFill } from "react-icons/pi";
-import { ImSpinner9 } from "react-icons/im"; // Import the spinner icon
+import { ImSpinner9 } from "react-icons/im";
 import SetThresholdSlider from "./SetThresholdSlider";
 import DetectLogicGatesOption from "./DetectLogicGatesOptions";
+import TruthTable from './TruthTable';
 import styles from './styles/component.module.css';
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import useFileUpload from '../../../hooks/useFileUpload';
 
-const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLogicGates, onTogglePredictionVisibility, onAnalyzeCircuit }) => {
+const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLogicGates, onTogglePredictionVisibility, onAnalyzeCircuit, onGetTruthTable, onExportVerilog }) => {
   const [selectedTool, setSelectedTool] = useState('');
   const [isPredictionToggled, setIsPredictionToggled] = useState(false);
   const { handleUpload } = useFileUpload(task.id);
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    // Update button states when circuitData changes
+  }, [circuitData]);
 
   const handleUploadFileClick = () => {
     if (!loading) {
@@ -32,9 +37,13 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
         }
       } else if (tool === "analyzeCircuit") {
         onAnalyzeCircuit();
+      } else if (tool === 'truthTable') {
+        onGetTruthTable();
+      } else if (tool === 'exportVerilog') {
+        onExportVerilog();
       }
-      setSelectedTool((prevSelectedTool) => (prevSelectedTool === tool ? '' : tool));
     }
+    setSelectedTool((prevSelectedTool) => (prevSelectedTool === tool ? '' : tool));
   };
 
   const handleTogglePredictions = () => {
@@ -49,6 +58,15 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
       onApplyThreshold(thresholdValue, mode);
     }
   };
+
+  // Check the availability of predictions and boolean expressions
+  const hasPredictions = circuitData.predictions && circuitData.predictions.length > 0;
+  const hasBooleanExpressions = circuitData.boolean_expressions && circuitData.boolean_expressions.length > 0;
+
+  // Disable state for tools
+  const isAnalyzeCircuitDisabled = !hasPredictions;
+  const isTruthTableDisabled = !hasPredictions || !hasBooleanExpressions;
+  const isExportVerilogDisabled = !hasPredictions || !hasBooleanExpressions;
 
   return (
     <div className={`w-[110px] h-full flex flex-col items-center gap-4 bg-secondaryBg border border-borderGray font-sans text-textGray px-3 py-4 relative select-none ${loading ? styles.disabled : ''}`}>
@@ -110,8 +128,8 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
       </div>
 
       <div
-        className={`${styles.tool} ${selectedTool === 'analyzeCircuit' ? 'bg-primaryColor text-white' : ''} ${loading && selectedTool !== 'analyzeCircuit' ? 'hover:bg-transparent' : ''}`}
-        onClick={() => handleToolClick('analyzeCircuit')}
+        className={`${styles.tool} ${loading && selectedTool !== 'analyzeCircuit' ? 'hover:bg-transparent' : ''} ${isAnalyzeCircuitDisabled ? 'bg-gray-500 text-gray-300 cursor-not-allowed' : ''}`}
+        onClick={() => !isAnalyzeCircuitDisabled && handleToolClick('analyzeCircuit')}
       >
         {loading && selectedTool === 'analyzeCircuit' ? (
           <ImSpinner9 size={25} className="animate-spin" />
@@ -122,16 +140,16 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
       </div>
 
       <div
-        className={`${styles.tool} ${selectedTool === 'truthTable' ? 'bg-primaryColor text-white' : ''} ${loading && selectedTool !== 'truthTable' ? 'hover:bg-transparent' : ''}`}
-        onClick={() => handleToolClick('truthTable')}
+        className={`${styles.tool} ${selectedTool === 'truthTable' ? 'bg-primaryColor text-white' : ''} ${loading && selectedTool !== 'truthTable' ? 'hover:bg-transparent' : ''} ${isTruthTableDisabled ? 'bg-gray-500 text-gray-300 cursor-not-allowed' : ''}`}
+        onClick={() => !isTruthTableDisabled && handleToolClick('truthTable')}
       >
         <FaTable size={20} />
         <h3 className={`${styles.tool_label} text-xs`}>Truth Table</h3>
       </div>
 
       <div
-        className={`${styles.tool} ${selectedTool === 'exportVerilog' ? 'bg-primaryColor text-white' : ''} ${loading && selectedTool !== 'exportVerilog' ? 'hover:bg-transparent' : ''}`}
-        onClick={() => handleToolClick('exportVerilog')}
+        className={`${styles.tool} ${loading && selectedTool !== 'exportVerilog' ? 'hover:bg-transparent' : ''} ${isExportVerilogDisabled ? 'bg-gray-500 text-gray-300 cursor-not-allowed' : ''}`}
+        onClick={() => !isExportVerilogDisabled && handleToolClick('exportVerilog')}
       >
         <FaFileExport size={20} />
         <h3 className={`${styles.tool_label} text-xs`}>Export Verilog</h3>
@@ -146,6 +164,12 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
       {selectedTool === 'logicGates' && (
         <div className="absolute -right-64 top-48">
           <DetectLogicGatesOption onDetectLogicGates={onDetectLogicGates} loading={loading} />
+        </div>
+      )}
+
+      {selectedTool === 'truthTable' && (
+        <div className="absolute -right-64 top-48">
+          <TruthTable data={circuitData.truth_table} />
         </div>
       )}
     </div>

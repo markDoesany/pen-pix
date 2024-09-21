@@ -41,7 +41,7 @@ const useGetTask = (taskId) => {
     }
   }, [taskId, fetchFiles]);
 
-  return { task, loading, error, fetchFiles};
+  return { task, setTask, loading, error, fetchFiles};
 };
 
 export default useGetTask;

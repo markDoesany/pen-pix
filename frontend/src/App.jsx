@@ -10,6 +10,7 @@ import LandingPage from './pages/LandingPage/index.jsx';
 import CircuitInspectorPage from './pages/CircuitInspector/index.jsx';
 import ErrorPage from './components/ErrorPage.jsx';
 import { ToastProvider } from './contexts/ToastContext'; 
+
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-datepicker/dist/react-datepicker.css';
 

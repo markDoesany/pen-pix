@@ -11,7 +11,7 @@ import axios from "axios";
 
 const CircuitInspectorPage = () => {
   const { taskId } = useParams();
-  const { task, loading: taskLoading } = useGetTask(taskId);
+  const { task, loading: taskLoading, setTask } = useGetTask(taskId);
   const [currentFile, setCurrentFile] = useState({});
   const [currentCircuitData, setCurrentCircuitData] = useState([]);
   const [currentPredictions, setCurrentPredictions] = useState([]);
@@ -42,7 +42,7 @@ const CircuitInspectorPage = () => {
         mode
       });
       setCurrentPredictions(response.data.predictions);
-      console.log("Predictions", response.data.predictions);
+      setCurrentCircuitData({...currentCircuitData, predictions:response.data.predictions})
     } catch (error) {
       console.log(error.message);
     } finally {
@@ -59,14 +59,74 @@ const CircuitInspectorPage = () => {
   }
 
   const handleAnalyzeCircuit = async() => {
+    setLoading(true)
     try {
-      await axios.post(`/detect-gates/analyze-circuit/${currentFile.id}`)
+      const response = await axios.post(`/detect-gates/analyze-circuit/${currentFile.id}`)
+      setCurrentCircuitData({...currentCircuitData, boolean_expressions:response.data.boolean_expressions})
+      console.log("Boolean Expressions:", response.data.boolean_expressions)
     } catch (error) {
       console.log(error)
+    }finally{
+      setLoading(false)
     }
-    console.log("Analyzed circuit")
   }
 
+  const handleGetTruthTable = async() =>{
+    setLoading(true)
+    try {
+      const response = await axios.get(`/detect-gates/get-truth-table/${currentFile.id}`)
+      setCurrentCircuitData({...currentCircuitData, truth_table: response.data.truth_table})
+    } catch (error) {
+      console.log(error.message)
+    }finally{
+      setLoading(false)
+    }
+  }
+  const handleExportVerilog = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`/detect-gates/export-verilog/${currentFile.id}`, {
+        responseType: 'blob', 
+      });
+  
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+  
+      link.setAttribute('download', `circuit_${currentFile.id}.v`); 
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  
+    } catch (error) {
+      console.error('Error downloading the file:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddAnswerKey = () =>{
+
+  }
+  
+  const handleDeleteExpression = async (expression_id) => {
+    try {
+      const response = await axios.post(`/task/delete-expression/${task.id}`, {
+        expression_id: expression_id,
+      });
+  
+      if (response.statusText === "OK") {
+        console.log("Answer keys",response.data)
+        // setTask((prevTask) => ({
+        //   ...prevTask,
+        //   answer_keys: response.data.answer_keys,
+        // }));
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  
   useEffect(() => {
     console.log("Updated current file", currentFile);
   }, [currentFile]);
@@ -115,6 +175,8 @@ const CircuitInspectorPage = () => {
             onDetectLogicGates={handleDetectLogicGates}
             onTogglePredictionVisibility={handlePredictionVisibility}
             onAnalyzeCircuit={handleAnalyzeCircuit}
+            onGetTruthTable={handleGetTruthTable}
+            onExportVerilog={handleExportVerilog}
             loading={loading} // Pass loading state to LeftSidebar
           />
         </div>
@@ -124,7 +186,12 @@ const CircuitInspectorPage = () => {
         </div>
 
         <div className="">
-          <RightSideBar />
+          <RightSideBar 
+            circuitData={currentCircuitData}
+            task={task}
+            onAddAnswerKey={handleAddAnswerKey}
+            onDeleteExpression={handleDeleteExpression}
+            />
         </div>
       </main>
     </div>

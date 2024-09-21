@@ -122,3 +122,30 @@ def delete_task(task_id):
     except Exception as e:
         db.session.rollback()  # Rollback in case of error
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
+    
+@login_required
+@task_bp.route('/delete-expression/<int:task_id>', methods=['POST'])
+def delete_expression(task_id):
+    task = Task.query.get(task_id)
+    if not task:
+        return jsonify({"message": "Task not found"}), 404
+    
+    expression_id = request.json.get('expression_id')
+    if expression_id is None:
+        return jsonify({"message": "Expression ID is required"}), 400
+
+    try:
+        expression_id = int(expression_id)
+        if expression_id < 0 or expression_id >= len(task.answer_keys):
+            return jsonify({"message": "Invalid expression ID"}), 400
+        
+        task.answer_keys.pop(expression_id)
+        db.session.commit()
+        return jsonify({"message": "Answer key deleted successfully", "task": task.to_dict()}), 200
+
+    except (ValueError, IndexError):
+        return jsonify({"message": "Invalid expression ID"}), 400
+
+
+
+
