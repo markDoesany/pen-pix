@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import styles from './index.module.css'; // Import CSS Module
 
-const StudentUploadLink = () => {
+const SubmissionPage = () => {
   const { taskId } = useParams(); // Get taskId from URL parameters
   const [task, setTask] = useState(null); // Initialize with null
   const [files, setFiles] = useState([]);
@@ -73,4 +73,4 @@ const StudentUploadLink = () => {
   );
 };
 
-export default StudentUploadLink;
+export default SubmissionPage;

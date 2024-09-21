@@ -17,7 +17,6 @@ const TaskPage = () => {
   const { taskId } = useParams();
   const navigate = useNavigate();
   const { handleDeleteTask: deleteTask}  = useDeleteTask()
-
   const fetchFiles = useCallback(async () => {
     try {
       const response = await axios.get(`/files/get-files/${taskId}`);
@@ -77,7 +76,7 @@ const TaskPage = () => {
       const response = await axios.patch(`/task/edit-task/${task.id}`, task, {
         withCredentials: true,
       });
-
+  
       console.log("Task saved:", response.data);
       setIsEditing(false);
       
@@ -85,7 +84,7 @@ const TaskPage = () => {
       console.log("Error saving task:", error);
     }
   };
-
+  
   const handleCancelEdit = () => {
     setIsEditing(false);
   };
@@ -96,12 +95,16 @@ const TaskPage = () => {
   };
 
   const handleAnalyzeSubmission = () =>{
-    navigate('/circuit-evaluator')
+    navigate(`/circuit-evaluator/${task.id}`)
   }
 
   const refreshFiles = () => {
     fetchFiles();
   };
+
+  const handleGetLink = () => {
+    navigate(`/student-upload/${task.id}`);
+  }
 
   return (
     <div>
@@ -163,7 +166,7 @@ const TaskPage = () => {
                   type="datetime-local"
                   value={task.due_date}
                   onChange={(e) =>
-                    setTask({ ...task, due_date: e.target.value })
+                    setTask({ ...task, class_schedule: e.target.value })
                   }
                   className="w-full p-2 border rounded"
                 />
@@ -199,8 +202,30 @@ const TaskPage = () => {
                           className="w-full p-2 border rounded"
                         />
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newAnswerKeys = task.answer_keys.filter((_, i) => i !== index);
+                          setTask({ ...task, answer_keys: newAnswerKeys });
+                        }}
+                        className="ml-2 px-4 py-2 bg-red-500 text-white rounded"
+                        disabled={task.answer_keys.length <= 1}
+                      >
+                        Delete
+                      </button>
                     </div>
                   ))}
+                  <button
+                    onClick={() => {
+                      setTask({
+                        ...task,
+                        answer_keys: [...(task.answer_keys || []), { expression: '', points: '' }]
+                      });
+                    }}
+                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+                  >
+                    Add Answer Key
+                  </button>
               </div>
             </div>
           ) : (
@@ -241,7 +266,7 @@ const TaskPage = () => {
           onDelete={handleDeleteTask}
           onUpload={handleUpload}
           onAnalyze={handleAnalyzeSubmission}
-          task={task} // Pass task to TaskActions
+          onGetLink={handleGetLink}
         />
       </div>
 

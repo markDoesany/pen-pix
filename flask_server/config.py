@@ -1,4 +1,3 @@
-# config.py
 import os
 
 class Config:
@@ -7,7 +6,6 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
     
     SESSION_TYPE = 'sqlalchemy'
-    # Email configuration for user authentication
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 587
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')

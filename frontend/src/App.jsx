@@ -8,7 +8,7 @@ import Dashboard from './pages/Dashboard/index.jsx';
 import TaskPage from './pages/TaskPage/index.jsx';
 import LandingPage from './pages/LandingPage/index.jsx';
 import CircuitInspectorPage from './pages/CircuitInspector/index.jsx';
-import StudentUploadLink from './pages/StudentFileUploadLink/index.jsx';
+import SubmissionPage from './pages/SubmissionPage/index.jsx'
 import ErrorPage from './components/ErrorPage.jsx';
 import { ToastProvider } from './contexts/ToastContext'; 
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,14 +18,15 @@ const App = () => {
   const location = useLocation();
   const state = location.state || {};
   const user = useRecoilValue(UserAtom);
-  const pathsWithoutNavbar = ['/auth', '/', '/reset-password', '/student-upload'];
-  const showNavbar = !pathsWithoutNavbar.includes(location.pathname);
-  const isAuthOrLandingPage = pathsWithoutNavbar.includes(location.pathname);
+
+  // Paths where the navbar should be hidden
+  const pathsWithoutNavbar = ['/auth', '/reset-password', `/student-upload/${location.pathname.split('/')[2]}`, `/circuit-evaluator/${location.pathname.split('/')[2]}`];
+  const showNavbar = !pathsWithoutNavbar.some(path => location.pathname.startsWith(path)) && location.pathname !== '/';
 
   return (
     <ToastProvider> 
-      <main className={`${isAuthOrLandingPage ? '' : 'flex justify-center items-center min-h-screen bg-gray-100'}`}>
-        <div className={`${isAuthOrLandingPage ? '' : 'flex flex-col max-w-6xl w-full min-h-screen p-5'}`}>
+      <main className={`${showNavbar ? 'flex justify-center items-center w-full min-h-screen bg-gray-100' : ''}`}>
+        <div className={`${showNavbar ? 'flex flex-col max-w-6xl min-h-screen p-5 w-full' : ''}`}>
           {showNavbar && <Header />}
           <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -33,8 +34,8 @@ const App = () => {
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/dashboard/:userId" element={<Dashboard />} />
             <Route path="/task/:taskId" element={<TaskPage />} />
-            <Route path="/circuit-evaluator" element={<CircuitInspectorPage />} />
-            <Route path="/student-upload/:taskId" element={<StudentUploadLink />} />
+            <Route path="/circuit-evaluator/:taskId" element={<CircuitInspectorPage />} />
+            <Route path="/student-upload/:taskId" element={<SubmissionPage />} />
             <Route path="/error" element={<ErrorPage errorType={state.errorType} errorMessage={state.errorMessage} />} />
             <Route path="*" element={<ErrorPage errorType="404" errorMessage="Page not found!" />} />
           </Routes>

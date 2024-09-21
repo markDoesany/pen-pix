@@ -1,6 +1,6 @@
 # tasks_endpoint.py
 from flask import request, jsonify, session
-from models import db, Task
+from model import db, Task
 from task import task_bp
 from utils.auth_helpers import login_required
 from datetime import datetime
@@ -50,9 +50,9 @@ def create_task():
 @task_bp.route('/get-tasks', methods=['GET'])
 def list_tasks():
     user_id = session.get('user_id')  
+    print("ID",user_id)
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
-    
     tasks = Task.query.filter_by(user_id = user_id)
     return jsonify([task.to_dict() for task in tasks])
 

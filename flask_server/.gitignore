@@ -1,4 +1,7 @@
-__pycache__/
-*.pyc
 venv/
+pycache/
 runs/
+*.pyc
+static/
+runs/
+instance/
