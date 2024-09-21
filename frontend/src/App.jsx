@@ -18,7 +18,7 @@ const App = () => {
   const location = useLocation();
   const state = location.state || {};
   const user = useRecoilValue(UserAtom);
-  const pathsWithoutNavbar = ['/auth', '/', '/reset-password'];
+  const pathsWithoutNavbar = ['/auth', '/', '/reset-password', '/student-upload'];
   const showNavbar = !pathsWithoutNavbar.includes(location.pathname);
   const isAuthOrLandingPage = pathsWithoutNavbar.includes(location.pathname);
 
