@@ -23,9 +23,9 @@ const RightSideBar = ({ task, circuitData, onAddAnswerKey, onDeleteExpression })
 
   return (
     <div 
-      className={`relative flex flex-col justify-center ${isCollapsed ? 'w-20 bg-black' : 'w-[300px]'} h-full px-5 text-textGray transition-all duration-300 ease-in-out`}
+      className={`relative flex flex-col gap-5  ${isCollapsed ? 'w-20 bg-black' : 'w-[300px]'} h-full px-5 text-textGray transition-all duration-300 ease-in-out`}
     >
-      <div className="absolute top-4 right-7 cursor-pointer" onClick={handleToggleCollapse}>
+      <div className="mt-5 cursor-pointer" onClick={handleToggleCollapse}>
         {isCollapsed ? <GoSidebarExpand size={25} /> : <GoSidebarCollapse size={25} />}
       </div>
       

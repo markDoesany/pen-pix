@@ -11,7 +11,7 @@ import axios from "axios";
 
 const CircuitInspectorPage = () => {
   const { taskId } = useParams();
-  const { task, loading: taskLoading, setTask } = useGetTask(taskId);
+  const { task, loading: taskLoading, setTask} = useGetTask(taskId);
   const [currentFile, setCurrentFile] = useState({});
   const [currentCircuitData, setCurrentCircuitData] = useState([]);
   const [currentPredictions, setCurrentPredictions] = useState([]);
@@ -116,11 +116,10 @@ const CircuitInspectorPage = () => {
       });
   
       if (response.statusText === "OK") {
-        console.log("Answer keys",response.data)
-        // setTask((prevTask) => ({
-        //   ...prevTask,
-        //   answer_keys: response.data.answer_keys,
-        // }));
+        setTask((prevTask) => ({
+          ...prevTask,
+          answer_keys: response.data.answer_keys,
+        }));
       }
     } catch (error) {
       console.log(error.message);

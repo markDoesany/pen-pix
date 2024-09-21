@@ -139,13 +139,11 @@ def delete_expression(task_id):
         if expression_id < 0 or expression_id >= len(task.answer_keys):
             return jsonify({"message": "Invalid expression ID"}), 400
         
-        task.answer_keys.pop(expression_id)
+        new_answer_keys = task.answer_keys.copy()
+        new_answer_keys.pop(expression_id)
+        task.answer_keys = new_answer_keys
         db.session.commit()
-        return jsonify({"message": "Answer key deleted successfully", "task": task.to_dict()}), 200
-
+        return jsonify({"message": "Answer key deleted successfully", "answer_keys": task.answer_keys}), 200
+    
     except (ValueError, IndexError):
         return jsonify({"message": "Invalid expression ID"}), 400
-
-
-
-
