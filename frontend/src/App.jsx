@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard/index.jsx';
 import TaskPage from './pages/TaskPage/index.jsx';
 import LandingPage from './pages/LandingPage/index.jsx';
 import CircuitInspectorPage from './pages/CircuitInspector/index.jsx';
+import SubmissionPage from './pages/SubmissionPage/index.jsx'
 import ErrorPage from './components/ErrorPage.jsx';
 import { ToastProvider } from './contexts/ToastContext'; 
 import 'react-toastify/dist/ReactToastify.css';
@@ -19,7 +20,7 @@ const App = () => {
   const user = useRecoilValue(UserAtom);
 
   // Paths where the navbar should be hidden
-  const pathsWithoutNavbar = ['/auth', '/reset-password', `/circuit-evaluator/${location.pathname.split('/')[2]}`];
+  const pathsWithoutNavbar = ['/auth', '/reset-password', `/student-upload/${location.pathname.split('/')[2]}`, `/circuit-evaluator/${location.pathname.split('/')[2]}`];
   const showNavbar = !pathsWithoutNavbar.some(path => location.pathname.startsWith(path)) && location.pathname !== '/';
 
   return (
@@ -34,6 +35,7 @@ const App = () => {
             <Route path="/dashboard/:userId" element={<Dashboard />} />
             <Route path="/task/:taskId" element={<TaskPage />} />
             <Route path="/circuit-evaluator/:taskId" element={<CircuitInspectorPage />} />
+            <Route path="/student-upload/:taskId" element={<SubmissionPage />} />
             <Route path="/error" element={<ErrorPage errorType={state.errorType} errorMessage={state.errorMessage} />} />
             <Route path="*" element={<ErrorPage errorType="404" errorMessage="Page not found!" />} />
           </Routes>

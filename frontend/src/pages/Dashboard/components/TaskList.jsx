@@ -29,6 +29,10 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
     refreshTasks()
   }
 
+  const handleGetLink = (taskId) => {
+    navigate(`/student-upload/${taskId}`);
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="grid grid-cols-9 gap-4 font-semibold text-sm border-b-2 pb-2">
@@ -63,7 +67,7 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
           <button className="text-right col-span-1 pr-4" onClick={(event) => handleMenu(event, task)}>
             <img className="inline-block" src="/icons/meatballs_menu.svg" alt="Menu icon" />
           </button>
-          {openTask === task && <TaskMenu onDelete={() => handleDeleteTask(task.id)}/>}
+          {openTask === task && <TaskMenu onDelete={() => handleDeleteTask(task.id)} onGetLink={() => handleGetLink(task.id)}/>}
         </div>
       ))}
     </div>

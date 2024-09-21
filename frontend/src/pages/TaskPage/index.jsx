@@ -98,10 +98,13 @@ const TaskPage = () => {
     navigate(`/circuit-evaluator/${task.id}`)
   }
 
-
   const refreshFiles = () => {
     fetchFiles();
   };
+
+  const handleGetLink = () => {
+    navigate(`/student-upload/${task.id}`);
+  }
 
   return (
     <div>
@@ -263,6 +266,7 @@ const TaskPage = () => {
           onDelete={handleDeleteTask}
           onUpload={handleUpload}
           onAnalyze={handleAnalyzeSubmission}
+          onGetLink={handleGetLink}
         />
       </div>
 
