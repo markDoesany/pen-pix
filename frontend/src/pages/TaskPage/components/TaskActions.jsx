@@ -1,10 +1,21 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload, onAnalyze }) => {
+const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload, onAnalyze, task }) => {
   const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
+  };
+
+  const handleGenerateLink = () => {
+    // Navigate to StudentUploadLink with the task ID
+    if (task && task.id) {
+      navigate(`/student-upload/${task.id}`); // Update the navigation path to include task ID
+    } else {
+      console.error('Task ID is missing');
+    }
   };
 
   return (
@@ -38,7 +49,10 @@ const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload, 
           >
             Edit Task
           </button>
-          <button className="w-full bg-green-500 text-white p-2 rounded">
+          <button
+            className="w-full bg-green-500 text-white p-2 rounded"
+            onClick={handleGenerateLink} // Update the onClick handler
+          >
             Generate Link
           </button>
           <button className="w-full bg-purple-500 text-white p-2 rounded">

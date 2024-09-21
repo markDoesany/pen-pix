@@ -9,7 +9,6 @@ import FilesList from './components/FilesList';
 import { formatDueDateTime } from '../../utils/helpers';
 import useDeleteTask from '../../hooks/useDeleteTask';
 
-
 const TaskPage = () => {
   const [task, setTask] = useState({});
   const [files, setFiles] = useRecoilState(FilesAtom)
@@ -100,7 +99,6 @@ const TaskPage = () => {
     navigate('/circuit-evaluator')
   }
 
-
   const refreshFiles = () => {
     fetchFiles();
   };
@@ -165,7 +163,7 @@ const TaskPage = () => {
                   type="datetime-local"
                   value={task.due_date}
                   onChange={(e) =>
-                    setTask({ ...task, class_schedule: e.target.value })
+                    setTask({ ...task, due_date: e.target.value })
                   }
                   className="w-full p-2 border rounded"
                 />
@@ -243,6 +241,7 @@ const TaskPage = () => {
           onDelete={handleDeleteTask}
           onUpload={handleUpload}
           onAnalyze={handleAnalyzeSubmission}
+          task={task} // Pass task to TaskActions
         />
       </div>
 
