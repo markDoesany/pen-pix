@@ -9,6 +9,7 @@ import TaskPage from './pages/TaskPage/index.jsx';
 import LandingPage from './pages/LandingPage/index.jsx';
 import CircuitInspectorPage from './pages/CircuitInspector/index.jsx';
 import SubmissionPage from './pages/SubmissionPage/index.jsx'
+import ClassPage from './pages/Classes/index.jsx';
 import ErrorPage from './components/ErrorPage.jsx';
 import { ToastProvider } from './contexts/ToastContext'; 
 
@@ -34,6 +35,7 @@ const App = () => {
             <Route path="/auth" element={user ? <Navigate to={`/dashboard/${user.id}`} /> : <Authentication />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/dashboard/:userId" element={<Dashboard />} />
+            <Route path="/classes/:userId" element={<ClassPage />} />
             <Route path="/task/:taskId" element={<TaskPage />} />
             <Route path="/circuit-evaluator/:taskId" element={<CircuitInspectorPage />} />
             <Route path="/student-upload/:taskId" element={<SubmissionPage />} />

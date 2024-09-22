@@ -8,17 +8,11 @@ from config import Config
 from flask_cors import CORS
 from flask_mailman import Mail
 from dotenv import load_dotenv
-from datetime import timedelta
 
 load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
-app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-app.config['SESSION_COOKIE_SECURE'] = True
-
 db.init_app(app)
 
 mail = Mail()
