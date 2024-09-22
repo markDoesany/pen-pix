@@ -1,14 +1,14 @@
-const TaskMenu = ({onDelete}) => {
+const TaskMenu = ({onDelete, onGetLink}) => {
 
   const handleDelete = (event) => {
     event.stopPropagation()
     onDelete()
   }
 
-  const handleGetLink = (event) =>{
-   event.stopPropagation() 
-   console.log('Generate Link')
-  }
+  const handleGetLink = (event) => {
+    event.stopPropagation();
+    onGetLink()
+  };
 
   const handleGetTemplate = (event) =>{
     event.stopPropagation() 
@@ -17,7 +17,7 @@ const TaskMenu = ({onDelete}) => {
  
 
   return (
-    <div className="absolute right-0 -bottom-32 bg-white border border-gray-300 shadow-lg rounded-md p-2 w-48 z-50">
+    <div className="absolute h-fit right-0 -bottom-32 bg-white border border-gray-300 shadow-lg rounded-md p-2 w-48 z-50 max-md:top-8 max-md:right-3">
       <ul className="space-y-2">
         <li>
           <button className="w-full text-left text-sm text-gray-700 hover:bg-gray-100 px-2 py-1 rounded-md" onClick={(event) => handleGetLink(event)}>

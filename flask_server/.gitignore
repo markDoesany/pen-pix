@@ -1,0 +1,7 @@
+venv/
+pycache/
+runs/
+*.pyc
+static/
+runs/
+instance/

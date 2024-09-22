@@ -1,6 +1,6 @@
 # tasks_endpoint.py
 from flask import request, jsonify, session
-from models import db, Task
+from model import db, Task
 from task import task_bp
 from utils.auth_helpers import login_required
 from datetime import datetime
@@ -46,14 +46,13 @@ def create_task():
 
     return jsonify(task.to_dict()), 201
 
-
 @login_required
 @task_bp.route('/get-tasks', methods=['GET'])
 def list_tasks():
     user_id = session.get('user_id')  
+    print("ID",user_id)
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
-    
     tasks = Task.query.filter_by(user_id = user_id)
     return jsonify([task.to_dict() for task in tasks])
 
@@ -112,7 +111,7 @@ def delete_task(task_id):
         if not task:
             return jsonify({"message": "Task not found"}), 404
 
-        TASK_FOLDER = os.path.join('images', str(task_id))
+        TASK_FOLDER = os.path.join('static', 'images', str(task_id))
         if os.path.exists(TASK_FOLDER):
             shutil.rmtree(TASK_FOLDER) 
 
@@ -123,3 +122,28 @@ def delete_task(task_id):
     except Exception as e:
         db.session.rollback()  # Rollback in case of error
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
+    
+@login_required
+@task_bp.route('/delete-expression/<int:task_id>', methods=['POST'])
+def delete_expression(task_id):
+    task = Task.query.get(task_id)
+    if not task:
+        return jsonify({"message": "Task not found"}), 404
+    
+    expression_id = request.json.get('expression_id')
+    if expression_id is None:
+        return jsonify({"message": "Expression ID is required"}), 400
+
+    try:
+        expression_id = int(expression_id)
+        if expression_id < 0 or expression_id >= len(task.answer_keys):
+            return jsonify({"message": "Invalid expression ID"}), 400
+        
+        new_answer_keys = task.answer_keys.copy()
+        new_answer_keys.pop(expression_id)
+        task.answer_keys = new_answer_keys
+        db.session.commit()
+        return jsonify({"message": "Answer key deleted successfully", "answer_keys": task.answer_keys}), 200
+    
+    except (ValueError, IndexError):
+        return jsonify({"message": "Invalid expression ID"}), 400

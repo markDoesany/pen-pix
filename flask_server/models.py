@@ -1,7 +1,7 @@
 # models.py
-
 import uuid
 from flask_sqlalchemy import SQLAlchemy
+from flask import url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 import datetime
@@ -115,6 +115,10 @@ class UploadedFile(db.Model):
     mimetype = db.Column(db.String(50), nullable=False)
     upload_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
+    
+    @property
+    def file_url(self):
+        return url_for('files.serve_file', task_id=self.task_id, filename=self.filename, _external=True)
 
     def to_dict(self):
         return {
@@ -122,7 +126,6 @@ class UploadedFile(db.Model):
             'filename': self.filename,
             'filepath': self.filepath,
             'mimetype': self.mimetype,
-            'upload_date': self.upload_date.isoformat() if self.upload_date else None,
-            'task_id': self.task_id
+            'file_url': self.file_url
         }
 

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'; // Import Link for navigation
+import styles from './styles/errorPage.module.css'
 import 'tailwindcss/tailwind.css'; // Import Tailwind CSS if not already done
 
 const ErrorPage = ({ errorType, errorMessage }) => {
@@ -7,15 +8,15 @@ const ErrorPage = ({ errorType, errorMessage }) => {
       case 'unauthorized':
         return (
           <>
-            <h1 className="text-4xl font-bold text-red-600 mb-4">Unauthorized</h1>
-            <p className="text-xl text-gray-700 mb-6">{errorMessage || "You don't have permission to access this page."}</p>
+            <h1 className={styles.title}>Unauthorized</h1>
+            <p className={styles.desc}>{errorMessage || "You don't have permission to access this page."}</p>
           </>
         );
       case '404':
         return (
           <>
-            <h1 className="text-4xl font-bold text-red-600 mb-4">Oops!</h1>
-            <p className="text-xl text-gray-700 mb-6">{errorMessage || "Page not found. The page you're looking for might have been removed or you might have entered an incorrect URL."}</p>
+            <h1  className={styles.title}>Oops!</h1>
+            <p className={styles.desc}>{errorMessage || "Page not found. The page you're looking for might have been removed or you might have entered an incorrect URL."}</p>
             <img
               src="https://via.placeholder.com/400x200.png?text=Error+404"
               alt="Error 404"
@@ -26,8 +27,8 @@ const ErrorPage = ({ errorType, errorMessage }) => {
       case '500':
         return (
           <>
-            <h1 className="text-4xl font-bold text-red-600 mb-4">Server Error</h1>
-            <p className="text-xl text-gray-700 mb-6">{errorMessage || "There was a problem with the server. Please try again later."}</p>
+            <h1  className={styles.title}>Server Error</h1>
+            <p className={styles.desc}>{errorMessage || "There was a problem with the server. Please try again later."}</p>
             <img
               src="https://via.placeholder.com/400x200.png?text=Error+500"
               alt="Error 500"
@@ -38,36 +39,36 @@ const ErrorPage = ({ errorType, errorMessage }) => {
       case '403':
         return (
           <>
-            <h1 className="text-4xl font-bold text-red-600 mb-4">Forbidden</h1>
-            <p className="text-xl text-gray-700 mb-6">{errorMessage || "You don't have permission to access this resource."}</p>
+            <h1 className={styles.title}>Forbidden</h1>
+            <p className={styles.desc}>{errorMessage || "You don't have permission to access this resource."}</p>
           </>
         );
       case '400':
         return (
           <>
-            <h1 className="text-4xl font-bold text-red-600 mb-4">Bad Request</h1>
-            <p className="text-xl text-gray-700 mb-6">{errorMessage || "The request could not be understood or was missing required parameters."}</p>
+            <h1 className={styles.title}>Bad Request</h1>
+            <p className={styles.desc}>{errorMessage || "The request could not be understood or was missing required parameters."}</p>
           </>
         );
       case '408':
         return (
           <>
-            <h1 className="text-4xl font-bold text-red-600 mb-4">Request Timeout</h1>
-            <p className="text-xl text-gray-700 mb-6">{errorMessage || "The request took too long and timed out. Please try again."}</p>
+            <h1 className={styles.title}>Request Timeout</h1>
+            <p className={styles.desc}>{errorMessage || "The request took too long and timed out. Please try again."}</p>
           </>
         );
       case '409':
         return (
           <>
-            <h1 className="text-4xl font-bold text-red-600 mb-4">Conflict</h1>
-            <p className="text-xl text-gray-700 mb-6">{errorMessage || "There was a conflict with the request. It could be due to a resource conflict or a duplicate entry."}</p>
+            <h1 className={styles.title}>Conflict</h1>
+            <p className={styles.desc}>{errorMessage || "There was a conflict with the request. It could be due to a resource conflict or a duplicate entry."}</p>
           </>
         );
       default:
         return (
           <>
-            <h1 className="text-4xl font-bold text-red-600 mb-4">Error</h1>
-            <p className="text-xl text-gray-700 mb-6">{errorMessage || "An unexpected error occurred."}</p>
+            <h1 className={styles.title}>Error</h1>
+            <p className={styles.desc}>{errorMessage || "An unexpected error occurred."}</p>
           </>
         );
     }

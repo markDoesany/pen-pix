@@ -22,7 +22,7 @@ const FilesList = ({ files, refreshFiles }) => {
           {files.map((file) => (
             <li key={file.id} className="flex justify-between items-center space-x-2">
               <a 
-                href={`http://127.0.0.1:5000/files/${file.task_id}/${file.filename}`} 
+                href={file.file_url} 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="text-blue-500"

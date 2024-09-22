@@ -1,11 +1,12 @@
 import { useRef } from 'react';
 
-const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload }) => {
+const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload, onAnalyze, onGetLink }) => {
   const fileInputRef = useRef(null);
 
   const handleUploadClick = () => {
     fileInputRef.current.click();
   };
+
 
   return (
     <div className="bg-white shadow-lg p-6 rounded-lg space-y-4">
@@ -28,6 +29,7 @@ const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload }
         <>
           <button
             className="w-full bg-orange-700 text-white p-2 rounded"
+            onClick={onAnalyze}
           >
             Analyze Submission
           </button>
@@ -37,7 +39,8 @@ const TaskActions = ({ isEditing, onEdit, onSave, onCancel, onDelete, onUpload }
           >
             Edit Task
           </button>
-          <button className="w-full bg-green-500 text-white p-2 rounded">
+          <button className="w-full bg-green-500 text-white p-2 rounded"
+            onClick={onGetLink}>
             Generate Link
           </button>
           <button className="w-full bg-purple-500 text-white p-2 rounded">
