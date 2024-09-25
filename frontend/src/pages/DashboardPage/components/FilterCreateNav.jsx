@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CreateTaskForm from './CreateTaskForm';
 
 const FilterCreateNav = ({ onFilterChange }) => {
+  const navigate = useNavigate()
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [showCreateTaskForm, setShowCreateTaskForm] = useState(false);
 
@@ -11,6 +13,7 @@ const FilterCreateNav = ({ onFilterChange }) => {
   };
 
   const handleCreateTask = () => {
+    navigate('/create-task')
     setShowCreateTaskForm(true); // Show the CreateTaskForm
   };
 

@@ -19,6 +19,9 @@ def login():
 
     user = User.query.filter_by(email=email).first()
     if user and user.check_password(password):
+        if not user.email_verified:
+            return jsonify({"error": "Email not verified. Please verify your email first."}), 403
+
         session['user_id'] = user.id
         return jsonify({"message": "User logged in successfully", "user": user.to_dict()})
     else:
@@ -29,6 +32,9 @@ def register():
     email = request.json.get("email")
     password = request.json.get("password")
     
+    if not email.endswith('@usc.edu.ph'):
+        return jsonify({"error": "Invalid email domain. Only @usc.edu.ph emails are allowed."}), 400
+    
     user = User.query.filter_by(email=email).first()
     
     if user:
@@ -36,10 +42,22 @@ def register():
     else:
         new_user = User(email=email)
         new_user.set_password(password)
+        verification_token = new_user.generate_verification_token()  # Generate verification token
         db.session.add(new_user)
         db.session.commit()
-        session['user_id'] = new_user.id
-        return jsonify({"message": "User registered successfully"})
+
+        verification_link = f"http://localhost:5173/verify-email?token={verification_token}"
+        
+        msg = EmailMessage(
+            "Email Verification",
+            f"Please verify your email by clicking on the following link: {verification_link}",
+            Config.MAIL_USERNAME, 
+            [email]
+        )
+        msg.send()
+
+        return jsonify({"message": "User registered successfully. Please verify your email."})
+
 
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
@@ -103,6 +121,24 @@ def verify_reset_token():
         return jsonify({"message": "Token is valid"})
     else:
         return jsonify({"error": "Invalid or expired token"}), 400
+    
+@auth_bp.route("/verify-email", methods=["POST"])
+def verify_email():
+    token = request.json.get("token")
+
+    if not token:
+        return jsonify({"error": "Token is required"}), 400
+
+    user = User.query.filter_by(verification_token=token).first()
+
+    if user and user.verify_verification_token(token):
+        user.email_verified = True
+        user.verification_token = None  
+        user.verification_token_expiry = None  
+        db.session.commit()
+        return jsonify({"message": "Email has been verified successfully."})
+    
+    return jsonify({"error": "Invalid or expired token."}), 400
 
 @auth_bp.route("/user/<string:user_id>", methods=["GET"])
 def get_user(user_id):

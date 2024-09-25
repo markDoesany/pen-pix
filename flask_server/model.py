@@ -16,6 +16,9 @@ class User(db.Model):
     password_hash = db.Column(db.String(150), nullable=False)
     reset_token = db.Column(db.String(100), nullable=True)
     reset_token_expiry = db.Column(db.DateTime, nullable=True)
+    verification_token = db.Column(db.String(100), nullable=True)  # Token for email verification
+    verification_token_expiry = db.Column(db.DateTime, nullable=True)  # Expiry for email verification
+    email_verified = db.Column(db.Boolean, default=False)  # Whether the email has been verified
     tasks = db.relationship('Task', backref='user', lazy=True, cascade="all, delete-orphan")
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
@@ -56,15 +59,47 @@ class User(db.Model):
             return False
         
         return False
-    
+
+    # Generate email verification token
+    def generate_verification_token(self):
+        payload = {
+            'verification_token': secrets.token_urlsafe(),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)  # 24-hour expiry
+        }
+        
+        token = jwt.encode(payload, self.SECRET_KEY, algorithm='HS256')
+        self.verification_token = token
+        self.verification_token_expiry = payload['exp']
+        
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+        
+        return token
+
+    def verify_verification_token(self, token):
+        try:
+            payload = jwt.decode(token, self.SECRET_KEY, algorithms=['HS256'])
+            if 'verification_token' in payload:
+                return True
+        except jwt.ExpiredSignatureError:
+            return False
+        except jwt.InvalidTokenError:
+            return False
+        
+        return False
+
     def to_dict(self):
         return {
             'id': self.id,
             'email': self.email,
-            # 'tasks': [task.to_dict() for task in self.tasks],
+            'email_verified': self.email_verified,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
+
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)

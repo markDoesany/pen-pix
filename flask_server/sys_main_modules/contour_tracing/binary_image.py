@@ -13,12 +13,9 @@ def draw_contour(img):
 def binarize_image(image_bytes: BytesIO) -> BytesIO:
     img_array = np.frombuffer(image_bytes.read(), np.uint8)
     img = cv2.imdecode(img_array, cv2.IMREAD_GRAYSCALE)
-    
-    _, thresh = cv2.threshold(img, 125, 255, cv2.THRESH_BINARY_INV)
-    
-    # Apply morphological transformations
+    inverted_img = cv2.bitwise_not(img)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-    dilate = cv2.dilate(thresh, kernel, iterations=2)
+    dilate = cv2.dilate(inverted_img, kernel, iterations=2)
     erode = cv2.erode(dilate, kernel, iterations=2)
     
     contour_img = draw_contour(erode)

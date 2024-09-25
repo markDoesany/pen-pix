@@ -53,6 +53,7 @@ const ComboBox = ({ options, value, onOptionSelect }) => {
       styles={customStyles}
       className={classnames('w-full')}
       classNamePrefix="react-select"
+      isSearchable 
     />
   );
 };

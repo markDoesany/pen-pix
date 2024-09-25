@@ -18,7 +18,13 @@ const RegisterForm = ({ onViewChange }) => {
       return;
     }
 
-    setLoading(true); // Start loading
+    // Validate email domain
+    if (!email.endsWith('@usc.edu.ph')) {
+      setError("Invalid email domain. Only @usc.edu.ph emails are allowed.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const response = await axios.post('/auth/register', {
