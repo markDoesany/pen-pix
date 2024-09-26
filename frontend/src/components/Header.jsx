@@ -1,17 +1,24 @@
 import Links from "./Links"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { LuMenu } from "react-icons/lu";
+import { IoSettingsOutline } from "react-icons/io5";
+import { RiNotification2Line } from "react-icons/ri";
+import { IoLogOut } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import useToast from "../hooks/useToast";
 import useLogout from "../hooks/useLogoutUser";
 import { useState } from "react";
+import Notifications from "./Notifications";
 
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
   const { toastSuccess, toastError } = useToast();
   const { logout } = useLogout();
+  const navigate = useNavigate()
+  const [ isNotificationOpen, setIsNotificationOpen] = useState(false)
 
   const handleLogout = async () => {
+
     try {
       logout();
       toastSuccess('Logout Successfully');
@@ -21,8 +28,12 @@ const Header = () => {
     }
   };
 
+  const handleToggleNotification = () =>{
+    setIsNotificationOpen(!isNotificationOpen)
+  }
+
   return (
-    <div className="flex justify-between items-center h-[50px] border-b-2 px-5 py-7 relative">
+    <div className="flex justify-between items-center h-[50px] border-b-2 px-5 py-7 relative w-full bg-white">
       <div className="flex items-center">
         <Link><img src="/icons/PenPix-txt.png" alt="Logo" /></Link>
       </div>
@@ -31,12 +42,22 @@ const Header = () => {
         <Links />
       </div>
 
-      <div className="user-menu flex items-center gap-5 font-semibold max-md:hidden">
-        <img className="cursor-pointer" src="/icons/notification.svg" alt="notification" />
-        <button className="bg-black text-white text-sm px-4 py-2 rounded-md" onClick={handleLogout}>Logout</button>
+      <div className="user-menu flex items-center gap-8 font-semibold max-md:hidden ">
+        <div className="flex items-center gap-3 cursor-pointer relative h-full w-full">
+          <RiNotification2Line size={25}  onClick={handleToggleNotification}/>
+          <IoSettingsOutline size={25} onClick={() => navigate('/settings')}/>
+          {isNotificationOpen ?
+            <div className="absolute w-full h-full z-50 -bottom-11 -left-64">
+              <Notifications onClose={() => setIsNotificationOpen(!isNotificationOpen)}/>
+            </div> : ''}
+        </div>
+        <button className="flex items-center gap-1" onClick={handleLogout}>
+          <span className="text-md text-primaryColor">Logout</span>
+          <IoLogOut size={35} color="#F26132"/>
+        </button>
       </div>
 
-      <div className={`z-10 fixed top-0 right-0 h-full w-1/4 bg-white shadow-lg transition-transform transform ${showMenu ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`z-10 fixed top-0 right-0 h-full w-1/4 bg-white shadow-lg transition-transform transform md:hidden ${showMenu ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="p-5">
           <div className="hidden max-md:block cursor-pointer mt-3">
             <IoClose size={30} onClick={() => setShowMenu(!showMenu)} />
@@ -44,16 +65,21 @@ const Header = () => {
           <div className="mt-10">
             <Links/>
           </div>
-          <div className="font-medium mt-10">
-            <button className="bg-black text-white text-sm px-2 py-1 rounded-md" onClick={handleLogout}>Logout</button>
-          </div>
+          <button className="flex items-center gap-1 mt-10" onClick={handleLogout}>
+            <span className="text-md text-primaryColor">Logout</span>
+            <IoLogOut size={25} color="#F26132"/>
+        </button>
         </div>
       </div>
 
       <div className="hidden max-md:flex gap-4 cursor-pointer ">
-        <img className="cursor-pointer" src="/icons/notification.svg" alt="notification" />
+        <div className="flex items-center gap-3 cursor-pointer">
+          <RiNotification2Line size={25} onClick={handleToggleNotification}/>
+          <IoSettingsOutline size={25} onClick={() => navigate('/settings')}/>
+        </div>
         <LuMenu size={30} onClick={() => setShowMenu(!showMenu)} />
       </div>
+      
     </div>
   )
 }

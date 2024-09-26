@@ -34,35 +34,27 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
 
   return (
     <div>
-      <div className="max-w-7xl mx-auto px-4 py-6 max-md:hidden">
-        <div className="grid grid-cols-9 gap-4 font-semibold text-sm border-b-2 pb-2">
-          <div className="text-left col-span-1 text-gray-500">Group</div>
+      <div className="max-w-7xl mx-auto px-4 py-7 max-md:hidden">
+        <div className="grid grid-cols-7 gap-4 font-semibold text-sm border-b-2 pb-2">
+          <div className="text-left text-gray-500">Course | Group</div>
           <div className="text-left col-span-2">Title</div>
-          <div className="text-center col-span-1">No. of Submissions</div>
-          <div className="text-center col-span-2">Due Date</div>
-          <div className="text-center col-span-1">Status</div>
-          <div className="text-center col-span-1">Type of Task</div>
-          <div className="text-right col-span-1 pr-3"></div>
+          <div className="text-center ">No. of Submissions</div>
+          <div className="text-center ">Due Date</div>
+          <div className="text-center ">Type of Task</div>
+          <div className="text-right  pr-3"></div>
         </div>
         {filteredTasks.map((task, index) => (
           <div
             key={index}
-            className="grid grid-cols-9 gap-4 text-sm border-b py-5 hover:bg-gray-200 rounded-b-sm cursor-pointer items-center relative"
+            className="grid grid-cols-7 gap-4 text-sm border-b py-5 hover:bg-gray-200 rounded-b-sm cursor-pointer items-center relative"
             onClick={() => handleSelectedTask(task.id)}
           >
-            <div className="text-left pl-3 col-span-1 font-semibold text-gray-500">{task.class_group}</div>
+            <div className="text-left pl-3 font-semibold text-gray-500">{task.class_group}</div>
             <div className="col-span-2 font-semibold text-left">{task.title}</div>
-            <div className="text-center col-span-1 border border-gray-300 rounded-md w-16 py-1 mx-auto">
+            <div className="text-center border border-gray-300 rounded-md w-16 py-1 mx-auto">
               <p>{task.reviewed_submissions}/{task.total_submissions}</p>
             </div>
-            <div className="text-center col-span-2">{formatDueDateTime(task.due_date)}</div>
-            <div
-              className={`text-center col-span-1 font-semibold ${
-                task.status === "Ongoing" ? "text-red-500" : "text-green-500"
-              }`}
-            >
-              {task.status}
-            </div>
+            <div className="text-center">{formatDueDateTime(task.due_date)}</div>
             <div className="text-center col-span-1 font-semibold">{task.type}</div>
             <button
               className="text-right col-span-1 pr-4"

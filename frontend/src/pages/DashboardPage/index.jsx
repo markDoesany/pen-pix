@@ -58,7 +58,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="mt-10 flex flex-col w-full">
+    <div className="flex flex-col w-full h-screen bg-white p-10">
       <FilterCreateNav onFilterChange={handleFilterChange} />
       {tasks.length === 0 ? (
         <EmptyTasksPlaceholder />

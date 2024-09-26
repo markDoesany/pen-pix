@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import useToast from '../../../hooks/useToast'
+import useToast from '../../../hooks/useToast';
 
 const RegisterForm = ({ onViewChange }) => {
   const [email, setEmail] = useState('');
@@ -8,6 +8,7 @@ const RegisterForm = ({ onViewChange }) => {
   const [repassword, setRepassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
   const { toastSuccess } = useToast();
 
   const handleSubmit = async (e) => {
@@ -31,7 +32,7 @@ const RegisterForm = ({ onViewChange }) => {
         email,
         password
       });
-      
+
       toastSuccess(response.data.message);
       setError(null);
       onViewChange('login');
@@ -39,7 +40,7 @@ const RegisterForm = ({ onViewChange }) => {
     } catch (error) {
       console.error('There was an error registering:', error.response?.data || error.message);
       setError("Registration failed. Please try again.");
-      
+
     } finally {
       setLoading(false); // End loading
     }
@@ -61,9 +62,11 @@ const RegisterForm = ({ onViewChange }) => {
             className="w-full h-10 p-2 border border-gray-300 rounded-lg outline-none focus:border-teal-400"
           />
         </div>
-        <div className="mb-4">
+
+        {/* Password field with toggle visibility */}
+        <div className="mb-4 relative">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             id="password"
             name="password"
             placeholder="Password"
@@ -72,10 +75,19 @@ const RegisterForm = ({ onViewChange }) => {
             required
             className="w-full h-10 p-2 border border-gray-300 rounded-lg outline-none focus:border-teal-400"
           />
+          <button
+            type="button"
+            className="absolute right-2 top-3 text-sm text-gray-500 underline"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
         </div>
-        <div className="mb-4">
+
+        {/* Re-Enter Password field */}
+        <div className="mb-4 relative">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             id="repassword"
             name="repassword"
             placeholder="Re-Enter Password"
@@ -85,6 +97,7 @@ const RegisterForm = ({ onViewChange }) => {
             className="w-full h-10 p-2 border border-gray-300 rounded-lg outline-none focus:border-teal-400"
           />
         </div>
+
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <button
           type="submit"
@@ -93,8 +106,9 @@ const RegisterForm = ({ onViewChange }) => {
         >
           {loading ? "Loading..." : "Sign up"}
         </button>
-        <div className="text-center mt-6">
-          <p className="text-gray-700">
+
+        <div className="text-right mt-6">
+          <p className="text-xs text-customGray2">
             Already have an account?{' '}
             <span
               className="text-[#953867] hover:underline cursor-pointer"

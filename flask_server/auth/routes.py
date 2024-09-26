@@ -4,6 +4,7 @@ from auth import auth_bp
 from model import User, db 
 from flask_mailman import EmailMessage
 from config import Config
+from datetime import timedelta
 
 @auth_bp.route('/check-session',methods=["GET"])
 def check_session():
@@ -16,13 +17,16 @@ def check_session():
 def login():
     email = request.json.get("email")
     password = request.json.get("password")
-
+    remember = request.json.get("remember", False)
+    
     user = User.query.filter_by(email=email).first()
     if user and user.check_password(password):
         if not user.email_verified:
             return jsonify({"error": "Email not verified. Please verify your email first."}), 403
 
         session['user_id'] = user.id
+        if remember:
+            session.permanent = True 
         return jsonify({"message": "User logged in successfully", "user": user.to_dict()})
     else:
         return jsonify({"error": "Unauthorized"}), 401
@@ -36,7 +40,6 @@ def register():
         return jsonify({"error": "Invalid email domain. Only @usc.edu.ph emails are allowed."}), 400
     
     user = User.query.filter_by(email=email).first()
-    
     if user:
         return jsonify({"error": "User already exists"}), 400
     else:
@@ -139,6 +142,24 @@ def verify_email():
         return jsonify({"message": "Email has been verified successfully."})
     
     return jsonify({"error": "Invalid or expired token."}), 400
+
+@auth_bp.route("/check-recovery-info", methods=["POST"])
+def check_recovery_info():
+    email = request.json.get("email")
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({"error": "No account found with that email address."}), 404
+
+    return jsonify({
+        "recovery_email": user.recovery_email or "",
+        "contact_number": user.contact_number or ""
+    })
+
 
 @auth_bp.route("/user/<string:user_id>", methods=["GET"])
 def get_user(user_id):

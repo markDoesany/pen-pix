@@ -1,67 +1,120 @@
 import { useState } from "react";
-import axios from "axios";
+import Verification from "./Verification";
+import PasswordRecovery from "./PasswordRecovery";
+import axios from "axios"; // Uncomment axios for API calls
 
 const ForgotPassword = ({ onViewChange }) => {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [showComponent, setShowComponent] = useState('getEmail');
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  
+  const [recoveryEmail, setRecoveryEmail] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
+  
+  const [selectedOption, setSelectedOption] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true); // Start loading
-
+  const handleGetRecoveryInfo = async () => {
+    if (!email || !isValidEmail(email)) return; // Only proceed if email is valid
+    setLoading(true); 
     try {
-      const response = await axios.post("/auth/forgot-password", {
+      const response = await axios.post("/auth/check-recovery-info", {
         email: email,
       });
 
-      setMessage(response.data.message);
-      setError(""); // Clear any previous errors
-            
+      const { recovery_email, contact_number } = response.data;
+      setRecoveryEmail(recovery_email);
+      setContactNumber(contact_number);
+      setError(""); 
+      setShowComponent('verifyEmail');
     } catch (err) {
       setError(err.response?.data?.error || "Something went wrong. Please try again.");
-      setMessage(""); // Clear any previous messages
     } finally {
-      setLoading(false); // End loading
+      setLoading(false); 
     }
   };
 
+  const handleRequestReset = async (option) => {
+    setSelectedOption(option);
+    if (!option) return; // Do not proceed if option is not valid
+    try {
+      await axios.post("/auth/forgot-password", {
+        email: option,
+      });
+      setError(""); 
+    } catch (err) {
+      setError(err.response?.data?.error || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false); 
+    }
+  };
+
+  const isValidEmail = (email) => {
+    // Simple regex for email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
+
   return (
-    <div className="w-full max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-5 text-center">Password Recovery</h1>
-      <p className="text-gray-700 mb-5 text-center">
-        Enter your university email and we&apos;ll send you a link to recover your password.
-      </p>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <input
-            type="email"
-            id="recovery-email"
-            placeholder="Enter your email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full h-10 p-2 border border-gray-400 rounded-lg outline-none focus:border-teal-400"
-          />
+    <div>
+      {showComponent === 'getEmail' && (
+        <div className="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-md">
+          <h1 className="text-2xl font-bold mb-5 text-center">Password Recovery</h1>
+          <p className="text-gray-700 mb-5 text-center">
+            Enter your university email and we&apos;ll send you a link to recover your password.
+          </p>
+          {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
+          <div className="mb-4">
+            <input
+              type="email"
+              id="recovery-email"
+              placeholder="Enter your email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full h-10 p-2 border border-gray-400 rounded-lg outline-none focus:border-teal-400"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              className="w-full h-12 bg-gray-200 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-300 transition duration-300"
+              onClick={() => onViewChange("login")}
+            >
+              Cancel
+            </button>
+            <button
+              className={`w-full h-12 rounded-lg cursor-pointer transition duration-300 mb-4 bg-[#953867] hover:bg-customGray3 text-white`}
+              onClick={handleGetRecoveryInfo}
+              disabled={loading || !isValidEmail(email)}
+            >
+              {loading ? "Loading..." : "Confirm"}
+            </button>
+          </div>
         </div>
-        <button
-          type="submit"
-          className={`w-full h-12 rounded-lg cursor-pointer transition duration-300 mb-4 ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#953867] hover:bg-black'} text-white`}
-          disabled={loading}
-        >
-          {loading ? "Loading..." : "Recover Password"}
-        </button>
-        <button
-          type="button"
-          className="w-full h-12 bg-gray-200 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-300 transition duration-300"
-          onClick={() => onViewChange("login")}
-        >
-          Cancel
-        </button>
-      </form>
-      {message && <p className="text-green-500 mt-4">{message}</p>}
-      {error && <p className="text-red-500 mt-4">{error}</p>}
+      )}
+
+      {showComponent === 'verifyEmail' && (
+        <Verification 
+          onButtonClick={(component, option) => {
+            setShowComponent(component);
+            if (option) {
+              handleRequestReset(option);
+            }
+          }}
+          recoveryEmail={recoveryEmail}
+          email={email}
+          contactNumber={contactNumber}
+        />
+      )}
+
+      {showComponent === 'passwordRecovery' && (
+        <PasswordRecovery 
+          email={selectedOption} 
+          resendEmail={handleRequestReset}
+        />
+      )}
+       {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
   );
 };

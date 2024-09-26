@@ -10,7 +10,7 @@ const CreateClassPage = () => {
   const navigate = useNavigate()
 
   const handleCreateClass = async() =>{
-    navigate(`/classes/${user.id}`)
+    navigate(`/classes/${user?.id}`)
   }
   return (
     <div className="flex flex-col p-5 gap-4 md:w-[800px] mx-auto">
@@ -37,7 +37,7 @@ const CreateClassPage = () => {
         <StudentList/>
       </div>
       <div className="flex gap-4 mt-5">
-        <button className="px-4 py-2 bg-gray-300 rounded-lg" onClick={() => navigate(`/classes/${user.id}`)}>Cancel</button>
+        <button className="px-4 py-2 bg-gray-300 rounded-lg" onClick={() => navigate(`/classes/${user?.id}`)}>Cancel</button>
         <button className="px-6 py-2 bg-black text-white rounded-lg" onClick={handleCreateClass}>Create Class</button>
       </div>
     </div>
