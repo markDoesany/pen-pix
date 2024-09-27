@@ -5,13 +5,11 @@ import { Link } from "react-router-dom";
 import './styles/styles.css'; // Include your custom styles here
 
 const AccountDisplay = ({ profile, onUploadProfileImage }) => {
-  const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(profile.profileImageUrl); 
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setImageFile(file);
       onUploadProfileImage(file);
       setImageUrl(URL.createObjectURL(file)); 
     }
