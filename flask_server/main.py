@@ -9,12 +9,14 @@ from config import Config
 from flask_cors import CORS
 from flask_mailman import Mail
 from dotenv import load_dotenv
+from flask_migrate import Migrate
 
 load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
+migrate = Migrate(app, db)
 
 mail = Mail()
 mail.init_app(app)

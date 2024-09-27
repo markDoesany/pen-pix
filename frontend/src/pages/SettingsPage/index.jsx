@@ -19,6 +19,7 @@ const SettingsPage = () => {
     id: currentUser?.id,
     name: currentUser.name || "Default Name",  
     email: currentUser.email || "default@example.com",  
+    profileImageUrl: currentUser.profile_image_url || "",
     contactNumber: currentUser.contact_number || "000-000-0000",  
     recoveryEmail: currentUser.recovery_email || "recovery@example.com"
   });
@@ -61,6 +62,26 @@ const SettingsPage = () => {
     }
   };
 
+  const handlepUloadProfileImage = async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const response = await axios.post('/auth/upload_profile_image', formData, {
+        withCredentials: true, 
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const updatedUserProfile = response.data.user
+      setProfile(prevProfile => ({ ...prevProfile, profileImageUrl: updatedUserProfile.profile_image_url}));
+      localStorage.setItem("user", JSON.stringify(updatedUserProfile));
+      console.log("USER",response.data.user)
+    } catch (error) {
+      console.error("Error uploading image:", error.response ? error.response.data : error.message);
+    }
+  };
+
   return (
     <div className="relative w-full text-customBlack1 bg-white mt-10 mb-10 rounded-lg p-10">
       <div className="absolute top-2 right-2 cursor-pointer">
@@ -93,7 +114,7 @@ const SettingsPage = () => {
         </div>
 
         <div className="flex-1 border-l-4 border-customGray1 px-10">
-          <AccountDisplay profile={profile}/>
+          <AccountDisplay profile={profile} onUploadProfileImage={handlepUloadProfileImage}/>
         </div>
       </div>
     </div>

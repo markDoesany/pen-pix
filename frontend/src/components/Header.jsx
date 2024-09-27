@@ -7,18 +7,21 @@ import { IoLogOut } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
 import useToast from "../hooks/useToast";
 import useLogout from "../hooks/useLogoutUser";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Notifications from "./Notifications";
 import { NotificationsAtom } from "../atoms/Notifications";
-import { useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
+import axios from "axios";
+import useErrorHandler from "../hooks/useErrorHandler";
 
 const Header = () => {
-  const notifications = useRecoilValue(NotificationsAtom)
+  const [notifications, setNotifications] = useRecoilState(NotificationsAtom)
   const [showMenu, setShowMenu] = useState(false);
   const { toastSuccess, toastError } = useToast();
   const { logout } = useLogout();
   const navigate = useNavigate()
   const [ isNotificationOpen, setIsNotificationOpen] = useState(false)
+  const { handleError } = useErrorHandler();
 
   const handleLogout = async () => {
 
@@ -34,6 +37,26 @@ const Header = () => {
   const handleToggleNotification = () =>{
     setIsNotificationOpen(!isNotificationOpen)
   }
+
+  useEffect(()=>{
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get('/notification/get-notifications'); // Adjust the URL if necessary
+        setNotifications(response.data.notifications);
+        console.log(response.data)
+      } catch (error) {
+        if (error.response?.status === 401) {
+          handleError('unauthorized', 'Unable to fetch notifications, please log in again.');
+        } else if (error.response?.status === 404) {
+          handleError('404', 'No notifications found.');
+        } else {
+          handleError('default', 'An error occurred while fetching notifications.');
+        }
+        console.log(error);
+      }
+    };
+    fetchNotifications()
+  }, [])
 
   return (
     <div className="flex justify-between items-center h-[50px] border-b-2 px-5 py-7 relative w-full bg-white">

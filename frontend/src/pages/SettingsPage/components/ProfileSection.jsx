@@ -8,7 +8,7 @@ const ProfileSection = ({ profile, onSave }) => {
 
   const handleSaveProfile = () => {
     onSave(updatedProfile);
-    setIsEditProfile(false); // Close edit mode after saving
+    setIsEditProfile(false); 
   };
 
   const handleInputChange = (e) =>{

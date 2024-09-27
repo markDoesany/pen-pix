@@ -6,11 +6,12 @@ import { useEffect } from "react";
 import axios from "axios";
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { formatDueDateTime } from "../../utils/helpers";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const NotificationPage = () => {
   const [notifications, setNotifications] = useRecoilState(NotificationsAtom);
   const { handleError } = useErrorHandler();
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -42,7 +43,7 @@ const NotificationPage = () => {
   return (
     <div className="relative w-full h-full text-customBlack1 bg-white mt-10 mb-10 rounded-lg px-10 pt-10 pb-4">
       <div className="absolute top-2 right-2 cursor-pointer">
-        <IoIosClose size={35} />
+        <IoIosClose size={35} onClick={() => navigate(`/auth`)}/>
       </div>
 
       <h2 className="text-customGray2 text-3xl font-medium">Notifications</h2>
@@ -54,7 +55,7 @@ const NotificationPage = () => {
       </div>
 
       <div className="h-[300px] overflow-y-auto mt-4 text-customGray2">
-        {notifications.map((notification, index) => (
+        {notifications?.map((notification, index) => (
           <Link to={`/task/${notification.task_id}`} key={index} className="grid grid-cols-5 gap-4 py-3 border-b">
             <div>{notification.task_id}</div>
             <div className="col-span-3">{notification.message}</div>

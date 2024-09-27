@@ -1,10 +1,10 @@
 # auth/routes.py
-from flask import request, session, jsonify
+from flask import request, session, jsonify, current_app, url_for
 from auth import auth_bp
 from model import User, db 
 from flask_mailman import EmailMessage
 from config import Config
-from datetime import timedelta
+import os
 
 @auth_bp.route('/check-session',methods=["GET"])
 def check_session():
@@ -225,3 +225,30 @@ def get_user(user_id):
         return jsonify({"user":user.to_dict()})
     else:
         return jsonify({"error": "User not found"}), 404
+
+@auth_bp.route('/upload_profile_image', methods=['POST'])
+def upload_profile_image():
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+
+    if user:
+        uploads_dir = os.path.join(current_app.root_path, 'static', 'images', 'profiles')
+        os.makedirs(uploads_dir, exist_ok=True)
+
+        image_file = request.files['image']
+        
+        image_filename = f"{user_id}_profile_image.jpg" 
+        image_file_path = os.path.join(uploads_dir, image_filename)
+        image_file.save(image_file_path)
+
+
+        image_url = url_for('static', filename=f'images/profiles/{image_filename}', _external=True)
+        user.set_profile_image(image_url)
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Image uploaded successfully!',
+            'user': user.to_dict()  
+        }), 200
+
+    return jsonify({'message': 'User not found!'}), 404

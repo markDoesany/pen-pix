@@ -16,6 +16,7 @@ class User(db.Model):
     recovery_email = db.Column(db.String(50), nullable=True, index=True)
     contact_number = db.Column(db.String(50), nullable=True)
     name = db.Column(db.String(50), nullable=True)
+    profile_image_url = db.Column(db.String(255), nullable=True)
     password_hash = db.Column(db.String(150), nullable=False)
     reset_token = db.Column(db.String(100), nullable=True)
     reset_token_expiry = db.Column(db.DateTime, nullable=True)
@@ -26,6 +27,12 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
     SECRET_KEY = os.environ.get("SECRET_KEY")
+      
+    def set_profile_image(self, filename):
+        self.profile_image_url = filename
+    
+    def get_profile_image(self):
+        return self.profile_image_url
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -101,6 +108,7 @@ class User(db.Model):
             'email': self.email,
             'recovery_email': self.recovery_email,
             'email_verified': self.email_verified,
+            'profile_image_url': self.get_profile_image(),
             'contact_number': self.contact_number,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
