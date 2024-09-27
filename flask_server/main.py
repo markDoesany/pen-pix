@@ -4,6 +4,7 @@ from auth import auth_bp
 from task import task_bp
 from files import files_bp
 from detect_gates import detect_gates_bp
+from notification import notification_bp
 from config import Config
 from flask_cors import CORS
 from flask_mailman import Mail
@@ -24,6 +25,7 @@ app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(task_bp, url_prefix='/task')
 app.register_blueprint(files_bp, url_prefix='/files')
 app.register_blueprint(detect_gates_bp, url_prefix='/detect-gates')
+app.register_blueprint(notification_bp, url_prefix='/notification')
 
 if __name__ == "__main__":
     with app.app_context():

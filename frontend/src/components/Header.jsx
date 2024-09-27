@@ -9,8 +9,11 @@ import useToast from "../hooks/useToast";
 import useLogout from "../hooks/useLogoutUser";
 import { useState } from "react";
 import Notifications from "./Notifications";
+import { NotificationsAtom } from "../atoms/Notifications";
+import { useRecoilValue } from "recoil";
 
 const Header = () => {
+  const notifications = useRecoilValue(NotificationsAtom)
   const [showMenu, setShowMenu] = useState(false);
   const { toastSuccess, toastError } = useToast();
   const { logout } = useLogout();
@@ -48,7 +51,7 @@ const Header = () => {
           <IoSettingsOutline size={25} onClick={() => navigate('/settings')}/>
           {isNotificationOpen ?
             <div className="absolute w-full h-full z-50 -bottom-11 -left-64">
-              <Notifications onClose={() => setIsNotificationOpen(!isNotificationOpen)}/>
+              <Notifications onClose={() => setIsNotificationOpen(!isNotificationOpen)} notificationsList={notifications}/>
             </div> : ''}
         </div>
         <button className="flex items-center gap-1" onClick={handleLogout}>
@@ -73,9 +76,13 @@ const Header = () => {
       </div>
 
       <div className="hidden max-md:flex gap-4 cursor-pointer ">
-        <div className="flex items-center gap-3 cursor-pointer">
+        <div className="flex items-center gap-3 cursor-pointer relative">
           <RiNotification2Line size={25} onClick={handleToggleNotification}/>
           <IoSettingsOutline size={25} onClick={() => navigate('/settings')}/>
+          {isNotificationOpen ?
+            <div className="absolute w-full h-full z-50 -bottom-11 right-64 max-md:right-56">
+              <Notifications onClose={() => setIsNotificationOpen(!isNotificationOpen)} notificationsList={notifications}/>
+            </div> : ''}
         </div>
         <LuMenu size={30} onClick={() => setShowMenu(!showMenu)} />
       </div>

@@ -97,8 +97,11 @@ class User(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'name': self.name,
             'email': self.email,
+            'recovery_email': self.recovery_email,
             'email_verified': self.email_verified,
+            'contact_number': self.contact_number,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
@@ -227,3 +230,25 @@ class PredictionResult(db.Model):
             'label': self.label,
             'circuit_analysis_id': self.circuit_analysis_id
         }
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.String(255), nullable=False)
+    task_id = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+    
+    def __init__(self, message, user_id, task_id):
+        self.message = message
+        self.user_id = user_id
+        self.task_id = task_id
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'message': self.message,
+            'user_id': self.user_id,
+            'task_id': self.task_id,
+            'created_at': self.created_at.isoformat()
+        }
+

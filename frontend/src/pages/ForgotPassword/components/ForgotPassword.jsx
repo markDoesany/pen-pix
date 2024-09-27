@@ -2,17 +2,18 @@ import { useState } from "react";
 import Verification from "./Verification";
 import PasswordRecovery from "./PasswordRecovery";
 import axios from "axios"; // Uncomment axios for API calls
+import { useNavigate } from "react-router-dom";
 
-const ForgotPassword = ({ onViewChange }) => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [showComponent, setShowComponent] = useState('getEmail');
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
   const [recoveryEmail, setRecoveryEmail] = useState("");
   const [contactNumber, setContactNumber] = useState("");
-  
   const [selectedOption, setSelectedOption] = useState("");
+
+  const navigate = useNavigate()
 
   const handleGetRecoveryInfo = async () => {
     if (!email || !isValidEmail(email)) return; // Only proceed if email is valid
@@ -79,7 +80,7 @@ const ForgotPassword = ({ onViewChange }) => {
             <button
               type="button"
               className="w-full h-12 bg-gray-200 text-gray-700 rounded-lg cursor-pointer hover:bg-gray-300 transition duration-300"
-              onClick={() => onViewChange("login")}
+              onClick={() => navigate("/auth")}
             >
               Cancel
             </button>

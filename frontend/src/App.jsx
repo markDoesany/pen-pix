@@ -3,6 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { UserAtom } from './atoms/UserAtom.js';
 import Header from './components/Header.jsx';
 import Authentication from './pages/Authentication/index.jsx';
+import ForgotPasswordPage from './pages/ForgotPassword/index.jsx'
 import ResetPasswordPage from './pages/ResetPassword/index.jsx';
 import EmailVerificationPage from './pages/EmailVerification/index.jsx';
 import Dashboard from './pages/DashboardPage/index.jsx';
@@ -27,7 +28,7 @@ const App = () => {
   const user = useRecoilValue(UserAtom);
 
   // Paths where the navbar should be hidden
-  const pathsWithoutNavbar = ['/auth', '/reset-password', '/verify-email',`/student-upload/${location.pathname.split('/')[2]}`, `/circuit-evaluator/${location.pathname.split('/')[2]}`];
+  const pathsWithoutNavbar = ['/auth', '/reset-password', '/forgot-password', '/verify-email',`/student-upload/${location.pathname.split('/')[2]}`, `/circuit-evaluator/${location.pathname.split('/')[2]}`];
   const showNavbar = !pathsWithoutNavbar.some(path => location.pathname.startsWith(path)) && location.pathname !== '/';
 
   return (
@@ -38,6 +39,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={user ? <Navigate to={`/dashboard/${user.id}`} /> : <Authentication />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/verify-email" element={<EmailVerificationPage />} />
             <Route path="/dashboard/:userId" element={<Dashboard />} />

@@ -109,7 +109,49 @@ def reset_password():
         db.session.commit()
         return jsonify({"message": "Password has been reset successfully."})
     
-    return jsonify({"error": "Invalid or expired token."}), 400
+
+@auth_bp.route("/change-password", methods=["POST"])
+def change_password():
+    new_password = request.json.get("newPassword")
+    
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized access"}), 401
+
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+    
+    if not new_password:
+        return jsonify({"error": "Token and new password are required"}), 400
+
+    if user:
+        user.set_password(new_password)
+        db.session.commit()
+        return jsonify({"message": "Password has been reset successfully."}), 200
+    
+    return jsonify({"Error": "Password changed is unsuccessful. Try again later."})
+    
+
+@auth_bp.route("/update-user-info", methods=["PUT"])
+def update_user_info():
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized access"}), 401
+
+    user_id = session['user_id']
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    name = request.json.get("name", user.name)
+    contact_number = request.json.get("contactNumber", user.contact_number)
+    recovery_email = request.json.get("recoveryEmail", user.recovery_email)
+    
+    user.name = name
+    user.contact_number = contact_number
+    user.recovery_email = recovery_email
+    db.session.commit()
+    return jsonify({"message": "User information updated successfully.", "user": user.to_dict()})
+
 
 @auth_bp.route("/verify-reset-token", methods=["POST"])
 def verify_reset_token():
@@ -143,6 +185,21 @@ def verify_email():
     
     return jsonify({"error": "Invalid or expired token."}), 400
 
+@auth_bp.route("/validate-password", methods=["POST"])
+def validate_password():
+    email = request.json.get("email")
+    password = request.json.get("password")
+
+    if not email or not password:
+        return jsonify({"error": "Email and password are required"}), 400
+
+    user = User.query.filter_by(email=email).first()
+
+    if user and user.check_password(password):
+        return jsonify({"message": "Password is valid."}), 200
+    else:
+        return jsonify({"error": "Invalid email or password."}), 401
+    
 @auth_bp.route("/check-recovery-info", methods=["POST"])
 def check_recovery_info():
     email = request.json.get("email")

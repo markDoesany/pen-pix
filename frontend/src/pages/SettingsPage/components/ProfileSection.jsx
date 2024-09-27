@@ -4,11 +4,20 @@ import ProfileInput from "./ProfileSetting";
 
 const ProfileSection = ({ profile, onSave }) => {
   const [isEditProfile, setIsEditProfile] = useState(false);
+  const [updatedProfile, setUpdatedProfile]  = useState(profile)
 
-  const handleSaveProfile = (updatedProfile) => {
+  const handleSaveProfile = () => {
     onSave(updatedProfile);
     setIsEditProfile(false); // Close edit mode after saving
   };
+
+  const handleInputChange = (e) =>{
+    const { name, value } = e.target;
+    setUpdatedProfile((prevProfile) => ({
+      ...prevProfile,
+      [name]: value
+    }));   
+  }
 
   return (
     <div>
@@ -19,18 +28,17 @@ const ProfileSection = ({ profile, onSave }) => {
               <div className="flex flex-col gap-3">
                 <label className="text-customGray2 text-lg">Name: </label>
                 <label className="text-customGray2 text-lg">Email: </label>
-                <label className="text-customGray2 text-lg">Contact #: </label>
+                <label className="text-customGray2 text-lg">Contact: </label>
               </div>
               {!isEditProfile ? 
               <div className="flex flex-col gap-3 text-lg">
                 <p>{profile.name}</p>
                 <p>{profile.email}</p>
-                <p>{profile.contact}</p>
+                <p>{profile.contactNumber}</p>
               </div> :
                 <ProfileInput
-                profile={profile}
-                onSave={handleSaveProfile}
-                onCancel={() => setIsEditProfile(false)}
+                  profile={profile}
+                  inputChange = {handleInputChange}
                 />
               }
             </div>

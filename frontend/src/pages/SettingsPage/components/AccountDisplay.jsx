@@ -3,7 +3,7 @@ import { HiMiniPencilSquare } from "react-icons/hi2";
 import { Link } from "react-router-dom";
 import './styles/styles.css'; // Include your custom styles here
 
-const AccountDisplay = () => {
+const AccountDisplay = ({profile}) => {
   return (
     <div className="flex flex-col items-center justify-center gap-5 w-full h-full">
       <div className="flex flex-col items-center">
@@ -18,8 +18,8 @@ const AccountDisplay = () => {
           </div>
         </div>
 
-        <p className="font-bold text-xl mt-3">Mark Teofel Cernal</p>
-        <p>20103214@usc.edu.ph</p>
+        <p className="font-bold text-xl mt-3">{profile.name}</p>
+        <p>{profile.email}</p>
       </div>
 
       <div className="flex flex-col items-center">
@@ -29,7 +29,7 @@ const AccountDisplay = () => {
           <Link to={"#"}>CPE 2301 | Group 1 2:30pm - 5:00 am</Link>
           <Link to={"#"}>CPE 2301 | Group 1 2:30pm - 5:00 am</Link>
         </div>
-        <Link to={"#"} className="underline text-customGray3 mt-2">View All Classes</Link>
+        <Link to={`/classes/${profile.id}`} className="underline text-customGray3 mt-2">View All Classes</Link>
       </div>
     </div>
   );

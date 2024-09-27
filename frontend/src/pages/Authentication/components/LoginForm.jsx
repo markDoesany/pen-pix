@@ -79,7 +79,7 @@ const LoginForm = ({ onViewChange }) => {
             />
             <div className="flex justify-between items-center w-full">
               <label htmlFor="remember_me" className="text-gray-700">Remember Me</label>
-              <span className=" text-sm text-[#828282] hover:text-[#953867] hover:underline cursor-pointer" onClick={() => onViewChange('forgotPassword')}>Forgot Password?</span>
+              <span className=" text-sm text-[#828282] hover:text-[#953867] hover:underline cursor-pointer" onClick={() => navigate('/forgot-password')}>Forgot Password?</span>
             </div>
           </div>
           <button

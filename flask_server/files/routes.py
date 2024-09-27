@@ -2,7 +2,7 @@ from werkzeug.utils import secure_filename
 import os
 from files import files_bp
 from utils.auth_helpers import login_required
-from model import db, UploadedFile, Task, CircuitAnalysis
+from model import db, UploadedFile, Task, CircuitAnalysis, Notification
 from flask import jsonify, request, send_from_directory
 
 @files_bp.route('/<int:task_id>/<filename>')
@@ -77,6 +77,10 @@ def upload_files():
         
         db.session.add(new_circuit_analysis)
         uploaded_files.append(new_file.to_dict())
+        
+        notification_message = f"File '{filename}' has been uploaded successfully to task {task_id}."
+        notification = Notification(message=notification_message, user_id=task.user_id, task_id=task_id)
+        db.session.add(notification)
 
     try:
         db.session.commit()
