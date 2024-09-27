@@ -33,7 +33,6 @@ def evaluate_boolean_expression(expr, values):
     
     return result
 
-
 def generate_truth_table(expression, input_count):
     """Generate the truth table for a boolean expression."""
     variables = symbols(f'X1:{input_count+1}')
