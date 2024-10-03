@@ -17,8 +17,8 @@ const FilterCreateNav = ({ onFilterChange }) => {
   };
 
   const handleCreateTask = () => {
-    navigate('/create-task')
-      // setShowCreateTaskForm(true); // Show the CreateTaskForm
+    // navigate('/create-task')
+    setShowCreateTaskForm(true); // Show the CreateTaskForm
   };
 
   const handleCloseForm = () => {
