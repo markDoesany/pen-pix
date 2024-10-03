@@ -1,38 +1,36 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserAtom } from '../../../atoms/UserAtom'
+import { UserAtom } from '../../../atoms/UserAtom';
 import { useSetRecoilState } from "recoil";
 import axios from "axios";
-import useToast from '../../../hooks/useToast'
+import useToast from '../../../hooks/useToast';
 
 const LoginForm = ({ onViewChange }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
   const { toastSuccess, toastError } = useToast();
-  const setUser = useSetRecoilState(UserAtom)
+  const setUser = useSetRecoilState(UserAtom);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading
+    setLoading(true);
+
+    const rememberMe = document.getElementById('remember_me').checked;
 
     try {
-      const response = await axios.post('/auth/login', { email, password }, {
-        withCredentials: true
-      });
-      const userId = response.data.user.id;
-      console.log("response",response)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
-      setUser(response.data.user)
+      const response = await axios.post('/auth/login', { email, password, remember: rememberMe }, { withCredentials: true });
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      setUser(response.data.user);
       toastSuccess(response.data.message);
-      navigate(`/dashboard/${userId}`);
+      navigate(`/dashboard/${response.data.user.id}`);
     } catch (error) {
       console.error('There was an error logging in:', error.response?.data || error.message);
       toastError(error.response?.data?.error || error.message);
-      
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
 
@@ -53,9 +51,9 @@ const LoginForm = ({ onViewChange }) => {
               className="w-full h-10 p-2 border border-gray-400 rounded-lg outline-none focus:border-teal-400"
             />
           </div>
-          <div className="mb-4">
+          <div className="mb-4 relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"} // Show/Hide password based on state
               id="password"
               name="password"
               placeholder="Password"
@@ -64,6 +62,13 @@ const LoginForm = ({ onViewChange }) => {
               required
               className="w-full h-10 p-2 border border-gray-400 rounded-lg outline-none focus:border-teal-400"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 px-3 py-1 text-gray-600 focus:outline-none underline text-sm"
+            >
+              {showPassword ? "Hide" : "Show"}
+            </button>
           </div>
           <div className="flex items-center mb-6">
             <input
@@ -72,7 +77,10 @@ const LoginForm = ({ onViewChange }) => {
               name="remember_me"
               className="mr-2"
             />
-            <label htmlFor="remember_me" className="text-gray-700">Remember Me</label>
+            <div className="flex justify-between items-center w-full">
+              <label htmlFor="remember_me" className="text-gray-700">Remember Me</label>
+              <span className=" text-sm text-[#828282] hover:text-[#953867] hover:underline cursor-pointer" onClick={() => navigate('/forgot-password')}>Forgot Password?</span>
+            </div>
           </div>
           <button
             type="submit"
@@ -81,10 +89,9 @@ const LoginForm = ({ onViewChange }) => {
           >
             {loading ? "Loading..." : "Login"}
           </button>
-          <div className="text-left mt-5 mb-4">
-            <p className="text-gray-700">Don&apos;t have an account? <span className="text-[#953867] hover:underline cursor-pointer" onClick={() => onViewChange('register')}>Sign Up</span></p>
+          <div className="text-right mt-5 mb-4 text-xs">
+            <p className="text-customGray2">No Account? <span className="text-[#953867] hover:underline cursor-pointer" onClick={() => onViewChange('register')}>Sign Up</span></p>
             <br />
-            <span className="text-[#828282] hover:text-[#953867] hover:underline cursor-pointer" onClick={() => onViewChange('forgotPassword')}>Forgot Password?</span>
           </div>
         </form>
       </div>

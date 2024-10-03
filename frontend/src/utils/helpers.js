@@ -1,6 +1,16 @@
 export const formatDueDateTime = (dateString) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-  return new Date(dateString).toLocaleString(undefined, options);
+  const date = new Date(dateString);
+  const formattedDate = date.toLocaleDateString(undefined, {
+    month: 'short',  
+    day: 'numeric',  
+  });
+
+  const formattedTime = date.toLocaleTimeString(undefined, {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,  
+  });
+  return `${formattedDate} | ${formattedTime}`;
 };
 
 export const formatDate = (date) => {

@@ -12,8 +12,8 @@ class Config:
     
     # Session configuration
     SESSION_TYPE = 'sqlalchemy'
-    SESSION_PERMANENT = True
-    PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
+    # SESSION_PERMANENT = True
+    PERMANENT_SESSION_LIFETIME = timedelta(days=7)
     SESSION_COOKIE_SAMESITE = 'None'
     SESSION_COOKIE_SECURE = True
 

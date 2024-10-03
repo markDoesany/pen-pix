@@ -10,13 +10,14 @@ export default {
         sans: ['Poppins', 'sans-serif']
       }, 
       colors: {
-        primaryColor: "#953867",
+        primaryColor: "#F26132",
         primaryBg: "#242424",
         secondaryBg: "#2F2F2F",
         thirdBg: "#3E4557",
-        textGray: "#D9D9D9",
-        borderGray: "#686868",
-
+        customGray1: "#D9D9D9",
+        customGray2: "#828282",
+        customGray3: "#686868",
+        customBlack1: "text-lg font-semibold",
       }
     },
   },

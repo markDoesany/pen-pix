@@ -13,13 +13,26 @@ db = SQLAlchemy()
 class User(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4().hex))
     email = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    recovery_email = db.Column(db.String(50), nullable=True, index=True)
+    contact_number = db.Column(db.String(50), nullable=True)
+    name = db.Column(db.String(50), nullable=True)
+    profile_image_url = db.Column(db.String(255), nullable=True)
     password_hash = db.Column(db.String(150), nullable=False)
     reset_token = db.Column(db.String(100), nullable=True)
     reset_token_expiry = db.Column(db.DateTime, nullable=True)
+    verification_token = db.Column(db.String(100), nullable=True)  # Token for email verification
+    verification_token_expiry = db.Column(db.DateTime, nullable=True)  # Expiry for email verification
+    email_verified = db.Column(db.Boolean, default=False)  # Whether the email has been verified
     tasks = db.relationship('Task', backref='user', lazy=True, cascade="all, delete-orphan")
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
     SECRET_KEY = os.environ.get("SECRET_KEY")
+      
+    def set_profile_image(self, filename):
+        self.profile_image_url = filename
+    
+    def get_profile_image(self):
+        return self.profile_image_url
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -56,15 +69,51 @@ class User(db.Model):
             return False
         
         return False
-    
+
+    # Generate email verification token
+    def generate_verification_token(self):
+        payload = {
+            'verification_token': secrets.token_urlsafe(),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)  # 24-hour expiry
+        }
+        
+        token = jwt.encode(payload, self.SECRET_KEY, algorithm='HS256')
+        self.verification_token = token
+        self.verification_token_expiry = payload['exp']
+        
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+        
+        return token
+
+    def verify_verification_token(self, token):
+        try:
+            payload = jwt.decode(token, self.SECRET_KEY, algorithms=['HS256'])
+            if 'verification_token' in payload:
+                return True
+        except jwt.ExpiredSignatureError:
+            return False
+        except jwt.InvalidTokenError:
+            return False
+        
+        return False
+
     def to_dict(self):
         return {
             'id': self.id,
+            'name': self.name,
             'email': self.email,
-            # 'tasks': [task.to_dict() for task in self.tasks],
+            'recovery_email': self.recovery_email,
+            'email_verified': self.email_verified,
+            'profile_image_url': self.get_profile_image(),
+            'contact_number': self.contact_number,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
         }
+
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -189,3 +238,25 @@ class PredictionResult(db.Model):
             'label': self.label,
             'circuit_analysis_id': self.circuit_analysis_id
         }
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.String(255), nullable=False)
+    task_id = db.Column(db.Integer, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+    
+    def __init__(self, message, user_id, task_id):
+        self.message = message
+        self.user_id = user_id
+        self.task_id = task_id
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'message': self.message,
+            'user_id': self.user_id,
+            'task_id': self.task_id,
+            'created_at': self.created_at.isoformat()
+        }
+
