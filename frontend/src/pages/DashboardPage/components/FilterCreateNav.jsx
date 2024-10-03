@@ -2,12 +2,14 @@ import { useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import CreateTaskForm from './CreateTaskForm';
 import { FaPlus } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom'
 
 
 const FilterCreateNav = ({ onFilterChange }) => {
   // const navigate = useNavigate()
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [showCreateTaskForm, setShowCreateTaskForm] = useState(false);
+  const navigate = useNavigate()
 
   const handleFilterChange = (filter) => {
     setSelectedFilter(filter);
@@ -15,8 +17,8 @@ const FilterCreateNav = ({ onFilterChange }) => {
   };
 
   const handleCreateTask = () => {
-    // navigate('/create-task')
-    setShowCreateTaskForm(true); // Show the CreateTaskForm
+    navigate('/create-task')
+      // setShowCreateTaskForm(true); // Show the CreateTaskForm
   };
 
   const handleCloseForm = () => {
