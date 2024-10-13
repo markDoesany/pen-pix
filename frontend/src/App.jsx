@@ -1,9 +1,10 @@
 import { Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil'; 
+import { useState } from 'react'; // Import useState
 import { UserAtom } from './atoms/UserAtom.js';
 import Header from './components/Header.jsx';
 import Authentication from './pages/Authentication/index.jsx';
-import ForgotPasswordPage from './pages/ForgotPassword/index.jsx'
+import ForgotPasswordPage from './pages/ForgotPassword/index.jsx';
 import ResetPasswordPage from './pages/ResetPassword/index.jsx';
 import EmailVerificationPage from './pages/EmailVerification/index.jsx';
 import Dashboard from './pages/DashboardPage/index.jsx';
@@ -12,7 +13,7 @@ import CreateClassPage from './pages/CreateClassPage/index.jsx';
 import TaskPage from './pages/TaskPage/index.jsx';
 import LandingPage from './pages/LandingPage/index.jsx';
 import CircuitInspectorPage from './pages/CircuitInspector/index.jsx';
-import SubmissionPage from './pages/SubmissionPage/index.jsx'
+import SubmissionPage from './pages/SubmissionPage/index.jsx';
 import ClassPage from './pages/ClassPage/index.jsx';
 import NotificationPage from './pages/NotificationsPage/index.jsx';
 import SettingsPage from './pages/SettingsPage/index.jsx';
@@ -26,14 +27,22 @@ const App = () => {
   const location = useLocation();
   const state = location.state || {};
   const user = useRecoilValue(UserAtom);
+  const [linkMapping, setLinkMapping] = useState({}); // Initialize your mapping here
 
   // Paths where the navbar should be hidden
-  const pathsWithoutNavbar = ['/auth', '/reset-password', '/forgot-password', '/verify-email',`/student-upload/${location.pathname.split('/')[2]}`, `/circuit-evaluator/${location.pathname.split('/')[2]}`];
+  const pathsWithoutNavbar = [
+    '/auth', 
+    '/reset-password', 
+    '/forgot-password', 
+    '/verify-email',
+    `/student-upload/${location.pathname.split('/')[2]}`, 
+    `/circuit-evaluator/${location.pathname.split('/')[2]}`
+  ];
   const showNavbar = !pathsWithoutNavbar.some(path => location.pathname.startsWith(path)) && location.pathname !== '/';
 
   return (
     <ToastProvider> 
-      <main className={`${showNavbar ? 'flex flex-col  w-full h- min-h-screen bg-[#EFEFEF]' : ''}`}>
+      <main className={`${showNavbar ? 'flex flex-col w-full h- min-h-screen bg-[#EFEFEF]' : ''}`}>
         {showNavbar && <Header />}
         <div className={`${showNavbar ? 'flex flex-col w-full min-h-screen' : ''}`}>
           <Routes>
@@ -46,11 +55,11 @@ const App = () => {
             <Route path="/classes/:userId" element={<ClassPage />} />
             <Route path="/create-class" element={<CreateClassPage />} />
             <Route path="/create-task" element={<CreateTaskPage />} />
-            <Route path="/task/:taskId" element={<TaskPage />} />
+            <Route path="/task/:taskId" element={<TaskPage setLinkMapping={setLinkMapping} />} /> {/* Pass setLinkMapping */}
             <Route path="/circuit-evaluator/:taskId" element={<CircuitInspectorPage />} />
-            <Route path="/student-upload/:taskId" element={<SubmissionPage />} />
-            <Route path="/notifications" element={<NotificationPage/>} />
-            <Route path="/settings" element={<SettingsPage/>} />
+            <Route path="/student-upload/:taskId/:identifier" element={<SubmissionPage />} />
+            <Route path="/notifications" element={<NotificationPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/error" element={<ErrorPage errorType={state.errorType} errorMessage={state.errorMessage} />} />
             <Route path="*" element={<ErrorPage errorType="404" errorMessage="Page not found!" />} />
           </Routes>

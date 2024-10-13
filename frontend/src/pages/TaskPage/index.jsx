@@ -53,7 +53,7 @@ const TaskPage = () => {
     formData.append('task_id', taskId);
 
     try {
-      const response = await axios.post('/files/upload-files', formData, {
+      const response = await ('/files/upload-files', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

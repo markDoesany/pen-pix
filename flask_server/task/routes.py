@@ -1,11 +1,32 @@
 # tasks_endpoint.py
-from flask import request, jsonify, session
+from flask import Flask, request, jsonify, session
 from model import db, Task
 from task import task_bp
 from utils.auth_helpers import login_required
 from datetime import datetime
 import shutil
 import os
+from flask_cors import CORS
+import random
+
+
+
+# Assume we have a dictionary to store task links temporarily
+task_links = {}
+
+@task_bp.route('/generate-link/<int:task_id>', methods=['POST'])
+def generate_link(task_id):
+    # Generate a random link (customize this logic as needed)
+    random_suffix = random.randint(1000, 9999)  # You can use any logic here
+    link = f"/student-upload/{task_id}/{random_suffix}"
+    
+    # Store the link with the task ID
+    task_links[task_id] = random_suffix;
+
+    
+    return jsonify({"link": link})
+
+
 
 @login_required
 @task_bp.route('/create-task', methods=['POST'])
@@ -65,6 +86,18 @@ def get_task(task_id):
         return jsonify({"error": "Task not found"}), 404
     
     return jsonify(task.to_dict())  # Assuming you have a `to_dict` method
+
+@login_required
+@task_bp.route('/get-task/<int:task_id>/<int:identifier>', methods=['GET'])
+def get_task_submit(task_id, identifier):
+    task = Task.query.get(task_id)
+    
+    # Check if the task exists and if the identifier is valid
+    if not task or task_links.get(task_id) != identifier:
+        return jsonify({"error": "Task not found or invalid identifier"}), 404
+    
+    return jsonify(task.to_dict())  # Assuming you have a `to_dict` method
+
 
 @login_required
 @task_bp.route('/edit-task/<int:task_id>', methods=['PATCH'])

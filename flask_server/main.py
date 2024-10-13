@@ -21,7 +21,7 @@ migrate = Migrate(app, db)
 mail = Mail()
 mail.init_app(app)
 
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True) 
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True) 
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(task_bp, url_prefix='/task')

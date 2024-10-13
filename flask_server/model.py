@@ -260,3 +260,18 @@ class Notification(db.Model):
             'created_at': self.created_at.isoformat()
         }
 
+class LinkMapping(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, nullable=False)
+    link = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'task_id': self.task_id,
+            'link': self.link,
+            'created_at': self.created_at.isoformat()
+        }
+
+

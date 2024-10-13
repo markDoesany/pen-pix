@@ -3,9 +3,13 @@ import { useNavigate } from "react-router-dom";
 import TaskMenu from "./TaskMenu";
 import { formatDueDateTime } from "../../../utils/helpers";
 import useDeleteTask from '../../../hooks/useDeleteTask';
+import LinkModal from './LinkModal'; // Import the LinkModal component
+import axios from 'axios'; // Import axios to handle API requests
 
 const TaskList = ({ filter, tasks, refreshTasks }) => {
   const [openTask, setOpenTask] = useState(null);
+  const [generatedLink, setGeneratedLink] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const { handleDeleteTask: deleteTask } = useDeleteTask();
 
@@ -28,8 +32,20 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
     refreshTasks();
   };
 
-  const handleGetLink = (taskId) => {
-    navigate(`/student-upload/${taskId}`);
+  const handleGetLink = async (taskId) => {
+    try {
+      const response = await axios.post(`/task/generate-link/${taskId}`);
+      const link = response.data.link; // Get the link from the response
+      setGeneratedLink(link); // Update the state with the generated link
+      setIsModalOpen(true); // Open the modal
+    } catch (error) {
+      console.error('Error generating link:', error);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setGeneratedLink(''); // Reset the link when closing
   };
 
   return (
@@ -41,7 +57,7 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
           <div className="text-center ">No. of Submissions</div>
           <div className="text-center ">Due Date</div>
           <div className="text-center ">Type of Task</div>
-          <div className="text-right  pr-3"></div>
+          <div className="text-right pr-3"></div>
         </div>
         {filteredTasks.map((task, index) => (
           <div
@@ -65,7 +81,7 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
             {openTask === task && (
               <TaskMenu
                 onDelete={() => handleDeleteTask(task.id)}
-                onGetLink={() => handleGetLink(task.id)}
+                onGetLink={() => handleGetLink(task.id)} // Pass the modified function
               />
             )}
           </div>
@@ -99,12 +115,14 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
             {openTask === task && (
               <TaskMenu
                 onDelete={() => handleDeleteTask(task.id)}
-                onGetLink={() => handleGetLink(task.id)}
+                onGetLink={() => handleGetLink(task.id)} // Pass the modified function
               />
             )}
           </div>
         ))}
       </div>
+
+      <LinkModal isOpen={isModalOpen} onClose={closeModal} link={generatedLink} />
     </div>
   );
 };
