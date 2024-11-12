@@ -32,7 +32,7 @@ const Links = () => {
         About
       </Link>
       <Link 
-        to="#" 
+        to="/contact" 
         className={`${style.link} ${isActive("#") ? style.active : ''}`}
       >
         Contact

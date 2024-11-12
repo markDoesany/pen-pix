@@ -26,9 +26,8 @@ def set_filter_threshold():
     if not uploaded_file:
         return jsonify({"error": "File not found"}), 404
 
-    task_id = uploaded_file.task_id  # Get taskId from the uploaded file
+    task_id = uploaded_file.task_id 
 
-    # Update or create the CircuitAnalysis for the current file
     def update_or_create_analysis(file, threshold_value):
         circuit_analysis = CircuitAnalysis.query.filter_by(uploaded_file_id=file.id).first()
         if not circuit_analysis:
@@ -47,20 +46,17 @@ def set_filter_threshold():
 
     try:
         if mode == 'single':
-            # Process a single file
             source_file = os.path.join('static', uploaded_file.filepath)
             img_io = apply_threshold_to_image(source_file, threshold_value=threshold_value)
             if img_io is None:
                 return jsonify({"error": "Failed to process image"}), 500
             
-            # Update the CircuitAnalysis for the single file
             update_or_create_analysis(uploaded_file, threshold_value)
             db.session.commit()
 
             return send_file(img_io, mimetype='image/png', as_attachment=False)
 
         elif mode == 'multiple':
-            # Process all files associated with the taskId
             uploaded_files = UploadedFile.query.filter_by(task_id=task_id).all()
 
             for file in uploaded_files:

@@ -83,38 +83,40 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="relative w-full text-customBlack1 bg-white mt-10 mb-10 rounded-lg p-10">
-      <div className="absolute top-2 right-2 cursor-pointer">
-        <IoIosClose size={35} onClick={() => navigate(`/dashboard/${profile.id}`)}/>
-      </div>
-      <h2 className="text-customGray2 text-3xl font-medium">Settings</h2>
-      <div className="flex h-full w-full gap-4 max-md:flex-col max-md:gap-2">
-        <div className="w-[600px] ml-5 h-[370px] overflow-y-auto pr-20 pb-10 pt-5 flex flex-col max-md:overflow-y-hidden max-md:h-fit max-md:w-[420px]">
-          <div>
-            <ProfileSection profile={profile} onSave={handleSetProfile} />
-          </div>
-
-          <div className="mt-7">
-            <AccountSetting
-              profile={profile}
-              isChangePassword={isChangePassword}
-              isChangeRecoveryEmail={isChangeRecoveryEmail}
-              onSaveRecoveryEmail={handleSaveRecoveryEmail}
-              onSavePassword={handleSavePassword}
-              onCancelPassword={() => setIsChangePassword(false)}
-              onCancelRecoveryEmail={() => setIsChangeRecoveryEmail(false)}
-              onChangePassword={() => setIsChangePassword(true)}
-              onChangeRecoveryEmail={() => setIsChangeRecoveryEmail(true)}
-            />
-          </div>
-
-          <div className="mt-7">
-            <NotificationSetting />
-          </div>
+    <div className="w-full min-h-screen bg-[#EFEFEF] p-10">
+      <div className="relative w-full h-full text-customBlack1 bg-white mb-10 rounded-lg p-10">
+        <div className="absolute top-2 right-2 cursor-pointer">
+          <IoIosClose size={35} onClick={() => navigate(`/dashboard/${profile.id}`)}/>
         </div>
+        <h2 className="text-customGray2 text-3xl font-medium">Settings</h2>
+        <div className="flex h-full w-full gap-4 max-md:flex-col max-md:gap-2">
+          <div className="w-[600px] ml-5 h-full overflow-y-auto pr-20 pb-10 pt-5 flex flex-col max-md:overflow-y-hidden max-md:h-fit max-md:w-[420px]">
+            <div>
+              <ProfileSection profile={profile} onSave={handleSetProfile} />
+            </div>
 
-        <div className="flex-1 border-l-4 border-customGray1 px-10">
-          <AccountDisplay profile={profile} onUploadProfileImage={handlepUloadProfileImage}/>
+            <div className="mt-7">
+              <AccountSetting
+                profile={profile}
+                isChangePassword={isChangePassword}
+                isChangeRecoveryEmail={isChangeRecoveryEmail}
+                onSaveRecoveryEmail={handleSaveRecoveryEmail}
+                onSavePassword={handleSavePassword}
+                onCancelPassword={() => setIsChangePassword(false)}
+                onCancelRecoveryEmail={() => setIsChangeRecoveryEmail(false)}
+                onChangePassword={() => setIsChangePassword(true)}
+                onChangeRecoveryEmail={() => setIsChangeRecoveryEmail(true)}
+              />
+            </div>
+
+            <div className="mt-7">
+              <NotificationSetting />
+            </div>
+          </div>
+
+          <div className="flex-1 border-l-4 border-customGray1 px-10">
+            <AccountDisplay profile={profile} onUploadProfileImage={handlepUloadProfileImage}/>
+          </div>
         </div>
       </div>
     </div>

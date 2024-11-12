@@ -16,6 +16,7 @@ import SubmissionPage from './pages/SubmissionPage/index.jsx'
 import ClassPage from './pages/ClassPage/index.jsx';
 import NotificationPage from './pages/NotificationsPage/index.jsx';
 import SettingsPage from './pages/SettingsPage/index.jsx';
+import ContactPage from './pages/ContactPage/index.jsx'
 import ErrorPage from './components/ErrorPage.jsx';
 import { ToastProvider } from './contexts/ToastContext'; 
 
@@ -33,7 +34,7 @@ const App = () => {
 
   return (
     <ToastProvider> 
-      <main className={`${showNavbar ? 'flex flex-col  w-full h- min-h-screen bg-[#EFEFEF]' : ''}`}>
+      <main className={`${showNavbar ? 'flex flex-col  w-full min-h-screen bg-white' : ''}`}>
         {showNavbar && <Header />}
         <div className={`${showNavbar ? 'flex flex-col w-full min-h-screen' : ''}`}>
           <Routes>
@@ -50,6 +51,7 @@ const App = () => {
             <Route path="/circuit-evaluator/:taskId" element={<CircuitInspectorPage />} />
             <Route path="/student-upload/:taskId" element={<SubmissionPage />} />
             <Route path="/notifications" element={<NotificationPage/>} />
+            <Route path="/contact" element={<ContactPage/>} />
             <Route path="/settings" element={<SettingsPage/>} />
             <Route path="/error" element={<ErrorPage errorType={state.errorType} errorMessage={state.errorMessage} />} />
             <Route path="*" element={<ErrorPage errorType="404" errorMessage="Page not found!" />} />

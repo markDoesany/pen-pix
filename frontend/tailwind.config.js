@@ -17,7 +17,7 @@ export default {
         customGray1: "#D9D9D9",
         customGray2: "#828282",
         customGray3: "#686868",
-        customBlack1: "text-lg font-semibold",
+        customBlack1: "#1E1E1E",
       }
     },
   },

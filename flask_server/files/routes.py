@@ -9,7 +9,7 @@ from flask import jsonify, request, send_from_directory
 def serve_file(task_id, filename):
     TASK_FOLDER = os.path.join('static', 'images', str(task_id))
     return send_from_directory(TASK_FOLDER, filename)
-
+    
 @login_required
 @files_bp.route('/upload-files', methods=['POST'])
 def upload_files():
