@@ -1,10 +1,10 @@
 import ComboBox from "./components/ClassGroupCombobox";
 import StudentList from "./components/StudentList";
 import { BsThreeDots } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useRecoilValue } from 'recoil';
 import { UserAtom } from '../../atoms/UserAtom';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 let options = [
@@ -14,7 +14,8 @@ let options = [
   { value: '4', label: '4' },
 ];
 
-const CreateClassPage = () => {
+const EditClassPage = () => {
+  const { classId } = useParams();
   const [classData, setClassData] = useState({
     classCode: '',
     classGroup: null,
@@ -26,22 +27,43 @@ const CreateClassPage = () => {
   const user = useRecoilValue(UserAtom);
   const navigate = useNavigate();
 
-  const handleCreateClass = async () => {
+  useEffect(() => {
+    const fetchClassData = async () => {
+      try {
+        const response = await axios.get(`/classes/get-class/${classId}`);
+        setClassData({
+          classCode: response.data.class_code,
+          classGroup: response.data.class_group,
+          classSchedule: response.data.class_schedule,
+          studentList: response.data.student_list || [], 
+        });
+        console.log(response.data)
+      } catch (error) {
+        console.error("Error fetching class data:", error);
+      }
+    };
+  
+    fetchClassData();
+  }, [classId]);
+  
+
+  const handleSaveChanges = async () => {
     const classPayload = {
       classCode: classData.classCode,
       classGroup: classData.classGroup,
       classSchedule: classData.classSchedule,
       studentList: classData.studentList
     };
-
+  
     try {
-      const response = await axios.post('/classes/create-class', classPayload);
+      const response = await axios.put(`/classes/edit-class/${classId}`, classPayload);
       console.log(response);
       navigate(`/classes/${user?.id}`);
     } catch (error) {
-      console.error("Error creating class:", error);
+      console.error("Error updating class:", error);
     }
   };
+  
 
   const handleAddStudent = () => {
     if (studentId.trim()) { 
@@ -64,7 +86,7 @@ const CreateClassPage = () => {
 
   return (
     <div className="flex flex-col p-5 gap-4 md:w-[800px] mx-auto">
-      <h1 className="text-[28px] font-medium mt-2">Create Class</h1>
+      <h1 className="text-[28px] font-medium mt-2">Edit Class</h1>
       <div className="flex flex-col gap-2">
         <label className="text-md font-medium">Class Name</label>
         <div className="flex gap-4">
@@ -79,7 +101,7 @@ const CreateClassPage = () => {
             <ComboBox
               options={options}
               placeholder="Class Group"
-              value={classData.classGroup}
+              value={String(classData.classGroup)}
               onChange={(selected) => setClassData({ ...classData, classGroup: selected.value })}
             />
           </div>
@@ -123,13 +145,13 @@ const CreateClassPage = () => {
         </button>
         <button
           className="px-6 py-2 bg-black text-white rounded-lg"
-          onClick={handleCreateClass}
+          onClick={handleSaveChanges}
         >
-          Create Class
+          Save Changes
         </button>
       </div>
     </div>
   );
 };
 
-export default CreateClassPage;
+export default EditClassPage;

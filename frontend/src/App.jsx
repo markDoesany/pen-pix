@@ -9,6 +9,7 @@ import EmailVerificationPage from './pages/EmailVerification/index.jsx';
 import Dashboard from './pages/DashboardPage/index.jsx';
 import CreateTaskPage from './pages/CreateTaskPage/index.jsx';
 import CreateClassPage from './pages/CreateClassPage/index.jsx';
+import EditClassPage from './pages/EditClassPage/index.jsx';
 import TaskPage from './pages/TaskPage/index.jsx';
 import LandingPage from './pages/LandingPage/index.jsx';
 import CircuitInspectorPage from './pages/CircuitInspector/index.jsx';
@@ -22,13 +23,13 @@ import { ToastProvider } from './contexts/ToastContext';
 
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-datepicker/dist/react-datepicker.css';
+// import 'antd/dist/antd.css'; 
 
 const App = () => {
   const location = useLocation();
   const state = location.state || {};
   const user = useRecoilValue(UserAtom);
 
-  // Paths where the navbar should be hidden
   const pathsWithoutNavbar = ['/auth', '/reset-password', '/forgot-password', '/verify-email',`/student-upload/${location.pathname.split('/')[2]}`, `/circuit-evaluator/${location.pathname.split('/')[2]}`];
   const showNavbar = !pathsWithoutNavbar.some(path => location.pathname.startsWith(path)) && location.pathname !== '/';
 
@@ -46,6 +47,7 @@ const App = () => {
             <Route path="/dashboard/:userId" element={<Dashboard />} />
             <Route path="/classes/:userId" element={<ClassPage />} />
             <Route path="/create-class" element={<CreateClassPage />} />
+            <Route path="/edit-class/:classId" element={<EditClassPage />} />
             <Route path="/create-task" element={<CreateTaskPage />} />
             <Route path="/task/:taskId" element={<TaskPage />} />
             <Route path="/circuit-evaluator/:taskId" element={<CircuitInspectorPage />} />

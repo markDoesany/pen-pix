@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom'
 
 
 const FilterCreateNav = ({ onFilterChange }) => {
-  // const navigate = useNavigate()
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [showCreateTaskForm, setShowCreateTaskForm] = useState(false);
   const navigate = useNavigate()
@@ -17,12 +16,12 @@ const FilterCreateNav = ({ onFilterChange }) => {
   };
 
   const handleCreateTask = () => {
-    // navigate('/create-task')
-    setShowCreateTaskForm(true); // Show the CreateTaskForm
+    navigate('/create-task')
+    setShowCreateTaskForm(true); 
   };
 
   const handleCloseForm = () => {
-    setShowCreateTaskForm(false); // Hide the CreateTaskForm
+    setShowCreateTaskForm(false); 
   };
 
   return (

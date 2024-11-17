@@ -20,9 +20,9 @@ class User(db.Model):
     password_hash = db.Column(db.String(150), nullable=False)
     reset_token = db.Column(db.String(100), nullable=True)
     reset_token_expiry = db.Column(db.DateTime, nullable=True)
-    verification_token = db.Column(db.String(100), nullable=True)  # Token for email verification
-    verification_token_expiry = db.Column(db.DateTime, nullable=True)  # Expiry for email verification
-    email_verified = db.Column(db.Boolean, default=False)  # Whether the email has been verified
+    verification_token = db.Column(db.String(100), nullable=True)  
+    verification_token_expiry = db.Column(db.DateTime, nullable=True) 
+    email_verified = db.Column(db.Boolean, default=False) 
     tasks = db.relationship('Task', backref='user', lazy=True, cascade="all, delete-orphan")
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
@@ -70,7 +70,6 @@ class User(db.Model):
         
         return False
 
-    # Generate email verification token
     def generate_verification_token(self):
         payload = {
             'verification_token': secrets.token_urlsafe(),
@@ -114,14 +113,31 @@ class User(db.Model):
             'updated_at': self.updated_at.isoformat()
         }
 
+class Classes(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    class_group = db.Column(db.Integer, nullable=False)
+    class_code = db.Column(db.String(100), nullable=False)
+    class_schedule = db.Column(db.String(100), nullable=False)
+    student_list = db.Column(db.JSON, nullable=True)
+
+    tasks = db.relationship('Task', backref='class', lazy=True)
+
+    def to_dict(self): 
+        return { 
+            'id': self.id, 
+            'class_code': self.class_code, 
+            'class_group': self.class_group, 
+            'class_schedule': self.class_schedule, 
+            'student_list': self.student_list,
+            'task_list': [task.id for task in self.tasks] 
+        }
+
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text, nullable=True)
     user_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)  
-    class_group = db.Column(db.String(100), nullable=False)  
-    class_schedule = db.Column(db.String(100), nullable=False)  
+    class_id = db.Column(db.String(36), db.ForeignKey('classes.id'), nullable=True)    
     total_submissions = db.Column(db.Integer, default=0) 
     reviewed_submissions = db.Column(db.Integer, default=0) 
     due_date = db.Column(db.DateTime, nullable=False)  
@@ -132,17 +148,14 @@ class Task(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_at = db.Column(db.DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
 
-    # Relationship with UploadedFile
     attached_files = db.relationship('UploadedFile', backref='task', lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
             'id': self.id,
             'title': self.title,
-            'description': self.description,
             'user_id': self.user_id,
-            'class_group': self.class_group,
-            'class_schedule': self.class_schedule,
+            'class_id': self.class_id,
             'total_submissions': self.total_submissions,
             'reviewed_submissions': self.reviewed_submissions,
             'due_date': self.due_date.isoformat() if self.due_date else None,

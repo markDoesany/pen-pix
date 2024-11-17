@@ -1,6 +1,6 @@
 # tasks_endpoint.py
 from flask import request, jsonify, session
-from model import db, Task
+from model import db, Task, Classes
 from task import task_bp
 from utils.auth_helpers import login_required
 from datetime import datetime
@@ -20,28 +20,29 @@ def create_task():
         return jsonify({"error": "Missing required fields"}), 400
 
     try:
-        # Convert due_date from string to datetime object if necessary
         due_date = datetime.fromisoformat(data['dueDate'])
     except (ValueError, TypeError):
         return jsonify({"error": "Invalid date format"}), 400
 
-    # Create the task instance with all required fields
     task = Task(
         title=data['title'],
-        description=data.get('description'),
         user_id=user_id,
-        class_group=data['classGroup']['name'],
-        class_schedule=data['classGroup']['schedule'],
+        class_id=data['classId'],
         total_submissions=data['totalSubmissions'],  
         reviewed_submissions=data['reviewedSubmission'], 
         due_date=due_date,
-        status=data.get('status', 'Ongoing'),  # Optional, default to 'Ongoing'
+        status=data.get('status', 'Ongoing'),  
         type=data['type'],
         answer_keys=data['answerKeys'],
-        ask_boolean= True if data['askBoolean'] == 'yes' else False
+        ask_boolean=True if data['askBoolean'] == 'yes' else False
     )
 
     db.session.add(task)
+    
+    class_obj = Classes.query.get(data['classGroup'])
+    if class_obj:
+        class_obj.tasks.append(task) 
+
     db.session.commit()
 
     return jsonify(task.to_dict()), 201
@@ -50,7 +51,6 @@ def create_task():
 @task_bp.route('/get-tasks', methods=['GET'])
 def list_tasks():
     user_id = session.get('user_id')  
-    print("ID",user_id)
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
     tasks = Task.query.filter_by(user_id = user_id)
@@ -64,7 +64,7 @@ def get_task(task_id):
     if not task:
         return jsonify({"error": "Task not found"}), 404
     
-    return jsonify(task.to_dict())  # Assuming you have a `to_dict` method
+    return jsonify(task.to_dict())  
 
 @login_required
 @task_bp.route('/edit-task/<int:task_id>', methods=['PATCH'])
@@ -78,8 +78,6 @@ def edit_task(task_id):
 
         task.title = task_data.get('title', task.title)
         task.description = task_data.get('description', task.description)
-        task.class_group = task_data.get('class_group', task.class_group)
-        task.class_schedule = task_data.get('class_schedule', task.class_schedule)
 
         due_date_str = task_data.get('due_date', task.due_date)
         if isinstance(due_date_str, str):

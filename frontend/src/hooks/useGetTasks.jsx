@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
 import axios from 'axios';
 import { useSetRecoilState } from 'recoil';
-import { TasksAtom } from '../atoms/TasksAtom'; // Adjust the path as needed
+import { TasksAtom } from '../atoms/TasksAtom'; 
 import useErrorHandler from './useErrorHandler';
 
 const useGetTasks = () => {
   const setTasks = useSetRecoilState(TasksAtom);
-
   const { handleError } = useErrorHandler();
 
   const getTasks = useCallback(async () => {

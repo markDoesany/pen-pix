@@ -5,7 +5,7 @@ const Combobox = () => {
   const [selectedOption, setSelectedOption] = useState(null);
 
   const options = [
-    { value: 'apple', label: 'Apple' },
+    { value: 1, label: 'Apple' },
     { value: 'banana', label: 'Banana' },
     { value: 'orange', label: 'Orange' },
     { value: 'grape', label: 'Grape' },
@@ -38,7 +38,7 @@ const Combobox = () => {
         value={selectedOption}
         onChange={handleChange}
         options={options}
-        placeholder="Select a fruit..."
+        placeholder="Select"
         classNamePrefix="react-select"
         styles={customStyles} 
         isClearable

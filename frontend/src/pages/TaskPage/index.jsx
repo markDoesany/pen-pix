@@ -107,9 +107,8 @@ const TaskPage = () => {
   }
 
   return (
-    <div>
-      <div className="w-full mx-auto p-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Left side: Task details */}
+    <div className="bg-[#EFEFEF] min-h-screen w-full p-10">
+      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 bg-white shadow-lg p-6 rounded-lg">
           {isEditing ? (
             <div className="space-y-4">
@@ -229,7 +228,7 @@ const TaskPage = () => {
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 ">
               <h1 className="text-xl font-bold">{task.title}</h1>
               <p>{task.description}</p>
               <p className="text-gray-500">Class: {task.class_group}</p>
@@ -270,7 +269,7 @@ const TaskPage = () => {
         />
       </div>
 
-      <div className="w-full mx-auto p-4">
+      <div className="w-full mx-auto p-4 mt-5">
         <FilesList files={files} refreshFiles={refreshFiles}/>
       </div>
     </div>
