@@ -4,7 +4,7 @@ import { IoMdRemoveCircle } from "react-icons/io";
 import { IoIosAddCircle } from "react-icons/io";
 import Combobox from "./components/Combobox";
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import { UserAtom } from '../../atoms/UserAtom';
 import axios from 'axios';
@@ -35,12 +35,12 @@ const scoreOptions = [
   { value: 20, label: "20" },
 ];
 
-const CreateTaskPage = () => {
+const EditTaskPage = () => {
   const [next, setNext] = useState(false);
   const navigate = useNavigate();
-  const user = useRecoilValue(UserAtom);
   const [classOptions, setClassOptions] = useState([]);
   const [errors, setErrors] = useState({});
+  const { taskId } = useParams();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -74,6 +74,38 @@ const CreateTaskPage = () => {
 
     fetchClasses();
   }, []);
+
+  useEffect(() => {
+    const getTask = async () => {
+      try {
+        const response = await axios.get(`/task/get-task/${taskId}`);
+        const task = response.data;
+        console.log(task); 
+  
+        setFormData({
+          title: task.title || "",
+          classId: Number(task.class_id) || "",
+          examType: task.exam_type || "",
+          dueDate: task.due_date ? task.due_date : new Date().toISOString().split('T')[0],
+          answerKeys: task.answer_keys || [
+            {
+              item: `Item ${1}`,
+              keys: [{ grade: "", expression: "" }],
+            }
+          ],
+          totalSubmissions: task.total_submissions || 0,
+          reviewedSubmissions: task.reviewed_submissions || 0,
+          status: task.status || "Ongoing",
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
+    getTask();
+  
+  }, [taskId]);
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -162,12 +194,12 @@ const CreateTaskPage = () => {
     setFormData((prev) => ({ ...prev, answerKeys: renumberedAnswerKeys }));
   };
 
-  const handleCreateTask = async () => {
+  const handleUpdateTask = async () => {
     console.log(formData)
     try {
-      const response = await axios.post("/task/create-task", formData);
-      console.log(response.data);
-      navigate(`/dashboard/${user.id}`);
+      const response = await axios.patch(`/task/edit-task/${taskId}`, formData);
+      console.log(response);
+      navigate(`/task/${taskId}`);
     } catch (error) {
       console.error(error);
     }
@@ -219,7 +251,7 @@ const CreateTaskPage = () => {
   
   return (
     <div className="flex flex-col p-5 gap-4 md:w-[800px] mx-auto">
-      <h1 className="text-[28px] font-medium mt-2">Create Task</h1>
+      <h1 className="text-[28px] font-medium mt-2">Edit Task</h1>
       {!next && (
         <div>
           <div className="flex flex-col gap-2">
@@ -250,7 +282,7 @@ const CreateTaskPage = () => {
             <h2 className="text-md font-medium">Type of Task</h2>
             <Combobox
               options={taskTypeOptions}
-              placeholder="Select an examType"
+              placeholder="Select an Task Type"
               value={formData.examType}
               onChange={(selected) => handleComboBoxChange(selected, 'examType')}
             />
@@ -339,7 +371,7 @@ const CreateTaskPage = () => {
           <div className="flex gap-4 mt-5">
             <button
               className="px-4 py-2 bg-gray-300 rounded-lg"
-              onClick={() => navigate(`/dashboard/${user.id}`)}
+              onClick={() => navigate(`/task/${taskId}`)}
             >
               Cancel
             </button>
@@ -376,7 +408,7 @@ const CreateTaskPage = () => {
         </div>
         <div className="flex gap-4 mt-5">
           <button className="px-4 py-2 bg-gray-300 rounded-lg" onClick={() => setNext(false)} >Back</button>
-          <button className="px-6 py-2 bg-black text-white rounded-lg" onClick={handleCreateTask}>Create Task</button>
+          <button className="px-6 py-2 bg-black text-white rounded-lg" onClick={handleUpdateTask}>Save Task</button>
         </div>
         </div>
       )}
@@ -384,4 +416,4 @@ const CreateTaskPage = () => {
   );
 };
 
-export default CreateTaskPage;
+export default EditTaskPage;

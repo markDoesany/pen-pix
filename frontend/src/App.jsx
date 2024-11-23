@@ -23,6 +23,7 @@ import { ToastProvider } from './contexts/ToastContext';
 
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-datepicker/dist/react-datepicker.css';
+import EditTaskPage from './pages/EditTaskpage/index.jsx';
 // import 'antd/dist/antd.css'; 
 
 const App = () => {
@@ -49,6 +50,7 @@ const App = () => {
             <Route path="/create-class" element={<CreateClassPage />} />
             <Route path="/edit-class/:classId" element={<EditClassPage />} />
             <Route path="/create-task" element={<CreateTaskPage />} />
+            <Route path="/edit-task/:taskId" element={<EditTaskPage />} />
             <Route path="/task/:taskId" element={<TaskPage />} />
             <Route path="/circuit-evaluator/:taskId" element={<CircuitInspectorPage />} />
             <Route path="/student-upload/:taskId" element={<SubmissionPage />} />

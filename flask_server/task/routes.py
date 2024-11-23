@@ -15,9 +15,10 @@ def create_task():
         return jsonify({"error": "User not logged in"}), 401
 
     data = request.json
+    print(data)
 
-    if not all(key in data for key in ['title', 'classGroup', 'dueDate', 'type', 'answerKeys', 'askBoolean']):
-        return jsonify({"error": "Missing required fields"}), 400
+    # if not all(key in data for key in ['title', 'classId', 'dueDate', 'examType', 'answerKeys', 'data', 'status', 'totalSubmissions','reviewedSubmission']):
+    #     return jsonify({"error": "Missing required fields"}), 400
 
     try:
         due_date = datetime.fromisoformat(data['dueDate'])
@@ -29,17 +30,16 @@ def create_task():
         user_id=user_id,
         class_id=data['classId'],
         total_submissions=data['totalSubmissions'],  
-        reviewed_submissions=data['reviewedSubmission'], 
+        reviewed_submissions=data['reviewedSubmissions'], 
         due_date=due_date,
         status=data.get('status', 'Ongoing'),  
-        type=data['type'],
+        exam_type=data['examType'],
         answer_keys=data['answerKeys'],
-        ask_boolean=True if data['askBoolean'] == 'yes' else False
     )
 
     db.session.add(task)
     
-    class_obj = Classes.query.get(data['classGroup'])
+    class_obj = Classes.query.get(data['classId'])
     if class_obj:
         class_obj.tasks.append(task) 
 
@@ -75,24 +75,19 @@ def edit_task(task_id):
             return jsonify({"message": "Task not found"}), 404
 
         task_data = request.json
+        print(task_data)
+        try:
+            due_date = datetime.fromisoformat(task_data['dueDate'])
+        except (ValueError, TypeError):
+            return jsonify({"error": "Invalid date format"}), 400
 
         task.title = task_data.get('title', task.title)
-        task.description = task_data.get('description', task.description)
-
-        due_date_str = task_data.get('due_date', task.due_date)
-        if isinstance(due_date_str, str):
-            try:
-                task.due_date = datetime.strptime(due_date_str, '%Y-%m-%dT%H:%M:%S')
-            except ValueError:
-                return jsonify({"message": "Invalid date format"}), 400
-        else:
-            task.due_date = due_date_str
-
-        task.type = task_data.get('type', task.type)
+        task.exam_type = task_data.get('examType', task.exam_type)
         task.status = task_data.get('status', task.status)
-        task.ask_boolean = task_data.get('ask_boolean', task.ask_boolean)
-        task.answer_keys = task_data.get('answer_keys', task.answer_keys)
-
+        task.answer_keys = task_data.get('answerKeys', task.answer_keys)
+        task.class_id = task_data.get('classId', task.class_id)
+        task.due_date = due_date
+        
         db.session.commit()
 
         return jsonify({"message": "Task updated", "task_id": task_id})

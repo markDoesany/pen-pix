@@ -10,7 +10,7 @@ const useGetClasses = () => {
 
   const getClasses = useCallback(async () => {
     try {
-      const response = await axios.get('/classes/get-classes', { withCredentials: true });
+      const response = await axios.get('/classes/get-classes');
       const classes = response.data;
       setClasses(classes); 
     } catch (error) {

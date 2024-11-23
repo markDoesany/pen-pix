@@ -1,5 +1,5 @@
 from flask import request, jsonify, session
-from model import db, Classes
+from model import db, Classes, Task
 from utils.auth_helpers import login_required
 from classes import classes_bp
 
@@ -26,7 +26,6 @@ def create_class():
     db.session.commit()
 
     return jsonify(classes.to_dict()), 201
-
 
 @login_required
 @classes_bp.route('/edit-class/<int:class_id>', methods=['PUT'])
@@ -64,19 +63,19 @@ def delete_class(class_id):
     if not user_id:
         return jsonify({"error": "User not logged in"}), 401
 
-    # Fetch the class by its ID
     class_to_delete = Classes.query.get(class_id)
 
     if not class_to_delete:
         return jsonify({"error": "Class not found"}), 404
 
     try:
-        # Delete the class from the database
+        Task.query.filter_by(class_id=class_id).delete() 
+        db.session.commit()
+        
         db.session.delete(class_to_delete)
         db.session.commit()
         return jsonify({"message": f"Class with ID {class_id} deleted successfully"}), 200
     except Exception as e:
-        # Handle any database errors
         db.session.rollback()
         return jsonify({"error": f"Failed to delete class: {str(e)}"}), 500
 
@@ -91,11 +90,10 @@ def get_classes():
     classes = Classes.query.all()
 
     if not classes:
-        return jsonify({"message": "No classes found"}), 404
+        return jsonify([]), 200
 
     classes_data = [cls.to_dict() for cls in classes]
     return jsonify(classes_data), 200
-
 
 @login_required
 @classes_bp.route('/get-class/<int:class_id>', methods=['GET'])

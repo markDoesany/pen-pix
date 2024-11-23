@@ -2,7 +2,7 @@ import { FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const ClassCard = ({ classData, onDelete }) => {
+const ClassCard = ({ classData, onDelete, recentTasks }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
@@ -10,12 +10,12 @@ const ClassCard = ({ classData, onDelete }) => {
   };
 
   const handleDeleteTask = async (e) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     try {
       const response = await axios.delete(`/classes/delete-class/${classData.id}`);
       if (response.status === 200) {
         alert(`Class ${classData.class_code} deleted successfully.`);
-        onDelete(classData.id); // Notify the parent component of the deletion
+        onDelete(classData.id); 
       }
     } catch (error) {
       console.error("Error deleting class:", error);
@@ -26,7 +26,7 @@ const ClassCard = ({ classData, onDelete }) => {
   return (
     <div
       className="group relative shadow-xl rounded-lg w-[300px] h-[300px] p-5 cursor-pointer transform hover:scale-105 duration-200 bg-white"
-      onClick={handleCardClick} 
+      onClick={handleCardClick}
     >
       <div
         className="absolute top-5 right-3 opacity-0 group-hover:opacity-100 duration-200"
@@ -42,13 +42,17 @@ const ClassCard = ({ classData, onDelete }) => {
           <span className="ml-2 text-sm font-medium">{classData.class_code}</span>
         </div>
       </div>
+
       <div className="mt-5">
         <h4 className="text-sm font-semibold">Recent Tasks</h4>
         <ul className="text-gray-500 list-disc list-inside pl-5 h-[120px] mt-2 flex flex-col gap-2">
-          <li>Laboratory Exercise</li>
-          <li>Assignment</li>
-          <li>Midterm</li>
-          <li>Prefinal</li>
+          {recentTasks.length === 0 ? (
+            <li>No tasks available</li> 
+          ) : (
+            recentTasks.map((taskTitle, index) => (
+              <li key={index}>{taskTitle}</li> 
+            ))
+          )}
         </ul>
       </div>
     </div>

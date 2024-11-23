@@ -8,15 +8,18 @@ import { FilesAtom } from '../../atoms/FilesAtom'
 import FilesList from './components/FilesList';
 import { formatDueDateTime } from '../../utils/helpers';
 import useDeleteTask from '../../hooks/useDeleteTask';
+import useClassData from '../../hooks/useClassData'
+
 
 const TaskPage = () => {
   const [task, setTask] = useState({});
   const [files, setFiles] = useRecoilState(FilesAtom)
-  const [isEditing, setIsEditing] = useState(false); // State to track if in edit mode
   const currentUser = useRecoilValue(UserAtom);
   const { taskId } = useParams();
   const navigate = useNavigate();
+  const {classData, loading} = useClassData(taskId)
   const { handleDeleteTask: deleteTask}  = useDeleteTask()
+
   const fetchFiles = useCallback(async () => {
     try {
       const response = await axios.get(`/files/get-files/${taskId}`);
@@ -41,7 +44,7 @@ const TaskPage = () => {
     };
 
     getTask();
-    fetchFiles(); // Fetch files on component mount
+    fetchFiles(); 
 
   }, [taskId, fetchFiles]);
 
@@ -67,27 +70,9 @@ const TaskPage = () => {
     }
   };
 
-  const handleEditTask = () => {
-    setIsEditing(true);
-  };
-
-  const handleSaveTask = async () => {
-    try {
-      const response = await axios.patch(`/task/edit-task/${task.id}`, task, {
-        withCredentials: true,
-      });
-  
-      console.log("Task saved:", response.data);
-      setIsEditing(false);
-      
-    } catch (error) {
-      console.log("Error saving task:", error);
-    }
-  };
-  
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-  };
+  const handleEditTask = () =>{
+    navigate(`/edit-task/${task?.id}`)
+  }
 
   const handleDeleteTask = async () => {
     await deleteTask(taskId)
@@ -106,134 +91,17 @@ const TaskPage = () => {
     navigate(`/student-upload/${task.id}`);
   }
 
+  if (loading) return
   return (
     <div className="bg-[#EFEFEF] min-h-screen w-full p-10">
       <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 bg-white shadow-lg p-6 rounded-lg">
-          {isEditing ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Title</label>
-                <input
-                  type="text"
-                  value={task.title}
-                  onChange={(e) => setTask({ ...task, title: e.target.value })}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
-                <textarea
-                  value={task.description}
-                  onChange={(e) => setTask({ ...task, description: e.target.value })}
-                  className="w-full p-2 border rounded"
-                  rows="4"
-                ></textarea>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Class Group</label>
-                <input
-                  type="text"
-                  value={task.class_group}
-                  onChange={(e) => setTask({ ...task, class_group: e.target.value })}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Type</label>
-                <input
-                  type="text"
-                  value={task.type}
-                  onChange={(e) => setTask({ ...task, type: e.target.value })}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Class Schedule</label>
-                <input
-                  type="text"
-                  value={task.class_schedule}
-                  onChange={(e) =>
-                    setTask({ ...task, class_schedule: e.target.value })
-                  }
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Due Date</label>
-                <input
-                  type="datetime-local"
-                  value={task.due_date}
-                  onChange={(e) =>
-                    setTask({ ...task, class_schedule: e.target.value })
-                  }
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Answer Keys</label>
-                {task.answer_keys &&
-                  task.answer_keys.map((key, index) => (
-                    <div key={index} className="flex space-x-4">
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700">Expression</label>
-                        <input
-                          type="text"
-                          value={key.expression}
-                          onChange={(e) => {
-                            const newAnswerKeys = [...task.answer_keys];
-                            newAnswerKeys[index].expression = e.target.value;
-                            setTask({ ...task, answer_keys: newAnswerKeys });
-                          }}
-                          className="w-full p-2 border rounded"
-                        />
-                      </div>
-                      <div className="w-20">
-                        <label className="block text-sm font-medium text-gray-700">Points</label>
-                        <input
-                          type="number"
-                          value={key.points}
-                          onChange={(e) => {
-                            const newAnswerKeys = [...task.answer_keys];
-                            newAnswerKeys[index].points = e.target.value;
-                            setTask({ ...task, answer_keys: newAnswerKeys });
-                          }}
-                          className="w-full p-2 border rounded"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newAnswerKeys = task.answer_keys.filter((_, i) => i !== index);
-                          setTask({ ...task, answer_keys: newAnswerKeys });
-                        }}
-                        className="ml-2 px-4 py-2 bg-red-500 text-white rounded"
-                        disabled={task.answer_keys.length <= 1}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    onClick={() => {
-                      setTask({
-                        ...task,
-                        answer_keys: [...(task.answer_keys || []), { expression: '', points: '' }]
-                      });
-                    }}
-                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-                  >
-                    Add Answer Key
-                  </button>
-              </div>
-            </div>
-          ) : (
             <div className="space-y-4 ">
               <h1 className="text-xl font-bold">{task.title}</h1>
               <p>{task.description}</p>
-              <p className="text-gray-500">Class: {task.class_group}</p>
-              <p className="text-gray-500">Type: {task.type}</p>
-              <p className="text-gray-500">Class Schedule: {task.class_schedule}</p>
+              <p className="text-gray-500">Class: {classData?.class_code} | {classData?.class_group}</p>
+              <p className="text-gray-500">Type: {task.exam_type}</p>
+              <p className="text-gray-500">Class Schedule: {classData?.class_schedule}</p>
               <p className="text-gray-500">Updated At: {formatDueDateTime(task.updated_at)}</p>
               <p className="text-gray-500">Due Date: {formatDueDateTime(task.due_date)}</p>
               <p className="text-gray-500">Status: {task.status}</p>
@@ -242,26 +110,33 @@ const TaskPage = () => {
               </p>
               <div className="space-y-2">
                 <label className="font-semibold">Answer Keys:</label>
-                <ul className="list-disc pl-5 space-y-1">
-                  {task.answer_keys &&
-                    task.answer_keys.map((key, index) => (
-                      <li key={index}>
-                        <span className="font-semibold">Expression:</span> {key.expression}
-                        <span className="ml-2 font-semibold">Points:</span> {key.points}
-                      </li>
-                    ))}
+                <ul className="pl-5 space-y-1 text-gray">
+                  { task.answer_keys?.map((answerKey, index) => {
+                      return(
+                        <ul key={index} className='text-gray-500'>
+                        <span className="font-semibold">{answerKey['item']}:</span>
+                        {answerKey['keys'].map((key, index)=>{
+                          return(
+                          <li key={index} className='list-disc ml-10 flex justify-between'>
+                            <div>
+                              <span className="ml-2 font-semibold">Expression: </span> 
+                              <span>{key['expression']}</span>
+                            </div>
+                            <div>
+                              <span className="ml-2 font-semibold">Grade: </span> 
+                              <span>{key['grade']}</span>
+                            </div>
+                          </li>)
+                        })}
+                      </ul>)
+                      })}
                 </ul>
               </div>
             </div>
-          )}
         </div>
 
-        {/* Right side: Buttons */}
         <TaskActions
-          isEditing={isEditing}
           onEdit={handleEditTask}
-          onSave={handleSaveTask}
-          onCancel={handleCancelEdit}
           onDelete={handleDeleteTask}
           onUpload={handleUpload}
           onAnalyze={handleAnalyzeSubmission}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TaskMenu from "./TaskMenu";
+import TaskItem from "./TaskItem";
 import { formatDueDateTime } from "../../../utils/helpers";
 import useDeleteTask from '../../../hooks/useDeleteTask';
 
@@ -49,13 +50,7 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
             className="grid grid-cols-7 gap-4 text-sm border-b py-5 hover:bg-gray-200 rounded-b-sm cursor-pointer items-center relative"
             onClick={() => handleSelectedTask(task.id)}
           >
-            <div className="text-left pl-3 font-semibold text-gray-500">{task.class_group}</div>
-            <div className="col-span-2 font-semibold text-left">{task.title}</div>
-            <div className="text-center border border-gray-300 rounded-md w-16 py-1 mx-auto">
-              <p>{task.reviewed_submissions}/{task.total_submissions}</p>
-            </div>
-            <div className="text-center">{formatDueDateTime(task.due_date)}</div>
-            <div className="text-center col-span-1 font-semibold">{task.type}</div>
+            <TaskItem task={task}/>
             <button
               className="text-right col-span-1 pr-4"
               onClick={(event) => handleMenu(event, task)}
