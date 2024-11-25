@@ -33,6 +33,7 @@ const Combobox = ({ options, placeholder, value, onChange }) => {
         styles={customStyles}
         isClearable
         isSearchable
+        noOptionsMessage={() => "Create class"}
       />
     </div>
   );

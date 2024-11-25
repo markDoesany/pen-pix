@@ -66,16 +66,24 @@ const EditClassPage = () => {
   
 
   const handleAddStudent = () => {
-    if (studentId.trim()) { 
-      setClassData((prev) => ({
-        ...prev,
-        studentList: [...prev.studentList, studentId]
-      }));
-      setStudentId(''); 
-    } else {
+    if (!studentId.trim()) {
       alert("Please enter a valid Student ID.");
+      return;
     }
+  
+    if (classData.studentList.includes(studentId)) {
+      alert(`Student ID ${studentId} already exists in the class.`);
+      return;
+    }
+  
+    setClassData((prev) => ({
+      ...prev,
+      studentList: [...prev.studentList, studentId],
+    }));
+  
+    setStudentId('');
   };
+  
 
   const handleRemoveStudent = (index) => {
     setClassData((prev) => ({

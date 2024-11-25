@@ -5,8 +5,6 @@ import { IoIosAddCircle } from "react-icons/io";
 import Combobox from "./components/Combobox";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
-import { UserAtom } from '../../atoms/UserAtom';
 import axios from 'axios';
 
 const taskTypeOptions = [

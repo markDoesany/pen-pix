@@ -23,7 +23,7 @@ const RightSideBar = ({ task, circuitData, onAddAnswerKey, onDeleteExpression })
 
   return (
     <div 
-      className={`relative flex flex-col gap-5  ${isCollapsed ? 'w-20 bg-black' : 'w-[300px]'} h-full px-5 text-textGray transition-all duration-300 ease-in-out`}
+      className={`bg-white relative flex flex-col gap-5  ${isCollapsed ? 'w-20 bg-black' : 'w-[300px]'} h-full px-5 text-textGray transition-all duration-300 ease-in-out`}
     >
       <div className="mt-5 cursor-pointer" onClick={handleToggleCollapse}>
         {isCollapsed ? <GoSidebarExpand size={25} /> : <GoSidebarCollapse size={25} />}
@@ -32,7 +32,7 @@ const RightSideBar = ({ task, circuitData, onAddAnswerKey, onDeleteExpression })
       {!isCollapsed && (
         <>
           <div>
-            <AnswerKeys onAdd={handleAddAnswerKey} task={task} onDeleteExpression={onDeleteExpression}/>
+            {/* <AnswerKeys onAdd={handleAddAnswerKey} task={task} onDeleteExpression={onDeleteExpression}/> */}
           </div>
           <div className="mt-5">
             <ExpressionsResult circuitData={circuitData}/>

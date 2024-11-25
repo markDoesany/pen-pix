@@ -69,11 +69,15 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
   const isExportVerilogDisabled = !hasPredictions || !hasBooleanExpressions;
 
   return (
-    <div className={`w-[110px] h-full flex flex-col items-center gap-4 bg-secondaryBg border border-borderGray font-sans text-textGray px-3 py-4 relative select-none ${loading ? styles.disabled : ''}`}>
+    <div className={`w-[110px] h-full flex flex-col items-center gap-4 bg-white border border-borderGray font-sans text-customBlack1 px-3 py-4 relative select-none ${loading ? styles.disabled : ''}`}>
       <div
-        className={`${styles.tool} ${selectedTool === 'fileUpload' ? 'bg-primaryColor text-white' : ''} ${loading && selectedTool !== 'fileUpload' ? 'hover:bg-transparent' : ''}`}
-        onClick={() => handleUploadFileClick()}
-      >
+          className={`${styles.tool} ${
+            selectedTool === 'fileUpload'
+              ? 'bg-gray-600 text-white'
+              : 'hover:bg-gray-200 hover:text-gray-800'
+          } ${loading && selectedTool !== 'fileUpload' ? 'hover:bg-transparent' : ''}`}
+          onClick={() => handleUploadFileClick()}
+        >
         {loading && selectedTool === 'fileUpload' ? (
           <ImSpinner9 size={20} className="animate-spin" />
         ) : (
@@ -96,9 +100,13 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
       </div>
 
       <div
-        className={`${styles.tool} ${selectedTool === 'threshold' ? 'bg-primaryColor text-white' : ''} ${loading && selectedTool !== 'threshold' ? 'hover:bg-transparent' : ''}`}
-        onClick={() => handleToolClick('threshold')}
-      >
+          className={`${styles.tool} ${
+            selectedTool === 'threshold'
+              ? 'bg-gray-600 text-white'
+              : 'hover:bg-gray-200 hover:text-gray-800'
+          } ${loading && selectedTool !== 'threshold' ? 'hover:bg-transparent' : ''}`}
+          onClick={() => handleToolClick('threshold')}
+        >
         {loading && selectedTool === 'threshold' ? (
           <ImSpinner9 size={20} className="animate-spin" />
         ) : (
@@ -108,7 +116,11 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
       </div>
 
       <div
-        className={`${styles.tool} ${selectedTool === 'logicGates' ? 'bg-primaryColor text-white' : ''} ${loading && selectedTool !== 'logicGates' ? 'hover:bg-transparent' : ''}`}
+        className={`${styles.tool} ${
+          selectedTool === 'logicGates'
+            ? 'bg-gray-600 text-white'
+            : 'hover:bg-gray-200 hover:text-gray-800'
+        } ${loading && selectedTool !== 'logicGates' ? 'hover:bg-transparent' : ''}`}
         onClick={() => handleToolClick('logicGates')}
       >
         {loading && selectedTool === 'logicGates' ? (
@@ -120,7 +132,11 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
       </div>
 
       <div
-        className={`${styles.tool} ${isPredictionToggled ? 'bg-primaryColor text-white' : ''} ${loading && selectedTool !== 'togglePredictions' ? 'hover:bg-transparent' : ''}`}
+        className={`${styles.tool} ${
+          isPredictionToggled
+            ? 'bg-gray-600 text-white'
+            : 'hover:bg-gray-200 hover:text-gray-800'
+        } ${loading && selectedTool !== 'togglePredictions' ? 'hover:bg-transparent' : ''}`}
         onClick={handleTogglePredictions}
       >
         {isPredictionToggled ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
@@ -128,7 +144,11 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
       </div>
 
       <div
-        className={`${styles.tool} ${loading && selectedTool !== 'analyzeCircuit' ? 'hover:bg-transparent' : ''} ${isAnalyzeCircuitDisabled ? 'bg-gray-500 text-gray-300 cursor-not-allowed' : ''}`}
+        className={`${styles.tool} ${loading &&
+          selectedTool === 'analyzeCircuit'
+            ? 'bg-gray-600 text-white'
+            : 'hover:bg-gray-200 hover:text-gray-800'
+        }${isAnalyzeCircuitDisabled ? 'bg-gray-500 text-gray-300 cursor-not-allowed' : ''}`}
         onClick={() => !isAnalyzeCircuitDisabled && handleToolClick('analyzeCircuit')}
       >
         {loading && selectedTool === 'analyzeCircuit' ? (
@@ -140,7 +160,11 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
       </div>
 
       <div
-        className={`${styles.tool} ${selectedTool === 'truthTable' ? 'bg-primaryColor text-white' : ''} ${loading && selectedTool !== 'truthTable' ? 'hover:bg-transparent' : ''} ${isTruthTableDisabled ? 'bg-gray-500 text-gray-300 cursor-not-allowed' : ''}`}
+        className={`${styles.tool} ${
+          selectedTool === 'truthTable'
+            ? 'bg-gray-600 text-white'
+            : 'hover:bg-gray-200 hover:text-gray-800'
+        } ${loading && selectedTool !== 'truthTable' ? 'hover:bg-transparent' : ''} ${isTruthTableDisabled ? 'bg-gray-500 text-gray-300 cursor-not-allowed' : ''}`}
         onClick={() => !isTruthTableDisabled && handleToolClick('truthTable')}
       >
         <FaTable size={20} />
@@ -148,7 +172,11 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
       </div>
 
       <div
-        className={`${styles.tool} ${loading && selectedTool !== 'exportVerilog' ? 'hover:bg-transparent' : ''} ${isExportVerilogDisabled ? 'bg-gray-500 text-gray-300 cursor-not-allowed' : ''}`}
+        className={`${styles.tool} ${loading &&
+          selectedTool === 'exportVerilog'
+            ? 'bg-gray-600 text-white'
+            : 'hover:bg-gray-200 hover:text-gray-800'
+        } ${isExportVerilogDisabled ? 'bg-gray-500 text-gray-300 cursor-not-allowed' : ''}`}
         onClick={() => !isExportVerilogDisabled && handleToolClick('exportVerilog')}
       >
         <FaFileExport size={20} />

@@ -43,8 +43,8 @@ const Header = ({ task, files, onCurrentFileChange }) => {
   };
 
   return (
-    <div className="flex justify-between items-center gap-8 bg-secondaryBg w-full h-[50px] border-b border-borderGray p-10 font-sans text-textGray">
-      <div className="Logo cursor-pointer w-[220px]">
+    <div className="flex justify-between items-center gap-8 bg-white w-full h-[50px] border-b border-borderGray p-10 font-sans text-customBlack1">
+      <div className="cursor-pointer w-[220px]">
         <Link to={`/dashboard/${currentUser.id}`} className="flex gap-2 items-center">
           <span className="font-bold text-2xl">PenPix |</span>
           <span className="font-xl">Pencil to Pixel</span>
@@ -77,8 +77,8 @@ const Header = ({ task, files, onCurrentFileChange }) => {
           <FaUserCircle size={35} />
           <Combobox
             options={formattedOptions}
-            value={currentFile}  // Set the current file as value
-            onOptionSelect={handleSelectedSubmission}  // Handle selection change
+            value={currentFile}  
+            onOptionSelect={handleSelectedSubmission}  
           />
         </div>
         <FaArrowRight 

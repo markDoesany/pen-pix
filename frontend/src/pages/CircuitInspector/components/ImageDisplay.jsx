@@ -99,7 +99,7 @@ const ImageDisplay = ({ img_url, predictions, isPredictionVisible}) => {
   const handleMouseUp = () => setStartDrag(null);
   return (
     <div
-      className={`image-canvas w-full h-full flex justify-center items-center bg-black cursor-pointer ${startDrag ? "cursor-grab" : ""}`}
+      className={`image-canvas w-full h-full flex justify-center items-center cursor-pointer ${startDrag ? "cursor-grab" : ""}`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

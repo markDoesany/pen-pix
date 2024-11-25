@@ -1,7 +1,6 @@
 import Select from 'react-select';
 import classnames from 'classnames';
 
-// Helper function to truncate labels longer than 10 characters
 const truncateLabel = (label, maxLength = 20) => {
   return label.length > maxLength ? `${label.slice(0, maxLength)}...` : label;
 };
@@ -9,14 +8,14 @@ const truncateLabel = (label, maxLength = 20) => {
 const customStyles = {
   control: (provided) => ({
     ...provided,
-    backgroundColor: '#2F2F2F',
+    backgroundColor: '#FFFFFF',
     borderColor: '#686868',
     color: '#FFFFFF',
     fontSize: '13px',
   }),
   singleValue: (provided) => ({
     ...provided,
-    color: '#FFFFFF',
+    color: '#2F2F2F',
   }),
   menu: (provided) => ({
     ...provided,
@@ -39,7 +38,6 @@ const ComboBox = ({ options, value, onOptionSelect }) => {
     onOptionSelect(selectedOption);
   };
 
-  // Modify options to truncate the label
   const truncatedOptions = options.map(option => ({
     ...option,
     label: truncateLabel(option.label),
@@ -54,6 +52,7 @@ const ComboBox = ({ options, value, onOptionSelect }) => {
       className={classnames('w-full')}
       classNamePrefix="react-select"
       isSearchable 
+      noOptionsMessage={() => "No submissions"}
     />
   );
 };

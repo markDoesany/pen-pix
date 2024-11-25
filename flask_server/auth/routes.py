@@ -53,7 +53,7 @@ def register():
         
         msg = EmailMessage(
             "Email Verification",
-            f"Please verify your email by clicking on the following link: {verification_link}",
+            f"Please verify your email by clicking on the following link:{verification_link}",
             Config.MAIL_USERNAME, 
             [email]
         )

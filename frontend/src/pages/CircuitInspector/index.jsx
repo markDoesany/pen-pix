@@ -160,7 +160,7 @@ const CircuitInspectorPage = () => {
   if (taskLoading) return <div>Loading...</div>; // Display loading state
 
   return (
-    <div className="bg-[#242424] min-h-screen flex flex-col">
+    <div className="bg-[#eeeded] min-h-screen flex flex-col text">
       <header className="bg-[#333]">
         <Header task={task} files={files} onCurrentFileChange={handleCurrentFile} />
       </header>

@@ -1,25 +1,39 @@
-import { FaTrashAlt } from "react-icons/fa";
+const ExpressionsResult = ({ circuitData }) => {
+  const booleanExpressions = circuitData?.boolean_expressions || [];
 
-const ExpressionsResult = ({circuitData}) => {
   return (
-    <div className="bg-secondaryBg text-textGray text-sm rounded-lg w-full h-[200px] flex flex-col items overflow-hidden ">
-      <div className="bg-thirdBg flex justify-center items-center relative p-2">
-        <h1 className="text-white font-semibold">Boolean Result</h1>
+    <div className="bg-white text-gray-800 text-base rounded-lg w-full max-h-[250px] flex flex-col overflow-hidden border border-gray-300 shadow-md">
+      <div className="bg-gray-800 text-white text-lg font-medium p-3 rounded-t-lg">
+        Boolean Result
       </div>
-      <div className="h-[180px] flex flex-col gap-2 pr-5 pl-2 py-4">
-        <div className="flex justify-between items-center gap-3 h-[40px]">
-          <span className="border border-borderGray p-2 rounded-md text-center w-10">Y1</span>
-          <span className="border border-borderGray p-2 rounded-md flex-grow text-center">X OR Y XOR Z</span>
-          <FaTrashAlt className="cursor-pointer" size={20}/>
-        </div>
-        <div className="flex justify-between items-center gap-3 h-[40px]">
-          <span className="border border-borderGray p-2 rounded-md text-center w-10">Y2</span>
-          <span className="border border-borderGray p-2 rounded-md flex-grow text-center">X OR Y XOR Z</span>
-          <FaTrashAlt className="cursor-pointer" size={20}/>
-        </div>
+
+      <div className="flex flex-col gap-4 p-4 overflow-y-auto">
+        {booleanExpressions.length > 0 ? (
+          booleanExpressions.map((expressionObj, index) => {
+            const [label, expression] = Object.entries(expressionObj)[0];
+            return (
+              <div
+                key={index}
+                className="flex items-center gap-4 p-2 bg-gray-50 border border-gray-200 rounded-md"
+              >
+                <span className="font-semibold text-gray-700 bg-gray-200 px-4 py-2 rounded-md w-20 text-center">
+                  {label}
+                </span>
+
+                <span className="text-sm text-gray-600 flex-grow">
+                  {expression}
+                </span>
+              </div>
+            );
+          })
+        ) : (
+          <div className="text-gray-500 text-center italic mt-8">
+            No Boolean expressions available.
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};
 
-export default ExpressionsResult
+export default ExpressionsResult;

@@ -172,6 +172,7 @@ class UploadedFile(db.Model):
     mimetype = db.Column(db.String(50), nullable=False)
     upload_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
+    item_number = db.Column(db.Integer, nullable=False)
     graded = db.Column(db.Boolean, default=False, nullable=False) 
     circuit_analysis = db.relationship('CircuitAnalysis', backref='uploaded_file', lazy=True, cascade="all, delete-orphan")
      
@@ -182,11 +183,12 @@ class UploadedFile(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'item_number': self.item_number,
             'filename': self.filename,
             'filepath': self.filepath,
             'mimetype': self.mimetype,
             'file_url': self.file_url,
-            'graded': self.graded  # Include graded in the dict
+            'graded': self.graded 
         }
         
         

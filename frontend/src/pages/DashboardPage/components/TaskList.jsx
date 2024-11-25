@@ -4,9 +4,11 @@ import TaskMenu from "./TaskMenu";
 import TaskItem from "./TaskItem";
 import { formatDueDateTime } from "../../../utils/helpers";
 import useDeleteTask from '../../../hooks/useDeleteTask';
+import TaskLinkModal from "./TaskLinkModal";
 
 const TaskList = ({ filter, tasks, refreshTasks }) => {
   const [openTask, setOpenTask] = useState(null);
+  const [modalTaskId, setModalTaskId] = useState(null);
   const navigate = useNavigate();
   const { handleDeleteTask: deleteTask } = useDeleteTask();
 
@@ -21,7 +23,9 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
   };
 
   const handleSelectedTask = (taskId) => {
-    navigate(`/task/${taskId}`);
+    if (!modalTaskId) {
+      navigate(`/task/${taskId}`);
+    }
   };
 
   const handleDeleteTask = async (taskId) => {
@@ -29,8 +33,13 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
     refreshTasks();
   };
 
-  const handleGetLink = (taskId) => {
-    navigate(`/student-upload/${taskId}`);
+  const handleShowLinkModal = (event, taskId) => {
+    event.stopPropagation(); // Prevent parent click
+    setModalTaskId(taskId);
+  };
+
+  const handleCloseModal = () => {
+    setModalTaskId(null);
   };
 
   return (
@@ -44,13 +53,13 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
           <div className="text-center ">Type of Task</div>
           <div className="text-right  pr-3"></div>
         </div>
-        {filteredTasks.map((task, index) => (
+        {filteredTasks.map((task) => (
           <div
-            key={index}
+            key={task.id}
             className="grid grid-cols-7 gap-4 text-sm border-b py-5 hover:bg-gray-200 rounded-b-sm cursor-pointer items-center relative"
             onClick={() => handleSelectedTask(task.id)}
           >
-            <TaskItem task={task}/>
+            <TaskItem task={task} />
             <button
               className="text-right col-span-1 pr-4"
               onClick={(event) => handleMenu(event, task)}
@@ -60,7 +69,7 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
             {openTask === task && (
               <TaskMenu
                 onDelete={() => handleDeleteTask(task.id)}
-                onGetLink={() => handleGetLink(task.id)}
+                onGetLink={(event) => handleShowLinkModal(event, task.id)}
               />
             )}
           </div>
@@ -70,18 +79,24 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
       <div className="hidden max-md:block">
         {filteredTasks.map((task) => (
           <div
-            key={task.id} // Use unique ID for key
+            key={task.id}
             className="border border-gray-300 rounded-lg p-4 mb-4 hover:bg-gray-100 cursor-pointer mt-5 relative"
             onClick={() => handleSelectedTask(task.id)}
           >
             <h3 className="font-semibold text-lg">{task.title}</h3>
             <p className="text-gray-600">Group: {task.class_group}</p>
             <p className="text-gray-600">Due Date: {formatDueDateTime(task.due_date)}</p>
-            <p className={`font-semibold ${task.status === "Ongoing" ? "text-red-500" : "text-green-500"}`}>
+            <p
+              className={`font-semibold ${
+                task.status === "Ongoing" ? "text-red-500" : "text-green-500"
+              }`}
+            >
               Status: {task.status}
             </p>
             <div className="flex justify-between items-center mt-2">
-              <p className="text-sm">Submissions: {task.reviewed_submissions}/{task.total_submissions}</p>
+              <p className="text-sm">
+                Submissions: {task.reviewed_submissions}/{task.total_submissions}
+              </p>
               <button
                 className="text-gray-500"
                 onClick={(event) => handleMenu(event, task)}
@@ -94,12 +109,20 @@ const TaskList = ({ filter, tasks, refreshTasks }) => {
             {openTask === task && (
               <TaskMenu
                 onDelete={() => handleDeleteTask(task.id)}
-                onGetLink={() => handleGetLink(task.id)}
+                onGetLink={(event) => handleShowLinkModal(event, task.id)}
               />
             )}
           </div>
         ))}
       </div>
+
+      {modalTaskId && (
+        <TaskLinkModal
+          isOpen={!!modalTaskId}
+          taskId={modalTaskId}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 };
