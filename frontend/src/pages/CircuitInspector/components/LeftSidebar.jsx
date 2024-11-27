@@ -1,4 +1,4 @@
-import { FaSliders, FaTable, FaEye, FaEyeSlash, FaFileExport, FaUpload } from "react-icons/fa6";
+import { FaSliders, FaTable, FaEye, FaEyeSlash, FaFileExport} from "react-icons/fa6";
 import { GiLogicGateNor } from "react-icons/gi";
 import { PiCircuitryFill } from "react-icons/pi";
 import { ImSpinner9 } from "react-icons/im";
@@ -6,36 +6,19 @@ import SetThresholdSlider from "./SetThresholdSlider";
 import DetectLogicGatesOption from "./DetectLogicGatesOptions";
 import TruthTable from './TruthTable';
 import styles from './styles/component.module.css';
-import { useRef, useState, useEffect } from "react";
-import useFileUpload from '../../../hooks/useFileUpload';
+import { useState, useEffect } from "react";
 
-const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLogicGates, onTogglePredictionVisibility, onAnalyzeCircuit, onGetTruthTable, onExportVerilog }) => {
+const LeftSidebar = ({ loading, circuitData, onApplyThreshold, onDetectLogicGates, onTogglePredictionVisibility, onAnalyzeCircuit, onGetTruthTable, onExportVerilog }) => {
   const [selectedTool, setSelectedTool] = useState('');
   const [isPredictionToggled, setIsPredictionToggled] = useState(false);
-  const { handleUpload } = useFileUpload(task.id);
-  const fileInputRef = useRef(null);
 
   useEffect(() => {
     // Update button states when circuitData changes
   }, [circuitData]);
 
-  const handleUploadFileClick = () => {
+  const handleToolClick = async (tool) => {
     if (!loading) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleToolClick = async (tool, files = []) => {
-    if (!loading) {
-      if (tool === 'fileUpload') {
-        if (files.length > 0) {
-          try {
-            await handleUpload(files);
-          } catch (error) {
-            console.log(error.message);
-          }
-        }
-      } else if (tool === "analyzeCircuit") {
+        if (tool === "analyzeCircuit") {
         onAnalyzeCircuit();
       } else if (tool === 'truthTable') {
         onGetTruthTable();
@@ -59,46 +42,15 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
     }
   };
 
-  // Check the availability of predictions and boolean expressions
   const hasPredictions = circuitData.predictions && circuitData.predictions.length > 0;
   const hasBooleanExpressions = circuitData.boolean_expressions && circuitData.boolean_expressions.length > 0;
 
-  // Disable state for tools
   const isAnalyzeCircuitDisabled = !hasPredictions;
   const isTruthTableDisabled = !hasPredictions || !hasBooleanExpressions;
   const isExportVerilogDisabled = !hasPredictions || !hasBooleanExpressions;
 
   return (
     <div className={`w-[110px] h-full flex flex-col items-center gap-4 bg-white border border-borderGray font-sans text-customBlack1 px-3 py-4 relative select-none ${loading ? styles.disabled : ''}`}>
-      <div
-          className={`${styles.tool} ${
-            selectedTool === 'fileUpload'
-              ? 'bg-gray-600 text-white'
-              : 'hover:bg-gray-200 hover:text-gray-800'
-          } ${loading && selectedTool !== 'fileUpload' ? 'hover:bg-transparent' : ''}`}
-          onClick={() => handleUploadFileClick()}
-        >
-        {loading && selectedTool === 'fileUpload' ? (
-          <ImSpinner9 size={20} className="animate-spin" />
-        ) : (
-          <FaUpload size={20} />
-        )}
-        <h3 className={`${styles.tool_label} text-xs`}>File Upload</h3>
-        <input
-          type="file"
-          ref={fileInputRef}
-          style={{ display: 'none' }}
-          accept="image/*"
-          multiple
-          onChange={(e) => {
-            const files = Array.from(e.target.files);
-            if (files.length > 0) {
-              handleToolClick('fileUpload', files);
-            }
-          }}
-        />
-      </div>
-
       <div
           className={`${styles.tool} ${
             selectedTool === 'threshold'
@@ -180,7 +132,7 @@ const LeftSidebar = ({ loading, task, circuitData, onApplyThreshold, onDetectLog
         onClick={() => !isExportVerilogDisabled && handleToolClick('exportVerilog')}
       >
         <FaFileExport size={20} />
-        <h3 className={`${styles.tool_label} text-xs`}>Export Verilog</h3>
+        <h3 className={`${styles.tool_label} text-xs`}>Export Netlist</h3>
       </div>
 
       {selectedTool === 'threshold' && (

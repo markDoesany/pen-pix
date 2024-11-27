@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 
-const ImageDisplay = ({ img_url, predictions, isPredictionVisible}) => {
+const ImageDisplay = ({ img_url, predictions, isPredictionVisible }) => {
   const canvasRef = useRef(null);
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -13,47 +13,49 @@ const ImageDisplay = ({ img_url, predictions, isPredictionVisible}) => {
     const img = new Image();
     img.src = img_url;
 
-    img.onload = () => drawImageAndPredictions();
+    img.onload = () => {
+      const drawImageAndPredictions = () => {
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
 
-    const drawImageAndPredictions = () => {
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
+        const imgAspectRatio = img.width / img.height;
+        const canvasAspectRatio = canvasWidth / canvasHeight;
 
-      const imgAspectRatio = img.width / img.height;
-      const canvasAspectRatio = canvasWidth / canvasHeight;
+        let drawWidth, drawHeight;
 
-      let drawWidth, drawHeight;
+        if (imgAspectRatio > canvasAspectRatio) {
+          drawWidth = canvasWidth / scale;
+          drawHeight = drawWidth / imgAspectRatio;
+        } else {
+          drawHeight = canvasHeight / scale;
+          drawWidth = drawHeight * imgAspectRatio;
+        }
 
-      if (imgAspectRatio > canvasAspectRatio) {
-        drawWidth = canvasWidth / scale;
-        drawHeight = drawWidth / imgAspectRatio;
-      } else {
-        drawHeight = canvasHeight / scale;
-        drawWidth = drawHeight * imgAspectRatio;
-      }
+        const x = (canvasWidth - drawWidth) / 2 + offset.x;
+        const y = (canvasHeight - drawHeight) / 2 + offset.y;
 
-      const x = (canvasWidth - drawWidth) / 2 + offset.x;
-      const y = (canvasHeight - drawHeight) / 2 + offset.y;
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        ctx.drawImage(img, x, y, drawWidth, drawHeight);
 
-      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-      ctx.drawImage(img, x, y, drawWidth, drawHeight);
+        if (isPredictionVisible && predictions && Array.isArray(predictions)) {
+          predictions.forEach(({ x: bx, y: by, width, height, class_name, confidence, color }) => {
+            const scaledX = x + (bx * (drawWidth / img.width));
+            const scaledY = y + (by * (drawHeight / img.height));
+            const scaledWidth = width * (drawWidth / img.width);
+            const scaledHeight = height * (drawHeight / img.height);
 
-      if (isPredictionVisible && predictions && Array.isArray(predictions)) {
-        predictions.forEach(({ x: bx, y: by, width, height, class_name, confidence, color }) => {
-          const scaledX = x + (bx * (drawWidth / img.width));
-          const scaledY = y + (by * (drawHeight / img.height));
-          const scaledWidth = width * (drawWidth / img.width);
-          const scaledHeight = height * (drawHeight / img.height);
+            ctx.strokeStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
 
-          ctx.strokeStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-          ctx.lineWidth = 2;
-          ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
+            ctx.font = '12px Arial';
+            ctx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+            ctx.fillText(`${class_name} (${(confidence * 100).toFixed(1)}%)`, scaledX, scaledY - 5);
+          });
+        }
+      };
 
-          ctx.font = '12px Arial';
-          ctx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-          ctx.fillText(`${class_name} (${(confidence * 100).toFixed(1)}%)`, scaledX, scaledY - 5);
-        });
-      }
+      drawImageAndPredictions();
     };
 
     const handleWheel = (e) => {
@@ -69,7 +71,7 @@ const ImageDisplay = ({ img_url, predictions, isPredictionVisible}) => {
     return () => {
       window.removeEventListener('wheel', handleWheel);
     };
-  }, [img_url, predictions, scale, offset, isInside]);
+  }, [img_url, scale, offset, isInside, isPredictionVisible]);
 
   const handleMouseEnter = () => setIsInside(true);
   const handleMouseLeave = () => setIsInside(false);
@@ -88,25 +90,28 @@ const ImageDisplay = ({ img_url, predictions, isPredictionVisible}) => {
       const currentY = e.clientY - canvasRect.top;
       const dx = currentX - startDrag.x;
       const dy = currentY - startDrag.y;
-      setOffset(prevOffset => ({
+      setOffset((prevOffset) => ({
         x: prevOffset.x + dx,
-        y: prevOffset.y + dy
+        y: prevOffset.y + dy,
       }));
       setStartDrag({ x: currentX, y: currentY });
     }
   };
 
   const handleMouseUp = () => setStartDrag(null);
+
   return (
     <div
-      className={`image-canvas w-full h-full flex justify-center items-center cursor-pointer ${startDrag ? "cursor-grab" : ""}`}
+      className={`image-canvas w-full h-full flex justify-center items-center cursor-pointer ${
+        startDrag ? 'cursor-grab' : ''
+      }`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-    <canvas ref={canvasRef} width={900} height={1000} />
+      <canvas ref={canvasRef} width={900} height={1000} />
     </div>
   );
 };

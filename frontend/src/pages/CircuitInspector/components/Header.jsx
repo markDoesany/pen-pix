@@ -53,7 +53,7 @@ const Header = ({ task, files, onCurrentFileChange }) => {
 
       <div className="flex-1 flex justify-between items-center border-r-2 border-l-2 border-borderGray px-7">
         <Link to={`/task/${task.id}`} className="flex-grow">
-          <h3 className="font-semibold text-sm">{task.title}</h3>
+          <h3 className="font-semibold text-sm">Task: {task.title}</h3>
           <small>Due date: {formatDueDateTime(task.due_date)}</small>
         </Link>
         <div className="flex items-center justify-between gap-10 w-[150px]">
@@ -62,7 +62,7 @@ const Header = ({ task, files, onCurrentFileChange }) => {
             <label className="text-sm">Graded</label>
           </div>
           <div className="text-sm">
-            <p>{currentIndex + 1}/{files.length}</p> {/* Page count */}
+            <p>{files.length ? currentIndex + 1: 0}/{files.length}</p> 
           </div>
         </div>
       </div>

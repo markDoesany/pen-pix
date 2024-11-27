@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 const DetectLogicGatesOption = ({ onDetectLogicGates, loading }) => {
   const [showCompletionText, setShowCompletionText] = useState(false);
-  const [processing, setProcessing] = useState(false); // Track processing state
-
+  const [processing, setProcessing] = useState(false); 
+  
   useEffect(() => {
     if (loading) {
       setProcessing(true);
@@ -12,15 +12,15 @@ const DetectLogicGatesOption = ({ onDetectLogicGates, loading }) => {
         setShowCompletionText(true);
         const timer = setTimeout(() => {
           setShowCompletionText(false);
-          setProcessing(false); // Reset processing state after showing completion
-        }, 2000); // Hide "Process Completed" after 2 seconds
+          setProcessing(false); 
+        }, 2000); 
         return () => clearTimeout(timer);
       }
     }
   }, [loading, processing]);
 
   return (
-    <div className='bg-secondaryBg p-4 rounded-lg w-[250px] flex flex-col gap-4'>
+    <div className='bg-secondaryBg p-4 rounded-lg w-[250px] flex flex-col gap-4 text-white'>
       <h1 className='font-semibold'>Detect Logic Gates:</h1>
 
       {loading ? (

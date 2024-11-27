@@ -16,8 +16,8 @@ const CircuitInspectorPage = () => {
   const [currentCircuitData, setCurrentCircuitData] = useState([]);
   const [currentPredictions, setCurrentPredictions] = useState([]);
   const [filteredImgUrl, setFilteredImgUrl] = useState('');
-  const [loading, setLoading] = useState(false); // New loading state
-  const [isVisibilityToggled, setIsVisibilityToggled] = useState(true); // New loading state
+  const [loading, setLoading] = useState(false); 
+  const [isVisibilityToggled, setIsVisibilityToggled] = useState(true); 
   const files = useRecoilValue(FilesAtom);
 
   const handleApplyThreshold = async (thresholdValue, mode = 'single') => {
@@ -30,6 +30,7 @@ const CircuitInspectorPage = () => {
 
       const imageUrl = URL.createObjectURL(response.data);
       setFilteredImgUrl(imageUrl);
+      setCurrentCircuitData({...currentCircuitData, threshold_value:thresholdValue})
     } catch (error) {
       console.error('Error applying threshold:', error);
     } 
@@ -105,10 +106,6 @@ const CircuitInspectorPage = () => {
     }
   };
 
-  const handleAddAnswerKey = () =>{
-
-  }
-  
   const handleDeleteExpression = async (expression_id) => {
     try {
       const response = await axios.post(`/task/delete-expression/${task.id}`, {
@@ -142,7 +139,8 @@ const CircuitInspectorPage = () => {
           const response = await axios.get(`/detect-gates/get-circuit-data/${currentFile.id}`);
           setCurrentCircuitData(response.data.circuit_analysis);
           setCurrentPredictions(response.data.circuit_analysis.predictions);
-          console.log(response.data.circuit_analysis);
+          handleApplyThreshold(response.data.circuit_analysis.threshold_value);
+          console.log("Circuit Data",response.data.circuit_analysis);
         } catch (error) {
           console.log(error.message);
         } 
@@ -151,13 +149,7 @@ const CircuitInspectorPage = () => {
     getCircuitData();
   }, [currentFile?.id]);
 
-  useEffect(() => {
-    if (currentCircuitData?.threshold_value !== undefined) {
-      handleApplyThreshold(currentCircuitData.threshold_value);
-    }
-  }, [currentCircuitData]);
-
-  if (taskLoading) return <div>Loading...</div>; // Display loading state
+  if (taskLoading) return <div>Loading...</div>; 
 
   return (
     <div className="bg-[#eeeded] min-h-screen flex flex-col text">
@@ -168,7 +160,6 @@ const CircuitInspectorPage = () => {
       <main className="flex flex-grow">
         <div className="">
           <LeftSidebar 
-            task={task} 
             circuitData={currentCircuitData} 
             onApplyThreshold={handleApplyThreshold} 
             onDetectLogicGates={handleDetectLogicGates}
@@ -188,7 +179,7 @@ const CircuitInspectorPage = () => {
           <RightSideBar 
             circuitData={currentCircuitData}
             task={task}
-            onAddAnswerKey={handleAddAnswerKey}
+            file={currentFile}
             onDeleteExpression={handleDeleteExpression}
             />
         </div>

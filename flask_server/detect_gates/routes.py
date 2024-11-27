@@ -123,9 +123,9 @@ def detect_logic_gates(file_id):
                     class_name=obj['class'],
                     class_id=obj['class_id'],
                     detection_id=obj['detection_id'],
-                    color=(obj['color']),  # Empty for now
-                    object_id=obj['object_id'],  # Empty for now
-                    label=obj['label'],  # Empty for now
+                    color=(obj['color']),  
+                    object_id=obj['object_id'],  
+                    label=obj['label'], 
                     circuit_analysis_id=circuit_analysis.id
                 )
                 db.session.add(new_prediction)

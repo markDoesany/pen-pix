@@ -5,11 +5,10 @@ import { TbCircuitChangeover } from "react-icons/tb";
 import { GiCircuitry } from "react-icons/gi";
 import { MdOutlineGrading } from "react-icons/md";
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
-import AddAnswerKey from "./AddAnswerKey";
 import styles from './styles/component.module.css';
 import { useState } from "react";
 
-const RightSideBar = ({ task, circuitData, onAddAnswerKey, onDeleteExpression }) => {
+const RightSideBar = ({ task, file, circuitData, onDeleteExpression }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isAddAnswer, setIsAddAnswer] = useState(false);
 
@@ -32,7 +31,7 @@ const RightSideBar = ({ task, circuitData, onAddAnswerKey, onDeleteExpression })
       {!isCollapsed && (
         <>
           <div>
-            {/* <AnswerKeys onAdd={handleAddAnswerKey} task={task} onDeleteExpression={onDeleteExpression}/> */}
+            <AnswerKeys onAdd={handleAddAnswerKey} task={task} file={file} onDeleteExpression={onDeleteExpression}/>
           </div>
           <div className="mt-5">
             <ExpressionsResult circuitData={circuitData}/>
@@ -59,11 +58,6 @@ const RightSideBar = ({ task, circuitData, onAddAnswerKey, onDeleteExpression })
               </div>
             </div>
           </div>
-          {isAddAnswer && (
-            <div className="absolute top-10 -left-96">
-              <AddAnswerKey onClose={handleAddAnswerKey} onAddAnswerKey={onAddAnswerKey}/>
-            </div>
-          )}
         </>
       )}
     </div>

@@ -3,7 +3,6 @@ import ReactSlider from 'react-slider';
 
 const SetThresholdSlider = ({ onApplyThreshold, value }) => {
   const [thresholdValue, setThresholdValue] = useState(value);
-
   useEffect(() => {
     setThresholdValue(value);
   }, [value]);
@@ -13,7 +12,7 @@ const SetThresholdSlider = ({ onApplyThreshold, value }) => {
   };
 
   return (
-    <div className='bg-secondaryBg p-4 rounded-lg w-[250px] flex flex-col gap-4'>
+    <div className='bg-secondaryBg p-4 rounded-lg w-[250px] flex flex-col gap-4 text-white'>
       <h1 className='font-semibold'>Set Threshold (0 - 255):</h1>
       <div className='flex items-center gap-5'>
         <ReactSlider
