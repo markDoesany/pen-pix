@@ -65,7 +65,7 @@ const Header = () => {
       </div>
 
       <div className="navbar flex items-center max-md:hidden">
-        <Links />
+        <Links onClickLink={() => setShowMenu(false)}/>
       </div>
 
       <div className="user-menu flex items-center gap-8 font-semibold max-md:hidden ">
@@ -89,7 +89,7 @@ const Header = () => {
             <IoClose size={30} onClick={() => setShowMenu(!showMenu)} />
           </div>
           <div className="mt-10">
-            <Links/>
+            <Links onClickLink={()=> setShowMenu(false)}/>
           </div>
           <button className="flex items-center gap-1 mt-10" onClick={handleLogout}>
             <span className="text-md text-primaryColor">Logout</span>

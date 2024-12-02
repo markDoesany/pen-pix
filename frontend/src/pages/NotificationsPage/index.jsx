@@ -2,7 +2,7 @@ import { IoIosClose } from "react-icons/io";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { useRecoilState } from 'recoil';
 import { NotificationsAtom } from "../../atoms/Notifications";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import useErrorHandler from '../../hooks/useErrorHandler';
 import { formatDueDateTime } from "../../utils/helpers";
@@ -11,7 +11,9 @@ import { Link, useNavigate } from "react-router-dom";
 const NotificationPage = () => {
   const [notifications, setNotifications] = useRecoilState(NotificationsAtom);
   const { handleError } = useErrorHandler();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1); // Track current page
+  const [notificationsPerPage] = useState(8); // Number of notifications per page
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -24,7 +26,6 @@ const NotificationPage = () => {
         });
 
         setNotifications(sortedNotifications);
-        console.log(response.data);
       } catch (error) {
         if (error.response?.status === 401) {
           handleError('unauthorized', 'Unable to fetch notifications, please log in again.');
@@ -33,18 +34,40 @@ const NotificationPage = () => {
         } else {
           handleError('default', 'An error occurred while fetching notifications.');
         }
-        console.log(error);
       }
     };
 
     fetchNotifications();
   }, []);
 
+  // Calculate total pages
+  const totalPages = Math.ceil(notifications.length / notificationsPerPage);
+
+  // Get notifications for the current page
+  const currentNotifications = notifications.slice(
+    (currentPage - 1) * notificationsPerPage,
+    currentPage * notificationsPerPage
+  );
+
+  // Handle previous page
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Handle next page
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   return (
     <div className="bg-[#EFEFEF] min-h-screen w-full p-10">
-      <div className="relative w-full text-customBlack1 bg-white rounded-lg px-10 pt-10 pb-4">
+      <div className="relative w-full h-full text-customBlack1 bg-white rounded-lg px-10 pt-10 pb-4">
         <div className="absolute top-2 right-2 cursor-pointer">
-          <IoIosClose size={35} onClick={() => navigate(`/auth`)}/>
+          <IoIosClose size={35} onClick={() => navigate(`/auth`)} />
         </div>
 
         <h2 className="text-customGray2 text-3xl font-medium">Notifications</h2>
@@ -55,8 +78,8 @@ const NotificationPage = () => {
           <div>Date</div>
         </div>
 
-        <div className="h-[300px] overflow-y-auto mt-4 text-customGray2">
-          {notifications?.map((notification, index) => (
+        <div className="min-h-full overflow-y-auto mt-4 text-customGray2">
+          {currentNotifications.map((notification, index) => (
             <Link to={`/task/${notification.task_id}`} key={index} className="grid grid-cols-5 gap-4 py-3 border-b">
               <div>{notification.task_id}</div>
               <div className="col-span-3">{notification.message}</div>
@@ -64,10 +87,19 @@ const NotificationPage = () => {
             </Link>
           ))}
         </div>
+
         <div className="flex gap-5 justify-center items-center mt-3">
-          <FaArrowLeft className="cursor-pointer"/>
-          <p>Page 1 of 1</p>
-          <FaArrowRight className="cursor-pointer"/>
+          <FaArrowLeft
+            className={`cursor-pointer ${currentPage === 1 ? 'text-gray-400' : ''}`}
+            onClick={handlePrevPage}
+          />
+          <p>
+            Page {currentPage} of {totalPages}
+          </p>
+          <FaArrowRight
+            className={`cursor-pointer ${currentPage === totalPages ? 'text-gray-400' : ''}`}
+            onClick={handleNextPage}
+          />
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 .tool {
-  @apply flex flex-col items-center justify-center gap-2 w-full hover:bg-primaryColor rounded-lg py-3 px-2 cursor-pointer transition-all duration-200 ease-in-out;
+  @apply flex flex-col items-center justify-center gap-2 w-full hover:bg-gray-200 rounded-lg py-3 px-2 cursor-pointer transition-all duration-200 ease-in-out;
 }
 
 .tool_label{

@@ -58,3 +58,21 @@ def string_to_sympy_expression(expression):
     simplified_expr = simplify_logic(eval_expr)
 
     return simplified_expr 
+
+
+def count_inputs(equations: list):
+    counts = {}
+    max_x = 0
+
+    for equation in equations:
+        matches = re.findall(r'X(\d+)', equation)
+
+        if matches:
+            for match in matches:
+                index = int(match)
+                if 1 <= index <= 8:  
+                    counts[f'X{index}'] = counts.get(f'X{index}', 0) + 1
+
+            max_x = max(max_x, max(int(match) for match in matches))
+    
+    return max_x

@@ -32,7 +32,6 @@ def upload_files():
     
     student_list = class_.student_list
     uploaded_files = []
-    skipped_files = []
     invalid_files = []
     
     TASK_FOLDER = os.path.join('static', 'images', str(task_id))
@@ -43,52 +42,64 @@ def upload_files():
     for file in files:
         if file.filename == '':
             return jsonify({"message": "Empty filename"}), 400
-        
+
         filename = secure_filename(file.filename)
-        student_id, _ = os.path.splitext(filename)
-        
+        filename_, _ = os.path.splitext(filename)
+        student_id = filename_.split('_')[0]
+
         if student_id not in student_list:
             invalid_files.append(filename)
             continue
 
         filepath = os.path.join(TASK_FOLDER, filename)
-        
-        if os.path.exists(filepath):
-            skipped_files.append(filename)
-            continue
-        
+
         try:
             file.save(filepath)
         except Exception as e:
             return jsonify({"message": f"File save error: {str(e)}"}), 500
 
-        new_file = UploadedFile(
-            filename=filename,
-            filepath=os.path.join('images', str(task_id), filename),
-            mimetype=file.mimetype,
-            task_id=task_id,
-            item_number=int(item_number)  # Assign the item number here
-        )
+        existing_file = UploadedFile.query.filter_by(
+            filename=filename, task_id=task_id
+        ).first()
         
-        db.session.add(new_file)
-        
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({"message": f"Database commit error (during file save): {str(e)}"}), 500
-        
-        new_circuit_analysis = CircuitAnalysis(
-            threshold_value=128,
-            predictions=[],
-            boolean_expressions=[],
-            netlist={},
-            truth_table=[],
-            verilog_url_file='',
-            uploaded_file_id=new_file.id
-        )
-        db.session.add(new_circuit_analysis)
-        uploaded_files.append(new_file.to_dict())
+        if existing_file:
+            existing_file.filepath = os.path.join('images', str(task_id), filename)
+            existing_file.mimetype = file.mimetype
+            existing_file.item_number = int(item_number)
+        else:
+            new_file = UploadedFile(
+                filename=filename,
+                filepath=os.path.join('images', str(task_id), filename),
+                mimetype=file.mimetype,
+                task_id=task_id,
+                item_number=int(item_number)
+            )
+            db.session.add(new_file)
+
+        existing_analysis = CircuitAnalysis.query.filter_by(uploaded_file_id=existing_file.id if existing_file else new_file.id).first()
+        if existing_analysis:
+            existing_analysis.threshold_value = 128
+            existing_analysis.predictions = []
+            existing_analysis.boolean_expressions = []
+            existing_analysis.netlist = {}
+            existing_analysis.truth_table = []
+            existing_analysis.verilog_url_file = ''
+        else:
+            new_circuit_analysis = CircuitAnalysis(
+                threshold_value=128,
+                predictions=[],
+                boolean_expressions=[],
+                netlist={},
+                truth_table=[],
+                verilog_url_file='',
+                uploaded_file_id=existing_file.id if existing_file else new_file.id
+            )
+            db.session.add(new_circuit_analysis)
+
+        uploaded_files.append({
+            "filename": filename,
+            "replaced": bool(existing_file),
+        })
         
         notification_message = f"File '{filename}' uploaded successfully for task {task_id}, item {item_number}."
         notification = Notification(message=notification_message, user_id=task.user_id, task_id=task_id)
@@ -107,12 +118,10 @@ def upload_files():
     response = {
         "message": "File upload results",
         "files_uploaded": uploaded_files,
-        "skipped_files": skipped_files,
         "invalid_files": invalid_files,
     }
     
     return jsonify(response), 200
-
 
 
 @login_required

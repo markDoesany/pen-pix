@@ -7,10 +7,12 @@ from sys_main_modules.contour_tracing.threshold_image import apply_threshold_to_
 from sys_main_modules.contour_tracing.binary_image import binarize_image
 from sys_main_modules.contour_tracing.mask_image import mask_image
 from sys_main_modules.contour_tracing.netlist import process_circuit_connection, get_class_count
-from sys_main_modules.contour_tracing.boolean_function import convert_to_sympy_expression, evaluate_boolean_expression, generate_truth_table, string_to_sympy_expression
+from sys_main_modules.contour_tracing.boolean_function import convert_to_sympy_expression, evaluate_boolean_expression, generate_truth_table, string_to_sympy_expression, count_inputs
 from sys_main_modules.contour_tracing.export_verilog import export_to_verilog
 from sys_main_modules.model_inference import infer_image
 from sys_main_modules.filter_json import filter_detections
+
+from sympy import SympifyError
 
 import os
 import io
@@ -231,50 +233,64 @@ def analyze_circuit(file_id):
         except Exception as e:
             return jsonify({"error": f"Error converting to sympy expressions: {str(e)}"}), 500
 
-        return jsonify({"boolean_expressions": expressions})
+        # Generate Truth Table
+        try:
+            truth_table_dict = {}
+            for idx, expression in enumerate(expressions):
+                for key, value in expression.items():
+                    try:
+                        sympy_expression = string_to_sympy_expression(value)
+                    except SympifyError:
+                        return jsonify({"error": f"Failed to parse boolean expression: {value}"}), 400
+
+                    truth_table = generate_truth_table(sympy_expression, input_count)
+                    truth_table_dict[f"OUT {idx + 1}"] = [[str(item) for item in row] for row in truth_table]
+
+            circuit_analysis.truth_table = truth_table_dict
+            db.session.commit()
+        except Exception as e:
+            return jsonify({"error": f"Error generating truth table: {str(e)}"}), 500
+
+        return jsonify({
+            "boolean_expressions": expressions,
+            "truth_table": truth_table_dict
+        })
 
     except Exception as e:
         return jsonify({"error": f"Unexpected error: {str(e)}"}), 500
 
-
-from flask import jsonify, abort
-from sympy import SympifyError
-
 @login_required
-@detect_gates_bp.route('/get-truth-table/<int:file_id>', methods=['GET'])
-def get_truth_table(file_id):
+@detect_gates_bp.route('/generate-truth-table', methods=['POST'])
+def gen_truth_table():
+    expressions = request.json.get('expressions')
+    truth_table_dict = {}
+    
+    input_count = count_inputs(expressions)
     try:
-        circuit_analysis = CircuitAnalysis.query.filter_by(uploaded_file_id=file_id).first()
-        
-        if not circuit_analysis:
-            return jsonify({"error": "Circuit analysis not found for the given file ID"}), 404
-        
-        boolean_expressions = circuit_analysis.boolean_expressions
-        input_count = get_class_count(circuit_analysis.predictions, 'input')
-        
-        truth_table_serializable = []
-        
-        for expression in boolean_expressions:
-            for key, value in expression.items():
-                try:
-                    sympy_expression = string_to_sympy_expression(value)
-                except SympifyError:
-                    return jsonify({"error": f"Failed to parse boolean expression: {value}"}), 400
+        try:
+            if not expressions:
+                return jsonify({"error": "No Expressions"}), 404
+        except:
+            print("Error")
+        for idx, expression in enumerate(expressions):
+                # value = expression.split('=')[1] - use to split
+            try:
+                sympy_expression = string_to_sympy_expression(expression)
+            except SympifyError:
+                return jsonify({"error": f"Failed to parse boolean expression: {expression}"}), 400
+            
+            try:
+                truth_table = generate_truth_table(sympy_expression, input_count)
+            except Exception as e:
+                return jsonify({"error": f"Error generating truth table: {str(e)}"}), 500
+                    
+            truth_table_dict[f"OUT {idx + 1}"] = [ [str(item) for item in row] for row in truth_table ]
                 
-                try:
-                    truth_table = generate_truth_table(sympy_expression, input_count)
-                except Exception as e:
-                    return jsonify({"error": f"Error generating truth table: {str(e)}"}), 500
-                
-                for row in truth_table:
-                    truth_table_serializable.append([str(item) for item in row])
-        
-        circuit_analysis.truth_table = truth_table_serializable
-        db.session.commit()
-        return jsonify({"truth_table": truth_table_serializable})
+        return jsonify({"truth_table": truth_table_dict})
     
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+
 
 @login_required
 @detect_gates_bp.route('/export-verilog/<int:file_id>', methods=['GET'])

@@ -11,9 +11,9 @@ import axios from "axios";
 
 const CircuitInspectorPage = () => {
   const { taskId } = useParams();
-  const { task, loading: taskLoading, setTask} = useGetTask(taskId);
+  const { task, loading: taskLoading} = useGetTask(taskId);
   const [currentFile, setCurrentFile] = useState({});
-  const [currentCircuitData, setCurrentCircuitData] = useState([]);
+  const [currentCircuitData, setCurrentCircuitData] = useState({});
   const [currentPredictions, setCurrentPredictions] = useState([]);
   const [filteredImgUrl, setFilteredImgUrl] = useState('');
   const [loading, setLoading] = useState(false); 
@@ -27,10 +27,13 @@ const CircuitInspectorPage = () => {
         mode,
         fileId: currentFile?.id,
       }, { responseType: 'blob' });
-
+      
       const imageUrl = URL.createObjectURL(response.data);
       setFilteredImgUrl(imageUrl);
-      setCurrentCircuitData({...currentCircuitData, threshold_value:thresholdValue})
+      setCurrentCircuitData((prev) => ({
+        ...prev,
+        threshold_value: thresholdValue,
+      }));
     } catch (error) {
       console.error('Error applying threshold:', error);
     } 
@@ -63,8 +66,8 @@ const CircuitInspectorPage = () => {
     setLoading(true)
     try {
       const response = await axios.post(`/detect-gates/analyze-circuit/${currentFile.id}`)
-      setCurrentCircuitData({...currentCircuitData, boolean_expressions:response.data.boolean_expressions})
-      console.log("Boolean Expressions:", response.data.boolean_expressions)
+      setCurrentCircuitData({...currentCircuitData, boolean_expressions:response.data.boolean_expressions, truth_table: response.data.truth_table})
+      console.log("Boolean Expressions:", response.data)
     } catch (error) {
       console.log(error)
     }finally{
@@ -72,17 +75,6 @@ const CircuitInspectorPage = () => {
     }
   }
 
-  const handleGetTruthTable = async() =>{
-    setLoading(true)
-    try {
-      const response = await axios.get(`/detect-gates/get-truth-table/${currentFile.id}`)
-      setCurrentCircuitData({...currentCircuitData, truth_table: response.data.truth_table})
-    } catch (error) {
-      console.log(error.message)
-    }finally{
-      setLoading(false)
-    }
-  }
   const handleExportVerilog = async () => {
     setLoading(true);
     try {
@@ -106,23 +98,6 @@ const CircuitInspectorPage = () => {
     }
   };
 
-  const handleDeleteExpression = async (expression_id) => {
-    try {
-      const response = await axios.post(`/task/delete-expression/${task.id}`, {
-        expression_id: expression_id,
-      });
-  
-      if (response.statusText === "OK") {
-        setTask((prevTask) => ({
-          ...prevTask,
-          answer_keys: response.data.answer_keys,
-        }));
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
-  
   useEffect(() => {
     console.log("Updated current file", currentFile);
   }, [currentFile]);
@@ -140,6 +115,7 @@ const CircuitInspectorPage = () => {
           setCurrentCircuitData(response.data.circuit_analysis);
           setCurrentPredictions(response.data.circuit_analysis.predictions);
           handleApplyThreshold(response.data.circuit_analysis.threshold_value);
+
           console.log("Circuit Data",response.data.circuit_analysis);
         } catch (error) {
           console.log(error.message);
@@ -165,9 +141,8 @@ const CircuitInspectorPage = () => {
             onDetectLogicGates={handleDetectLogicGates}
             onTogglePredictionVisibility={handlePredictionVisibility}
             onAnalyzeCircuit={handleAnalyzeCircuit}
-            onGetTruthTable={handleGetTruthTable}
             onExportVerilog={handleExportVerilog}
-            loading={loading} // Pass loading state to LeftSidebar
+            loading={loading}
           />
         </div>
 
@@ -180,7 +155,6 @@ const CircuitInspectorPage = () => {
             circuitData={currentCircuitData}
             task={task}
             file={currentFile}
-            onDeleteExpression={handleDeleteExpression}
             />
         </div>
       </main>
