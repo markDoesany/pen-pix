@@ -107,6 +107,10 @@ def upload_files():
     
     total_submissions = len(task.attached_files)
     task.total_submissions = total_submissions
+    
+    if task.reviewed_submissions < task.total_submissions:
+        task.status = "Ongoing"
+        
     db.session.add(task)
 
     try:
@@ -149,7 +153,15 @@ def delete_file(file_id):
     task = Task.query.get(file.task_id)
     if not task:
         return jsonify({"message": "Associated task not found"}), 404
-
+    
+    reviewed_count = UploadedFile.query.filter_by(task_id=file.task_id, graded=True).count()
+    task.reviewed_submissions = reviewed_count
+    
+    if task.reviewed_submissions == task.total_submissions:
+        task.status = "Completed"
+    elif task.reviewed_submissions < task.total_submissions:
+        task.status = "Ongoing"
+        
     try:
         os.remove(os.path.join('static', file.filepath))
         db.session.delete(file)
@@ -163,5 +175,50 @@ def delete_file(file_id):
         return jsonify({"message": f"Error deleting file: {str(e)}"}), 500
 
     return jsonify({"message": "File deleted successfully"})
+
+
+@login_required
+@files_bp.route('/update-grade/<int:file_id>', methods=['PUT'])
+def update_total_grade(file_id):
+    file = UploadedFile.query.get(file_id)
+    
+    if not file:
+        return jsonify({"message": "File not found"}), 404
+    
+    data = request.get_json()
+    total_grade = data.get('total_grade')
+
+    if total_grade is None:
+        return jsonify({"message": "Total grade is required"}), 400
+    
+    if not isinstance(total_grade, int) or total_grade < 0:
+        return jsonify({"message": "Invalid grade value. It should be a non-negative integer."}), 400
+    
+    file.total_grade = total_grade
+    file.graded = True  
+
+    task = Task.query.get(file.task_id)
+    if not task:
+        return jsonify({"message": "Associated task not found"}), 404
+
+    reviewed_count = UploadedFile.query.filter_by(task_id=file.task_id, graded=True).count()
+    task.reviewed_submissions = reviewed_count
+
+    if task.reviewed_submissions == task.total_submissions:
+        task.status = "Completed"
+    elif task.reviewed_submissions < task.total_submissions:
+        task.status = "Ongoing"
+        
+    try:
+        db.session.commit()
+        return jsonify({
+            "message": "Grade updated successfully",
+            "total_grade": file.total_grade,
+            "graded": file.graded,
+            "task_reviewed_submissions": task.reviewed_submissions
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error updating grade: {str(e)}"}), 500
 
 

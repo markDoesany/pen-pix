@@ -1,16 +1,16 @@
 import {
   FaSliders,
-  FaTable,
+  // FaTable,
   FaEye,
   FaEyeSlash,
-  FaFileExport,
+  // FaFileExport,
 } from "react-icons/fa6";
 import { GiLogicGateNor } from "react-icons/gi";
 import { PiCircuitryFill } from "react-icons/pi";
 import { ImSpinner9 } from "react-icons/im";
 import SetThresholdSlider from "./SetThresholdSlider";
 import DetectLogicGatesOption from "./DetectLogicGatesOptions";
-import TruthTable from "./TruthTable";
+// import TruthTable from "./TruthTable";
 import styles from "./styles/component.module.css";
 import { useState, useEffect } from "react";
 
@@ -67,13 +67,13 @@ const LeftSidebar = ({
     }
   };
 
-  const handleCloseTable = () =>{
-    setSelectedTool("")
-  }
+  // const handleCloseTable = () =>{
+  //   setSelectedTool("")
+  // }
 
   return (
     <div
-      className={`w-[110px] h-full flex flex-col items-center gap-4 bg-white border border-borderGray font-sans text-customBlack1 px-3 py-4 relative select-none ${
+      className={`w-[110px] h-full flex flex-col items-center justify-center gap-4 bg-white border border-borderGray font-sans text-customBlack1 px-3 py-4 relative select-none ${
         loading ? styles.disabled : ""
       }`}
     >
@@ -139,7 +139,7 @@ const LeftSidebar = ({
         <h3 className={`${styles.tool_label} text-xs`}>Analyze Circuit</h3>
       </div>
 
-      <div
+      {/* <div
         className={`${styles.tool} ${
           selectedTool === "truthTable"
             ? "bg-gray-600 text-white"
@@ -151,9 +151,9 @@ const LeftSidebar = ({
       >
         <FaTable size={20} />
         <h3 className={`${styles.tool_label} text-xs`}>Truth Table</h3>
-      </div>
+      </div> */}
 
-      <div
+      {/* <div
         className={`${styles.tool} ${
           disabledStates.exportVerilog
             ? "opacity-50 cursor-not-allowed"
@@ -165,10 +165,10 @@ const LeftSidebar = ({
       >
         <FaFileExport size={20} />
         <h3 className={`${styles.tool_label} text-xs`}>Export Netlist</h3>
-      </div>
+      </div> */}
 
       {selectedTool === "threshold" && (
-        <div className="absolute -right-64 top-24">
+        <div className="absolute -right-64 top-44">
           <SetThresholdSlider
             onApplyThreshold={handleApplyThreshold}
             value={circuitData.threshold_value}
@@ -177,7 +177,7 @@ const LeftSidebar = ({
       )}
 
       {selectedTool === "logicGates" && (
-        <div className="absolute -right-64 top-48">
+        <div className="absolute -right-64 top-80">
           <DetectLogicGatesOption
             onDetectLogicGates={onDetectLogicGates}
             loading={loading}
@@ -185,11 +185,11 @@ const LeftSidebar = ({
         </div>
       )}
 
-      {selectedTool === "truthTable" && (
+      {/* {selectedTool === "truthTable" && (
         <div className="absolute -right-64 top-48">
           <TruthTable data={circuitData.truth_table} onClose={handleCloseTable}/>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

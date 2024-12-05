@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import useGetTask from '../../hooks/useGetTask';
 import { useEffect, useState } from "react";
 import { FilesAtom } from "../../atoms/FilesAtom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import axios from "axios";
 
 const CircuitInspectorPage = () => {
@@ -18,7 +18,7 @@ const CircuitInspectorPage = () => {
   const [filteredImgUrl, setFilteredImgUrl] = useState('');
   const [loading, setLoading] = useState(false); 
   const [isVisibilityToggled, setIsVisibilityToggled] = useState(true); 
-  const files = useRecoilValue(FilesAtom);
+  const [files, setFiles] = useRecoilState(FilesAtom);
 
   const handleApplyThreshold = async (thresholdValue, mode = 'single') => {
     try {
@@ -75,29 +75,6 @@ const CircuitInspectorPage = () => {
     }
   }
 
-  const handleExportVerilog = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`/detect-gates/export-verilog/${currentFile.id}`, {
-        responseType: 'blob', 
-      });
-  
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-  
-      link.setAttribute('download', `circuit_${currentFile.id}.v`); 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-  
-    } catch (error) {
-      console.error('Error downloading the file:', error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     console.log("Updated current file", currentFile);
   }, [currentFile]);
@@ -125,6 +102,13 @@ const CircuitInspectorPage = () => {
     getCircuitData();
   }, [currentFile?.id]);
 
+  const handleGradeUpdate = (fileId, newGrade) => {
+    const updatedFiles = files.map((file) => 
+      file.id === fileId ? { ...file, graded: newGrade } : file
+    );
+    setFiles(updatedFiles);
+  };
+
   if (taskLoading) return <div>Loading...</div>; 
 
   return (
@@ -141,7 +125,7 @@ const CircuitInspectorPage = () => {
             onDetectLogicGates={handleDetectLogicGates}
             onTogglePredictionVisibility={handlePredictionVisibility}
             onAnalyzeCircuit={handleAnalyzeCircuit}
-            onExportVerilog={handleExportVerilog}
+            // onExportVerilog={handleExportVerilog}
             loading={loading}
           />
         </div>
@@ -155,6 +139,7 @@ const CircuitInspectorPage = () => {
             circuitData={currentCircuitData}
             task={task}
             file={currentFile}
+            onGradeUpdate={handleGradeUpdate} 
             />
         </div>
       </main>

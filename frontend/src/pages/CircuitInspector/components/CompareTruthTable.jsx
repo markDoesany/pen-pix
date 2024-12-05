@@ -1,8 +1,9 @@
 import { IoClose } from "react-icons/io5";
 
-const CompareTruthTable = ({ answerTable, submittedTable, onClose }) => {
+const CompareTruthTable = ({ answerTable, circuitTruthTable, onClose }) => {
+  console.log(circuitTruthTable);
   const answerKeys = Object.keys(answerTable);
-  const submittedKeys = Object.keys(submittedTable);
+  const submittedKeys = Object.keys(circuitTruthTable);
   const allKeys = [...new Set([...answerKeys, ...submittedKeys])];
 
   const generateRows = () => {
@@ -14,7 +15,7 @@ const CompareTruthTable = ({ answerTable, submittedTable, onClose }) => {
 
       allKeys.forEach((key) => {
         const answerRow = answerTable[key]?.[i] || [];
-        const submittedRow = submittedTable[key]?.[i] || [];
+        const submittedRow = circuitTruthTable[key]?.[i] || [];
         row.inputs = answerRow.slice(0, -1);
         row.answers[key] = answerRow[answerRow.length - 1] || "-";
         row.submissions[key] = submittedRow[submittedRow.length - 1] || "-";
@@ -75,12 +76,7 @@ const CompareTruthTable = ({ answerTable, submittedTable, onClose }) => {
             </thead>
             <tbody>
               {rows.map((row, index) => (
-                <tr
-                  key={`row-${index}`}
-                  className={Object.keys(row.answers).some((key) => hasMismatch(key, index))
-                    ? "bg-red-100"
-                    : ""}
-                >
+                <tr key={`row-${index}`}>
                   {row.inputs.map((input, inputIndex) => (
                     <td
                       key={`input-${index}-${inputIndex}`}
@@ -92,7 +88,9 @@ const CompareTruthTable = ({ answerTable, submittedTable, onClose }) => {
                   {allKeys.map((key) => (
                     <td
                       key={`answer-${key}-${index}`}
-                      className="border border-gray-400 px-4 py-2 text-center"
+                      className={`border border-gray-400 px-4 py-2 text-center ${
+                        hasMismatch(key, index) ? "bg-red-100" : ""
+                      }`}
                     >
                       {row.answers[key]}
                     </td>
@@ -100,7 +98,9 @@ const CompareTruthTable = ({ answerTable, submittedTable, onClose }) => {
                   {allKeys.map((key) => (
                     <td
                       key={`submitted-${key}-${index}`}
-                      className="border border-gray-400 px-4 py-2 text-center"
+                      className={`border border-gray-400 px-4 py-2 text-center ${
+                        hasMismatch(key, index) ? "bg-red-100" : ""
+                      }`}
                     >
                       {row.submissions[key]}
                     </td>

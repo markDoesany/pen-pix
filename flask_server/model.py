@@ -174,6 +174,7 @@ class UploadedFile(db.Model):
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
     item_number = db.Column(db.Integer, nullable=False)
     graded = db.Column(db.Boolean, default=False, nullable=False) 
+    total_grade = db.Column(db.Integer, nullable=True)
     circuit_analysis = db.relationship('CircuitAnalysis', backref='uploaded_file', lazy=True, cascade="all, delete-orphan")
      
     @property
@@ -188,7 +189,8 @@ class UploadedFile(db.Model):
             'filepath': self.filepath,
             'mimetype': self.mimetype,
             'file_url': self.file_url,
-            'graded': self.graded 
+            'graded': self.graded,
+            'total_grade': self.total_grade,
         }
         
         

@@ -3,14 +3,15 @@ import { formatDueDateTime } from "../../../utils/helpers";
 
 const TaskItem = ({task}) => {
   const {classData, loading} = useClassData(Number(task.class_id))
-
+  const gradedFilesCount = task.files.filter(file => file.graded).length;
+  
   if (loading) return
   return (
     <>
       <div className="text-left pl-3 font-semibold text-gray-500">{classData?.class_code} | {classData?.class_group}</div>
       <div className="col-span-2 font-semibold text-left">{task.title}</div>
       <div className="text-center border border-gray-300 rounded-md w-16 py-1 mx-auto">
-        <p>{task.reviewed_submissions}/{task.total_submissions}</p>
+        <p>{gradedFilesCount}/{task.total_submissions}</p>
       </div>
       <div className="text-center">{formatDueDateTime(task.due_date)}</div>
       <div className="text-center col-span-1 font-semibold">{task.exam_type}</div>

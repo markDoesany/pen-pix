@@ -16,7 +16,7 @@ const SetThresholdSlider = ({ onApplyThreshold, value }) => {
       <h1 className='font-semibold'>Set Threshold (0 - 255):</h1>
       <div className='flex items-center gap-5'>
         <ReactSlider
-          className="w-full h-2 rounded-lg items-center flex" 
+          className="w-full h-2 rounded-lg items-center flex cursor-pointer" 
           thumbClassName="w-5 h-5 bg-primaryColor rounded-full" 
           trackClassName="h-2 bg-primaryBg"
           min={0}  

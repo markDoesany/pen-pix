@@ -8,7 +8,7 @@ from sys_main_modules.contour_tracing.binary_image import binarize_image
 from sys_main_modules.contour_tracing.mask_image import mask_image
 from sys_main_modules.contour_tracing.netlist import process_circuit_connection, get_class_count
 from sys_main_modules.contour_tracing.boolean_function import convert_to_sympy_expression, evaluate_boolean_expression, generate_truth_table, string_to_sympy_expression, count_inputs
-from sys_main_modules.contour_tracing.export_verilog import export_to_verilog
+from sys_main_modules.contour_tracing.export_netlist import export_to_verilog, generate_ltspice_netlist
 from sys_main_modules.model_inference import infer_image
 from sys_main_modules.filter_json import filter_detections
 
@@ -16,6 +16,7 @@ from sympy import SympifyError
 
 import os
 import io
+import json
 
 @login_required
 @detect_gates_bp.route('/set-filter-threshold', methods=['POST'])
@@ -302,14 +303,36 @@ def get_exported_verilog(file_id):
     combined_expression_dict = {}
     for expression in expression_dict_list:
         combined_expression_dict.update(expression)  
-        
     verilog_content = export_to_verilog(combined_expression_dict)
     verilog_file = io.StringIO(verilog_content)
-    verilog_filename = f"circuit_{file_id}.v"
+    verilog_filename = f"circuit_{file_id}.asc"
 
     return send_file(
         io.BytesIO(verilog_file.getvalue().encode('utf-8')),
         mimetype='text/plain',
         as_attachment=True,
         download_name=verilog_filename 
+    )
+
+@login_required
+@detect_gates_bp.route('/generate-netlist/<int:file_id>', methods=['GET'])
+def generate_netlist(file_id):
+    circuit_analysis = CircuitAnalysis.query.filter_by(uploaded_file_id=file_id).first()
+    
+    expression_dict_list = circuit_analysis.boolean_expressions
+
+    combined_expression_dict = {}
+    for expression in expression_dict_list:
+        combined_expression_dict.update(expression)  
+    netlist_content = generate_ltspice_netlist(combined_expression_dict)
+    print("Netliist", netlist_content)
+    netlist_file = io.StringIO(netlist_content)
+    netlist_filename = f"circuit_{file_id}.asc"
+
+
+    return send_file(
+        io.BytesIO(netlist_file.getvalue().encode('utf-8')),
+        mimetype='text/plain',
+        as_attachment=True,
+        download_name=netlist_filename 
     )

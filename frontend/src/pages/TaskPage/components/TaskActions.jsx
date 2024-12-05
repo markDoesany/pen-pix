@@ -5,7 +5,7 @@ const TaskActions = ({ onEdit, onDelete, onAnalyze, onGetLink, openUploadModal }
         className="flex-1 hover:text-white p-2 hover:bg-gray-600 border-b border-gray-500 border-opacity-50"
         onClick={onAnalyze}
       >
-        Check Task
+        Open Task
       </button>
       <button
         className="flex-1 hover:text-white p-2 hover:bg-gray-600 border-b border-gray-500 border-opacity-50"

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { UserAtom } from "../../../atoms/UserAtom";
 import { useRecoilValue } from "recoil";
 import { formatDueDateTime } from "../../../utils/helpers";
-import { useState} from "react";
+import { useState } from "react";
 
 const Header = ({ task, files, onCurrentFileChange }) => {
   const currentUser = useRecoilValue(UserAtom);
@@ -18,6 +18,8 @@ const Header = ({ task, files, onCurrentFileChange }) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentFile = formattedOptions[currentIndex];
+
+  const gradedFilesCount = files.filter(file => file.graded).length;
 
   const handleSelectedSubmission = (selectedSubmission) => {
     const newIndex = formattedOptions.findIndex(option => option.id === selectedSubmission.id);
@@ -58,7 +60,7 @@ const Header = ({ task, files, onCurrentFileChange }) => {
         </Link>
         <div className="flex items-center justify-between gap-10 w-[150px]">
           <div className="flex flex-col items-center">
-            <p>0/{files.length}</p>
+            <p>{gradedFilesCount}/{files.length}</p> 
             <label className="text-sm">Graded</label>
           </div>
           <div className="text-sm">

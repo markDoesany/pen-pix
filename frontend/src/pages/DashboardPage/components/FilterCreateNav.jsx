@@ -38,13 +38,13 @@ const FilterCreateNav = ({ onFilterChange }) => {
             className={`px-3 py-1 h-full w-full border-r-2 border-l-2 border-customGray2 ${selectedFilter === 'Completed' ? 'bg-white text-gray-900' : 'hover:bg-white text-gray-900'}`}
             onClick={() => handleFilterChange('Completed')}
           >
-            Complete
+            Completed
           </button>
           <button
             className={`px-3 py-1 h-full w-full rounded-r-md ${selectedFilter === 'Ongoing' ? 'bg-white text-gray-900' : 'hover:bg-white text-gray-900'}`}
             onClick={() => handleFilterChange('Ongoing')}
           >
-            Incomplete
+            Ongoing
           </button>
         </div>
 
