@@ -46,7 +46,7 @@ const ClassPage = () => {
           <p>Loading...</p>
         </div>
       ) : (
-        <div className="flex flex-wrap gap-10">
+        <div className="flex flex-wrap gap-10 justify-center sm:justify-start">
           {classes.length > 0 && classes.map((classData) => {
             const recentTasks = getRecentTasks(classData.task_list);
 
@@ -63,6 +63,7 @@ const ClassPage = () => {
         </div>
       )}
     </div>
+
   );
 };
 

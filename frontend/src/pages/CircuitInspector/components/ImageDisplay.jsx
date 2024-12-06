@@ -111,7 +111,7 @@ const ImageDisplay = ({ img_url, predictions, isPredictionVisible }) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <canvas ref={canvasRef} width={900} height={1000} />
+      <canvas ref={canvasRef} width={1200} height={900} />
     </div>
   );
 };

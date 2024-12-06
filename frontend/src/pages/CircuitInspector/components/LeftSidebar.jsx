@@ -73,7 +73,7 @@ const LeftSidebar = ({
 
   return (
     <div
-      className={`w-[110px] h-full flex flex-col items-center justify-center gap-4 bg-white border border-borderGray font-sans text-customBlack1 px-3 py-4 relative select-none ${
+      className={`w-[95px] max-sm:w-[60px] h-full flex items-center flex-col gap-4  bg-gray-800 border border-borderGray font-sans text-customBlack1 py-3 px-3 relative select-none rounded-2xl ${
         loading ? styles.disabled : ""
       }`}
     >
@@ -90,7 +90,7 @@ const LeftSidebar = ({
         ) : (
           <FaSliders size={20} />
         )}
-        <h3 className={`${styles.tool_label} text-xs`}>Set Threshold</h3>
+        <h3 className={`${styles.tool_label} text-xs max-sm:hidden`}>Set Threshold</h3>
       </div>
 
       <div
@@ -106,7 +106,7 @@ const LeftSidebar = ({
         ) : (
           <GiLogicGateNor size={30} />
         )}
-        <h3 className={`${styles.tool_label} text-xs`}>Logic Gates</h3>
+        <h3 className={`${styles.tool_label} text-xs max-sm:hidden`}>Logic Gates</h3>
       </div>
 
       <div
@@ -118,7 +118,7 @@ const LeftSidebar = ({
         onClick={handleTogglePredictions}
       >
         {isPredictionToggled ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
-        <h3 className={`${styles.tool_label} text-xs`}>Toggle Predictions</h3>
+        <h3 className={`${styles.tool_label} text-xs max-sm:hidden`}>Toggle Predictions</h3>
       </div>
 
       <div
@@ -136,7 +136,7 @@ const LeftSidebar = ({
         ) : (
           <PiCircuitryFill size={25} />
         )}
-        <h3 className={`${styles.tool_label} text-xs`}>Analyze Circuit</h3>
+        <h3 className={`${styles.tool_label} text-xs max-sm:hidden`}>Analyze Circuit</h3>
       </div>
 
       {/* <div

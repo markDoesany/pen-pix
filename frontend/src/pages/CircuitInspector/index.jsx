@@ -117,8 +117,8 @@ const CircuitInspectorPage = () => {
         <Header task={task} files={files} onCurrentFileChange={handleCurrentFile} />
       </header>
 
-      <main className="flex flex-grow">
-        <div className="">
+      <main className="flex justify-between w-full max-lg:flex-col">
+        <div className="fixed left-5 top-1/2 transform -translate-y-1/2 z-50 max-lg:absolute">
           <LeftSidebar 
             circuitData={currentCircuitData} 
             onApplyThreshold={handleApplyThreshold} 
@@ -130,11 +130,11 @@ const CircuitInspectorPage = () => {
           />
         </div>
 
-        <div className="flex-grow ">
+        <div className="w-full">
           <ImageDisplay img_url={filteredImgUrl} predictions={currentPredictions} isPredictionVisible={isVisibilityToggled} />
         </div>
 
-        <div className="">
+        <div className="absolute right-0">
           <RightSideBar 
             circuitData={currentCircuitData}
             task={task}

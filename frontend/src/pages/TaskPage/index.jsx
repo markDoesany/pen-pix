@@ -110,46 +110,52 @@ const TaskPage = () => {
 
   if (loading) return;
   return (
-    <div className="bg-[#EFEFEF] min-h-screen w-full p-10">
-      <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-white shadow-lg p-6 rounded-lg">
-          <div className="space-y-4 ">
-            <h1 className="text-xl font-bold">{task.title}</h1>
-            <p>{task.description}</p>
-            <p className="text-gray-500">Class: {classData?.class_code} | {classData?.class_group}</p>
-            <p className="text-gray-500">Type: {task.exam_type}</p>
-            <p className="text-gray-500">Class Schedule: {classData?.class_schedule}</p>
-            <p className="text-gray-500">Updated At: {formatDueDateTime(task.updated_at)}</p>
-            <p className="text-gray-500">Due Date: {formatDueDateTime(task.due_date)}</p>
-            <p className="text-gray-500">Status: {task.status}</p>
-            <p className="text-gray-500">
-              Submissions: {files.length}
-            </p>
+    <div className="bg-[#EFEFEF] min-h-screen w-full p-4 sm:p-6 md:p-10">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+        {/* Task Details Section */}
+        <div className="lg:col-span-2 bg-white shadow-lg p-4 md:p-6 rounded-lg">
+          <div className="space-y-4">
+            <h1 className="text-lg md:text-xl font-bold">{task.title}</h1>
+            <p className="text-sm md:text-base">{task.description}</p>
+            <div className="text-gray-500 text-sm md:text-base space-y-1">
+              <p>Class: {classData?.class_code} | {classData?.class_group}</p>
+              <p>Type: {task.exam_type}</p>
+              <p>Class Schedule: {classData?.class_schedule}</p>
+              <p>Updated At: {formatDueDateTime(task.updated_at)}</p>
+              <p>Due Date: {formatDueDateTime(task.due_date)}</p>
+              <p>Status: {task.status}</p>
+              <p>Submissions: {files.length}</p>
+            </div>
+
+            {/* Answer Keys Section */}
             <div className="space-y-2">
-              <label className="font-semibold">Answer Keys:</label>
-              <ul className="pl-5 space-y-1 text-gray">
+              <label className="font-semibold text-sm md:text-base">Answer Keys:</label>
+              <ul className="pl-4 space-y-2 text-gray-500 text-sm md:text-base">
                 {task.answer_keys?.map((answerKey, index) => (
-                  <ul key={index} className='text-gray-500'>
+                  <li key={index} className="space-y-1">
                     <span className="font-semibold">{answerKey['item']}:</span>
-                    {answerKey['keys'].map((key, index) => (
-                      <li key={index} className='list-disc ml-10 flex justify-between'>
-                        <div>
-                          <span className="ml-2 font-semibold">Expression: </span>
-                          <span>{key['expression']}</span>
-                        </div>
-                        <div>
-                          <span className="ml-2 font-semibold">Grade: </span>
-                          <span>{key['grade']}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                    <ul className="pl-6 space-y-1">
+                      {answerKey['keys'].map((key, index) => (
+                        <li key={index} className="flex justify-between items-center">
+                          <div>
+                            <span className="font-semibold">Expression: </span>
+                            <span>{key['expression']}</span>
+                          </div>
+                          <div>
+                            <span className="font-semibold">Grade: </span>
+                            <span>{key['grade']}</span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
                 ))}
               </ul>
             </div>
           </div>
         </div>
 
+        {/* Task Actions Section */}
         <TaskActions
           onEdit={handleEditTask}
           onDelete={handleDeleteTask}
@@ -159,10 +165,12 @@ const TaskPage = () => {
         />
       </div>
 
-      <div className="w-full mx-auto p-4 mt-5">
+      {/* Files List Section */}
+      <div className="w-full bg-white shadow-lg p-4 mt-4 md:mt-6 rounded-lg">
         <FilesList files={files} refreshFiles={refreshFiles} />
       </div>
 
+      {/* Modals */}
       {isModalOpen && (
         <TaskLinkModal
           isOpen={isModalOpen}
@@ -170,7 +178,6 @@ const TaskPage = () => {
           taskId={modalData}
         />
       )}
-
       {isUploadModalOpen && (
         <UploadModal
           isOpen={isUploadModalOpen}
@@ -180,6 +187,7 @@ const TaskPage = () => {
         />
       )}
     </div>
+
   );
 };
 

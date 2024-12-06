@@ -28,8 +28,8 @@ const UploadModal = ({ isOpen, onClose, items, onUploadFiles }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg w-1/3">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded-lg w-full max-w-2xl sm:w-4/5 md:w-1/2 lg:w-1/3 xl:w-1/4">
         <h2 className="text-xl font-bold mb-4">Upload Files</h2>
         <div className="space-y-4">
           {items.map((item, index) => (
@@ -39,7 +39,7 @@ const UploadModal = ({ isOpen, onClose, items, onUploadFiles }) => {
                 type="file"
                 multiple
                 onChange={(e) => handleFileChange(e, index)}
-                className="flex-grow"
+                className="flex-grow p-2 border rounded-md"
               />
             </div>
           ))}

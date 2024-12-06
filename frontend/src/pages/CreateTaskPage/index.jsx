@@ -223,18 +223,18 @@ const CreateTaskPage = () => {
       {!next && (
         <div>
           <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-2">
-          <label className="text-md font-medium">Title</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleInputChange}
-            placeholder="Laboratory Exercise #1"
-            className={`placeholder-gray-500 placeholder-opacity-75 focus:placeholder-opacity-50 border ${errors.title ? 'border-red-500' : 'border-gray-300'} rounded-lg px-2 py-1 focus:outline-none text-md`}
-          />
-          {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
-        </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-md font-medium">Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                placeholder="Laboratory Exercise #1"
+                className={`placeholder-gray-500 placeholder-opacity-75 focus:placeholder-opacity-50 border ${errors.title ? 'border-red-500' : 'border-gray-300'} rounded-lg px-2 py-1 focus:outline-none text-md`}
+              />
+              {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
+            </div>
           </div>
           <div className="mt-4 flex flex-col gap-2">
             <h2 className="text-md font-medium">Class Group</h2>
@@ -270,70 +270,61 @@ const CreateTaskPage = () => {
               {errors.noAnswerKeys && <p className="text-red-500 text-sm">{errors.noAnswerKeys}</p>}
               {formData.answerKeys.map((answer, itemIndex) => (
                 <div key={itemIndex} className="flex flex-col gap-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold">{answer.item}</h3>
-                  {errors[`missingAnswerKey${itemIndex}`] && <p className="text-red-500 text-sm">{errors[`missingAnswerKey${itemIndex}`]}</p>}
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-semibold">{answer.item}</h3>
+                    {errors[`missingAnswerKey${itemIndex}`] && <p className="text-red-500 text-sm">{errors[`missingAnswerKey${itemIndex}`]}</p>}
+                    <button
+                      className="text-red-500"
+                      onClick={() => handleRemoveItem(itemIndex)}
+                    >
+                      <IoMdRemoveCircle />
+                    </button>
+                  </div>
+                  {answer.keys.map((key, keyIndex) => (
+                    <div key={keyIndex} className="flex flex-col gap-2">
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="text"
+                          placeholder={`Expression for Answer Key ${keyIndex + 1}`}
+                          value={key.expression}
+                          onChange={(e) =>
+                            handleExpressionChange(itemIndex, keyIndex, "expression", e.target.value)
+                          }
+                          className={`border rounded-lg px-2 py-1 w-full ${errors[`answerKeyExpression-${itemIndex}-${keyIndex}`] ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                        <div className="w-1/4">
+                          <Combobox
+                            options={scoreOptions}
+                            placeholder="Set Score"
+                            value={key.grade}
+                            onChange={(selected) =>
+                              handleExpressionChange(itemIndex, keyIndex, "grade", selected?.value || "")
+                            }
+                          />
+                        </div>
+                        <button
+                          className="text-black-500"
+                          onClick={() => handleRemoveExpression(itemIndex, keyIndex)}
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                      {errors[`answerKeyExpression-${itemIndex}-${keyIndex}`] && (
+                        <p className="text-red-500 text-sm">{errors[`answerKeyExpression-${itemIndex}-${keyIndex}`]}</p>
+                      )}
+                      {errors[`answerKeyGrade-${itemIndex}-${keyIndex}`] && (
+                        <p className="text-red-500 text-sm">{errors[`answerKeyGrade-${itemIndex}-${keyIndex}`]}</p>
+                      )}
+                    </div>
+                  ))}
                   <button
-                    className="text-red-500"
-                    onClick={() => handleRemoveItem(itemIndex)}
+                    className="flex items-center gap-2 text-blue-500 mt-2"
+                    onClick={() => handleAddExpression(itemIndex)}
                   >
-                    <IoMdRemoveCircle />
+                    <IoIosAddCircle size={20} /> Add Expression
                   </button>
                 </div>
-                {answer.keys.map((key, keyIndex) => (
-                  <div key={keyIndex} className="flex flex-col gap-2">
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="text"
-                        placeholder={`Expression for Answer Key ${keyIndex + 1}`}
-                        value={key.expression}
-                        onChange={(e) =>
-                          handleExpressionChange(itemIndex, keyIndex, "expression", e.target.value)
-                        }
-                        className={`border rounded-lg px-2 py-1 w-full ${
-                          errors[`answerKeyExpression-${itemIndex}-${keyIndex}`]
-                            ? 'border-red-500'
-                            : 'border-gray-300'
-                        }`}
-                      />
-                      <div className="w-1/4">
-                        <Combobox
-                          options={scoreOptions}
-                          placeholder="Set Score"
-                          value={key.grade}
-                          onChange={(selected) =>
-                            handleExpressionChange(itemIndex, keyIndex, "grade", selected?.value || "")
-                          }
-                        />
-                      </div>
-                      <button
-                        className="text-black-500"
-                        onClick={() => handleRemoveExpression(itemIndex, keyIndex)}
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                    {errors[`answerKeyExpression-${itemIndex}-${keyIndex}`] && (
-                      <p className="text-red-500 text-sm">
-                        {errors[`answerKeyExpression-${itemIndex}-${keyIndex}`]}
-                      </p>
-                    )}
-                    {errors[`answerKeyGrade-${itemIndex}-${keyIndex}`] && (
-                      <p className="text-red-500 text-sm">
-                        {errors[`answerKeyGrade-${itemIndex}-${keyIndex}`]}
-                      </p>
-                    )}
-                  </div>
-                ))}
-                <button
-                  className="flex items-center gap-2 text-blue-500 mt-2"
-                  onClick={() => handleAddExpression(itemIndex)}
-                >
-                  <IoIosAddCircle size={20} /> Add Expression
-                </button>
-              </div>
-            ))}
-
+              ))}
             </div>
           </div>
           <div className="flex gap-4 mt-5">
@@ -354,33 +345,34 @@ const CreateTaskPage = () => {
       )}
       {next && (
         <div className="flex flex-col gap-5">
-        <h2 className="text-md font-medium">{getLabelFromValue(formData.examType, taskTypeOptions)}</h2>
-        <div>
-          <div className="flex justify-between items-center">
-            <h2 className="text-md font-medium">Class Group</h2>
-            <h2 className="text-md font-medium">Due Date</h2>
-          </div>
-          <div className="mt-2">
-            <div className="flex items-center justify-between gap-5">
-              <p className="font-light">{getLabelFromValue(formData.classId, classOptions)}</p>
-              <input
-                type="datetime-local"
-                name="dueDate"
-                value={formData.dueDate}
-                onChange={handleInputChange}
-                className="placeholder-gray-500 placeholder-opacity-75 focus:placeholder-opacity-50 border border-gray-300 rounded-lg px-2 py-1 focus:outline-none text-md"
-              />
+          <h2 className="text-md font-medium">{getLabelFromValue(formData.examType, taskTypeOptions)}</h2>
+          <div>
+            <div className="flex justify-between items-center">
+              <h2 className="text-md font-medium">Class Group</h2>
+              <h2 className="text-md font-medium">Due Date</h2>
             </div>
+            <div className="mt-2">
+              <div className="flex items-center justify-between gap-5">
+                <p className="font-light">{getLabelFromValue(formData.classId, classOptions)}</p>
+                <input
+                  type="datetime-local"
+                  name="dueDate"
+                  value={formData.dueDate}
+                  onChange={handleInputChange}
+                  className="placeholder-gray-500 placeholder-opacity-75 focus:placeholder-opacity-50 border border-gray-300 rounded-lg px-2 py-1 focus:outline-none text-md"
+                />
+              </div>
+            </div>
+            {errors.dueDate && <p className="text-red-500 text-sm">{errors.dueDate}</p>}
           </div>
-          {errors.dueDate && <p className="text-red-500 text-sm">{errors.dueDate}</p>}
-        </div>
-        <div className="flex gap-4 mt-5">
-          <button className="px-4 py-2 bg-gray-300 rounded-lg" onClick={() => setNext(false)} >Back</button>
-          <button className="px-6 py-2 bg-black text-white rounded-lg" onClick={handleCreateTask}>Create Task</button>
-        </div>
+          <div className="flex gap-4 mt-5">
+            <button className="px-4 py-2 bg-gray-300 rounded-lg" onClick={() => setNext(false)}>Back</button>
+            <button className="px-6 py-2 bg-black text-white rounded-lg" onClick={handleCreateTask}>Create Task</button>
+          </div>
         </div>
       )}
     </div>
+
   );
 };
 
