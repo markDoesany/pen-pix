@@ -153,7 +153,7 @@ const RightSideBar = ({ task, file, circuitData, onGradeUpdate }) => {
   }
 
   return (
-    <div className={`bg-white flex flex-col gap-5 relative ${isCollapsed ? 'w-20 bg-transparent' : 'w-[400px]'} h-full px-5 text-textGray transition-all duration-300 ease-in-out pb-10`}>
+    <div className={`bg-white flex flex-col gap-5 relative ${isCollapsed ? 'w-20 bg-transparent' : 'w-[300px]'} h-full px-5 text-textGray transition-all duration-300 ease-in-out pb-10`}>
       <div className="mt-5 cursor-pointer" onClick={handleToggleCollapse}>
         {isCollapsed ? <GoSidebarExpand size={25} /> : <GoSidebarCollapse size={25} />}
       </div>

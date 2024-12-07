@@ -1,12 +1,17 @@
 import { useRef, useEffect, useState } from 'react';
+import ClassSelector from './ClassSelector';
+import axios from 'axios'
 
-const ImageDisplay = ({ img_url, predictions, isPredictionVisible }) => {
+const ImageDisplay = ({ img_url, predictions = [], isPredictionVisible, confidenceThreshold, onSetPredictions }) => {
   const canvasRef = useRef(null);
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [startDrag, setStartDrag] = useState(null);
   const [isInside, setIsInside] = useState(true);
-
+  const [selectedPrediction, setSelectedPrediction] = useState({})
+  const [position, setPosition] = useState(0)
+  const [isClassSelectorOpen, setIsClassSelectorOpen] = useState(false)
+  
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -37,20 +42,45 @@ const ImageDisplay = ({ img_url, predictions, isPredictionVisible }) => {
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         ctx.drawImage(img, x, y, drawWidth, drawHeight);
 
-        if (isPredictionVisible && predictions && Array.isArray(predictions)) {
-          predictions.forEach(({ x: bx, y: by, width, height, class_name, confidence, color }) => {
+        if (isPredictionVisible && predictions && predictions.length) {
+          predictions.forEach((prediction) => {
+            const { x: bx, y: by, width, height, class_name, confidence, color } = prediction;
             const scaledX = x + (bx * (drawWidth / img.width));
             const scaledY = y + (by * (drawHeight / img.height));
             const scaledWidth = width * (drawWidth / img.width);
             const scaledHeight = height * (drawHeight / img.height);
 
-            ctx.strokeStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
+            if (confidence * 100 < confidenceThreshold) {
+              ctx.strokeStyle = 'red'; // Use red for low-confidence boxes
+              ctx.lineWidth = 3;
+              ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
+
+              ctx.beginPath();
+              ctx.moveTo(scaledX, scaledY);
+              ctx.lineTo(scaledX + scaledWidth, scaledY + scaledHeight);
+              ctx.moveTo(scaledX + scaledWidth, scaledY);
+              ctx.lineTo(scaledX, scaledY + scaledHeight);
+              ctx.stroke();
+            } else {
+              ctx.strokeStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+              ctx.lineWidth = 2;
+              ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
+            }
 
             ctx.font = '12px Arial';
             ctx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-            ctx.fillText(`${class_name} (${(confidence * 100).toFixed(1)}%)`, scaledX, scaledY - 5);
+            ctx.fillText(
+              `${class_name} (${(confidence * 100).toFixed(1)}%)`,
+              scaledX,
+              scaledY - 5
+            );
+
+            prediction.clickData = {
+              scaledX,
+              scaledY,
+              scaledWidth,
+              scaledHeight,
+            };
           });
         }
       };
@@ -66,12 +96,41 @@ const ImageDisplay = ({ img_url, predictions, isPredictionVisible }) => {
       }
     };
 
+    canvas.addEventListener('click', handleCanvasClick);
     window.addEventListener('wheel', handleWheel, { passive: false });
 
     return () => {
+      canvas.removeEventListener('click', handleCanvasClick);
       window.removeEventListener('wheel', handleWheel);
     };
-  }, [img_url, scale, offset, isInside, isPredictionVisible]);
+  }, [img_url, scale, offset, isInside, isPredictionVisible, predictions, confidenceThreshold]);
+
+  const handleCanvasClick = (e) => {
+    const canvas = canvasRef.current;
+    const canvasRect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - canvasRect.left;
+    const clickY = e.clientY - canvasRect.top;
+
+    predictions.forEach((prediction) => {
+      const { clickData, confidence } = prediction
+      if (
+        clickData &&
+        confidence * 100 < confidenceThreshold &&
+        clickX >= clickData.scaledX &&
+        clickX <= clickData.scaledX + clickData.scaledWidth &&
+        clickY >= clickData.scaledY &&
+        clickY <= clickData.scaledY + clickData.scaledHeight
+      ) {
+        console.log('Clicked on:', prediction);
+        setSelectedPrediction(prediction);
+        setPosition({
+          top: e.clientY + 10,
+          left: e.clientX + 10,
+        });
+        setIsClassSelectorOpen(true);
+      }
+    });
+  };
 
   const handleMouseEnter = () => setIsInside(true);
   const handleMouseLeave = () => setIsInside(false);
@@ -98,6 +157,35 @@ const ImageDisplay = ({ img_url, predictions, isPredictionVisible }) => {
     }
   };
 
+  const handleClassChange = async (selectedClass) => {
+    try {
+      if (!selectedPrediction || !selectedPrediction.id) {
+        console.error("No prediction selected or missing ID");
+        return;
+      }
+  
+      const response = await axios.put(`/detect-gates/edit-prediction/${selectedPrediction.circuit_analysis_id}`, {
+        className: selectedClass,
+        detectionId: selectedPrediction.detection_id
+      });
+  
+      if (response.status === 200) {
+        console.log("Class updated successfully:", response.data);
+        onSetPredictions(response.data.filtered_predictions);
+  
+        setIsClassSelectorOpen(false);
+      } else {
+        console.error("Failed to update class:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error updating class:", error.message);
+    }
+  };
+  
+  const handleCloseClassSelector = () => {
+    setIsClassSelectorOpen(false);
+  };
+
   const handleMouseUp = () => setStartDrag(null);
 
   return (
@@ -112,6 +200,9 @@ const ImageDisplay = ({ img_url, predictions, isPredictionVisible }) => {
       onMouseLeave={handleMouseLeave}
     >
       <canvas ref={canvasRef} width={1200} height={900} />
+      {isClassSelectorOpen && (
+        <ClassSelector prediction={selectedPrediction} onClassChange={handleClassChange} position={position} onCancel={handleCloseClassSelector} />
+      )}
     </div>
   );
 };

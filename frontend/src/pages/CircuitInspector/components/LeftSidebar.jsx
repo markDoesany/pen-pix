@@ -73,7 +73,7 @@ const LeftSidebar = ({
 
   return (
     <div
-      className={`w-[95px] max-sm:w-[60px] h-full flex items-center flex-col gap-4  bg-gray-800 border border-borderGray font-sans text-customBlack1 py-3 px-3 relative select-none rounded-2xl ${
+      className={`w-[95px] max-sm:w-[60px] h-full flex items-center flex-col gap-4  bg-gray-800 bg-opacity-85 border border-borderGray font-sans text-customBlack1 py-3 px-3 relative select-none rounded-2xl ${
         loading ? styles.disabled : ""
       }`}
     >
@@ -168,7 +168,7 @@ const LeftSidebar = ({
       </div> */}
 
       {selectedTool === "threshold" && (
-        <div className="absolute -right-64 top-44">
+        <div className="absolute -right-64">
           <SetThresholdSlider
             onApplyThreshold={handleApplyThreshold}
             value={circuitData.threshold_value}
@@ -177,7 +177,7 @@ const LeftSidebar = ({
       )}
 
       {selectedTool === "logicGates" && (
-        <div className="absolute -right-64 top-80">
+        <div className="absolute -right-64 top-28">
           <DetectLogicGatesOption
             onDetectLogicGates={onDetectLogicGates}
             loading={loading}

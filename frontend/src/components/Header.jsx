@@ -10,11 +10,13 @@ import useLogout from "../hooks/useLogoutUser";
 import { useEffect, useState } from "react";
 import Notifications from "./Notifications";
 import { NotificationsAtom } from "../atoms/Notifications";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import axios from "axios";
 import useErrorHandler from "../hooks/useErrorHandler";
+import { UserAtom } from "../atoms/UserAtom";
 
 const Header = () => {
+  const currentUser = useRecoilValue(UserAtom);
   const [notifications, setNotifications] = useRecoilState(NotificationsAtom)
   const [showMenu, setShowMenu] = useState(false);
   const { toastSuccess, toastError } = useToast();
@@ -61,7 +63,7 @@ const Header = () => {
   return (
     <div className="flex justify-between items-center h-[50px] border-b-2 px-5 py-7 relative w-full bg-white">
       <div className="flex items-center">
-        <Link><img src="/icons/PenPix-txt.png" alt="Logo" /></Link>
+        <Link to={`/dashboard/${currentUser.id}`}><img src="/icons/PenPix-txt.png" alt="Logo" /></Link>
       </div>
 
       <div className="navbar flex items-center max-md:hidden">

@@ -2,6 +2,7 @@ import Header from "./components/Header";
 import LeftSidebar from "./components/LeftSidebar";
 import RightSideBar from "./components/RightSideBar";
 import ImageDisplay from "./components/ImageDisplay";
+import ConfidenceSlider from './components/ConfidenceSlider';
 import { useParams } from "react-router-dom";
 import useGetTask from '../../hooks/useGetTask';
 import { useEffect, useState } from "react";
@@ -10,14 +11,15 @@ import { useRecoilState } from "recoil";
 import axios from "axios";
 
 const CircuitInspectorPage = () => {
-  const { taskId } = useParams();
-  const { task, loading: taskLoading} = useGetTask(taskId);
   const [currentFile, setCurrentFile] = useState({});
   const [currentCircuitData, setCurrentCircuitData] = useState({});
   const [currentPredictions, setCurrentPredictions] = useState([]);
   const [filteredImgUrl, setFilteredImgUrl] = useState('');
   const [loading, setLoading] = useState(false); 
   const [isVisibilityToggled, setIsVisibilityToggled] = useState(true); 
+  const [confidence, setConfidence] = useState(50);
+  const { taskId } = useParams();
+  const { task, loading: taskLoading} = useGetTask(taskId);
   const [files, setFiles] = useRecoilState(FilesAtom);
 
   const handleApplyThreshold = async (thresholdValue, mode = 'single') => {
@@ -75,6 +77,10 @@ const CircuitInspectorPage = () => {
     }
   }
 
+  const handleSetCurrentPredictions = (updatedPredictions) =>{
+    setCurrentPredictions(updatedPredictions)
+  }
+
   useEffect(() => {
     console.log("Updated current file", currentFile);
   }, [currentFile]);
@@ -109,6 +115,11 @@ const CircuitInspectorPage = () => {
     setFiles(updatedFiles);
   };
 
+  const handleSliderChange = (value) => {
+    setConfidence(value);
+  };
+
+
   if (taskLoading) return <div>Loading...</div>; 
 
   return (
@@ -118,7 +129,7 @@ const CircuitInspectorPage = () => {
       </header>
 
       <main className="flex justify-between w-full max-lg:flex-col">
-        <div className="fixed left-5 top-1/2 transform -translate-y-1/2 z-50 max-lg:absolute">
+        <div className="fixed left-5 top-3/4 transform -translate-y-3/4 z-50 max-lg:absolute">
           <LeftSidebar 
             circuitData={currentCircuitData} 
             onApplyThreshold={handleApplyThreshold} 
@@ -130,8 +141,12 @@ const CircuitInspectorPage = () => {
           />
         </div>
 
+        <div className="fixed left-3/4 bottom-5  -translate-x-3/4">
+          <ConfidenceSlider onChange={handleSliderChange} />
+        </div>
+
         <div className="w-full">
-          <ImageDisplay img_url={filteredImgUrl} predictions={currentPredictions} isPredictionVisible={isVisibilityToggled} />
+          <ImageDisplay img_url={filteredImgUrl} predictions={currentPredictions} isPredictionVisible={isVisibilityToggled} confidenceThreshold={confidence} onSetPredictions={handleSetCurrentPredictions}/>
         </div>
 
         <div className="absolute right-0">

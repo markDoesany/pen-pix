@@ -5,7 +5,6 @@ def distance(p1, p2):
     return ((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) ** 0.5
 
 def add_color_property_and_ids(detections):
-    # Define the color mapping for each class in BGR format
     class_colors = {
         'and': (0, 0, 255),          # Red
         'input': (0, 255, 0),        # Green
@@ -31,7 +30,7 @@ def add_color_property_and_ids(detections):
 
     # Add color property and IDs based on the class
     for detection in detections:
-        class_name = detection['class']
+        class_name = detection['class'] if 'class' in detection else detection['class_name']
         detection['color'] = class_colors.get(class_name, (255, 255, 255))  # Default to white if class is not found
 
         if class_name == 'input':

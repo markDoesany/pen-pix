@@ -336,3 +336,46 @@ def generate_netlist(file_id):
         as_attachment=True,
         download_name=netlist_filename 
     )
+
+@login_required
+@detect_gates_bp.route('/edit-prediction/<int:circuit_analysis_id>', methods=['PUT'])
+def edit_prediction(circuit_analysis_id):
+    detection_id = request.json.get('detectionId')
+    class_name = request.json.get('className')
+    if not detection_id or not class_name:
+        return jsonify({"error": "Both detectionId and className are required"}), 400
+
+    circuit_analysis = CircuitAnalysis.query.filter_by(id=circuit_analysis_id).first()
+    if not circuit_analysis:
+        return jsonify({"error": f"CircuitAnalysis with id {circuit_analysis_id} not found"}), 404
+
+    prediction = next((pred for pred in circuit_analysis.predictions if pred['detection_id'] == detection_id), None)
+    if not prediction:
+        return jsonify({"error": f"Prediction with detection_id {detection_id} not found"}), 404
+
+    update_prediction = PredictionResult.query.filter_by(id=prediction['id']).first()
+    if not update_prediction:
+        return jsonify({"error": f"PredictionResult with id {prediction['id']} not found"}), 404
+
+    update_prediction.class_name = class_name
+    db.session.commit()
+    
+    try:
+        predictions = PredictionResult.query.filter_by(circuit_analysis_id=circuit_analysis.id).all()
+        prediction_dicts = [prediction.to_dict() for prediction in predictions]
+        filtered_predictions = filter_detections(prediction_dicts)
+        circuit_analysis.predictions = filtered_predictions
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "Failed to save changes", "details": str(e)}), 500
+
+    return jsonify({
+        "message": "Prediction updated and detections filtered successfully",
+        "prediction": {
+            "id": update_prediction.id,
+            "detection_id": update_prediction.detection_id,
+            "class_name": update_prediction.class_name,
+        },
+        "filtered_predictions": filtered_predictions
+    }), 200
