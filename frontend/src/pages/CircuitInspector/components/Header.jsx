@@ -6,7 +6,7 @@ import { useRecoilValue } from "recoil";
 import { formatDueDateTime } from "../../../utils/helpers";
 import { useState } from "react";
 
-const Header = ({ task, files, onCurrentFileChange }) => {
+const Header = ({ task, files, onCurrentFileChange, gradedFilesCount, fileIndex }) => {
   const currentUser = useRecoilValue(UserAtom);
   const formattedOptions = files?.map((file) => ({
     id: file.id,
@@ -15,11 +15,9 @@ const Header = ({ task, files, onCurrentFileChange }) => {
     graded: file.graded,
     mimetype: file.mimetype,
   }));
-
-  const [currentIndex, setCurrentIndex] = useState(0);
+  // console.log("index",fileIndex)
+  const [currentIndex, setCurrentIndex] = useState(fileIndex);
   const currentFile = formattedOptions[currentIndex];
-
-  const gradedFilesCount = files.filter(file => file.graded).length;
 
   const handleSelectedSubmission = (selectedSubmission) => {
     const newIndex = formattedOptions.findIndex(option => option.id === selectedSubmission.id);

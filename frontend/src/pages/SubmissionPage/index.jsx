@@ -10,6 +10,7 @@ const SubmissionPage = () => {
   const [task, setTask] = useState(null); 
   const [files, setFiles] = useState({}); 
   const [isUploaded, setIsUploaded] = useState(false); 
+  const [isPastDue, setIsPastDue] = useState(false); // Track if due date has passed
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -17,6 +18,12 @@ const SubmissionPage = () => {
         const response = await axios.get(`/task/get-task/${taskId}`);
         if (response.data) {
           setTask(response.data);
+
+          // Check if the due date has passed
+          const dueDate = new Date(response.data.due_date);
+          if (new Date() > dueDate) {
+            setIsPastDue(true);
+          }
         } else {
           console.error('No task data received or incorrect data format');
         }
@@ -45,29 +52,25 @@ const SubmissionPage = () => {
       }
     });
     formData.append('task_id', task.id);
-    console.log("formData",formData)
     try {
       const response = await axios.post('/files/upload-files', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      console.log("Reponse",response.data)
       const { files_uploaded, skipped_files, invalid_files } = response.data;
-  
+
       if (invalid_files.length > 0) {
         alert(`The following files were rejected because their names don't match students in the class: ${invalid_files.join(', ')}`);
       } else if (files_uploaded.length > 0) {
         alert('File(s) uploaded successfully!');
-        setIsUploaded(true)
+        setIsUploaded(true);
       } else if (skipped_files.length > 0) {
         alert(`Some files were skipped because they already exist: ${skipped_files.join(', ')}`);
       }
-
     } catch (error) {
       console.error('Error uploading files:', error);
       alert('An error occurred during file upload.');
     }
   };
-  
 
   if (!task) {
     return <div>Loading...</div>;
@@ -80,7 +83,15 @@ const SubmissionPage = () => {
       </div>
       <h1 className="text-lg font-bold text-center">Submission Page</h1>
       <div className={`${styles.app} bg-white p-6 rounded-lg shadow-md`}>
-        {!isUploaded ? (
+        {isPastDue ? (
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-red-500">Submission Closed</h2>
+            <p className="text-gray-600 mt-2">The due date for this task has passed. You can no longer submit files.</p>
+            <Link to="/" className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+              Go to Home
+            </Link>
+          </div>
+        ) : !isUploaded ? (
           <>
             <div className={`${styles.taskDetails} mb-5`}>
               <h2 className="text-xl font-semibold">{task.title || 'Task Title'}</h2>

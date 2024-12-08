@@ -114,19 +114,21 @@ const RightSideBar = ({ task, file, circuitData, onGradeUpdate }) => {
             Result: "Mismatch",
           });
         }
-      } else {
-        detailedResults.push({
-          Output: `OUT ${index + 1}`,
-          Expression: relevantAnswerKey.keys[index]?.expression || "Unknown Expression",
-          Grade: 0,
-          Result: "Missing in Submitted Table",
-        });
+        } else {
+          detailedResults.push({
+            Output: `OUT ${index + 1}`,
+            Expression: relevantAnswerKey.keys[index]?.expression || "Unknown Expression",
+            Grade: 0,
+            Result: "Missing in Submitted Table",
+          });
       }
     });
     const totalGrade = detailedResults.reduce((sum, result) => sum + result.Grade, 0);
 
-    setGradeResults(detailedResults);
-    await updateGrade(file.id, totalGrade);
+    if (detailedResults.length > 0 && circuitData.boolean_expressions.length > 0){
+      setGradeResults(detailedResults);
+      await updateGrade(file.id, totalGrade);
+    }
     setShowGradeModal(true);  
   };
 

@@ -7,10 +7,12 @@ import { useParams } from "react-router-dom";
 import useGetTask from '../../hooks/useGetTask';
 import { useEffect, useState } from "react";
 import { FilesAtom } from "../../atoms/FilesAtom";
-import { useRecoilState } from "recoil";
+import useToast from "../../hooks/useToast";
+import { useRecoilValue } from "recoil";
 import axios from "axios";
 
 const CircuitInspectorPage = () => {
+  const { taskId} = useParams(); 
   const [currentFile, setCurrentFile] = useState({});
   const [currentCircuitData, setCurrentCircuitData] = useState({});
   const [currentPredictions, setCurrentPredictions] = useState([]);
@@ -18,18 +20,26 @@ const CircuitInspectorPage = () => {
   const [loading, setLoading] = useState(false); 
   const [isVisibilityToggled, setIsVisibilityToggled] = useState(true); 
   const [confidence, setConfidence] = useState(50);
-  const { taskId } = useParams();
   const { task, loading: taskLoading} = useGetTask(taskId);
-  const [files, setFiles] = useRecoilState(FilesAtom);
+  const files = useRecoilValue(FilesAtom);
+  const [gradedFilesCount, setGradedFilesCount] = useState(0)
+  const {toastSuccess, toastError} = useToast()
+
+  const [fileIndex, setFileIndex] = useState(() => {
+    const storedIndex = localStorage.getItem("fileIndex");
+    return storedIndex ? JSON.parse(storedIndex) : 0;
+  });
+
 
   const handleApplyThreshold = async (thresholdValue, mode = 'single') => {
+    console.log(currentFile?.id)
     try {
       const response = await axios.post('/detect-gates/set-filter-threshold', {
         thresholdValue,
         mode,
         fileId: currentFile?.id,
       }, { responseType: 'blob' });
-      
+
       const imageUrl = URL.createObjectURL(response.data);
       setFilteredImgUrl(imageUrl);
       setCurrentCircuitData((prev) => ({
@@ -69,8 +79,11 @@ const CircuitInspectorPage = () => {
     try {
       const response = await axios.post(`/detect-gates/analyze-circuit/${currentFile.id}`)
       setCurrentCircuitData({...currentCircuitData, boolean_expressions:response.data.boolean_expressions, truth_table: response.data.truth_table})
+
+      toastSuccess("Circuit Analysis is Completed.")
       console.log("Boolean Expressions:", response.data)
     } catch (error) {
+      toastError("Error in Analyzing the Circuit.")
       console.log(error)
     }finally{
       setLoading(false)
@@ -82,11 +95,10 @@ const CircuitInspectorPage = () => {
   }
 
   useEffect(() => {
-    console.log("Updated current file", currentFile);
-  }, [currentFile]);
-
-  useEffect(() => {
-    setCurrentFile(files[0]);
+    if (files.length > 0) {
+      setCurrentFile(files[fileIndex]);
+      localStorage.removeItem("fileIndex");
+    }
   }, [files]);
 
   useEffect(() => {
@@ -99,6 +111,10 @@ const CircuitInspectorPage = () => {
           setCurrentPredictions(response.data.circuit_analysis.predictions);
           handleApplyThreshold(response.data.circuit_analysis.threshold_value);
 
+          const gradedCount = files.filter((file) => file.graded).length;
+          setGradedFilesCount(gradedCount); 
+          setFileIndex(files[files.indexOf(currentFile)])
+          
           console.log("Circuit Data",response.data.circuit_analysis);
         } catch (error) {
           console.log(error.message);
@@ -109,10 +125,12 @@ const CircuitInspectorPage = () => {
   }, [currentFile?.id]);
 
   const handleGradeUpdate = (fileId, newGrade) => {
-    const updatedFiles = files.map((file) => 
+    const updatedFiles = files.map((file) =>
       file.id === fileId ? { ...file, graded: newGrade } : file
     );
-    setFiles(updatedFiles);
+  
+    const gradedCount = updatedFiles.filter((file) => file.graded).length;
+    setGradedFilesCount(gradedCount); 
   };
 
   const handleSliderChange = (value) => {
@@ -125,7 +143,7 @@ const CircuitInspectorPage = () => {
   return (
     <div className="bg-[#eeeded] min-h-screen flex flex-col text">
       <header className="bg-[#333]">
-        <Header task={task} files={files} onCurrentFileChange={handleCurrentFile} />
+        <Header task={task} files={files} onCurrentFileChange={handleCurrentFile} gradedFilesCount={gradedFilesCount} fileIndex={fileIndex}/>
       </header>
 
       <main className="flex w-full max-lg:flex-col">
@@ -136,7 +154,6 @@ const CircuitInspectorPage = () => {
             onDetectLogicGates={handleDetectLogicGates}
             onTogglePredictionVisibility={handlePredictionVisibility}
             onAnalyzeCircuit={handleAnalyzeCircuit}
-            // onExportVerilog={handleExportVerilog}
             loading={loading}
           />
         </div>

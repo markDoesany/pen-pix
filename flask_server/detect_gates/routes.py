@@ -30,7 +30,6 @@ def set_filter_threshold():
         return jsonify({"error": "File not found"}), 404
 
     task_id = uploaded_file.task_id 
-
     def update_or_create_analysis(file, threshold_value):
         circuit_analysis = CircuitAnalysis.query.filter_by(uploaded_file_id=file.id).first()
         if not circuit_analysis:

@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { FaTrash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const FilesList = ({ files, refreshFiles, task }) => {
   const [sortOption, setSortOption] = useState('desc');
   const [filterOption, setFilterOption] = useState('all');
+  const navigate = useNavigate()
 
   // Calculate the total grade for each item in answer_keys
   const calculateTotalGrade = () => {
@@ -58,6 +60,11 @@ const FilesList = ({ files, refreshFiles, task }) => {
     return <p className="text-sm">No submissions available.</p>;
   };
 
+  const handleNavigate = (fileIndex) =>{
+    localStorage.setItem("fileIndex", JSON.stringify(fileIndex));
+    navigate(`/circuit-evaluator/${task.id}`)
+  }
+
   return (
     <div className="bg-white shadow-md p-4 rounded-md">
       <h2 className="text-lg font-semibold mb-3">Submissions</h2>
@@ -106,21 +113,22 @@ const FilesList = ({ files, refreshFiles, task }) => {
                 </tr>
               </thead>
               <tbody>
-                {files.map((file) => (
+                {files.map((file, index) => (
                   <tr key={file.id} className="text-center">
                     <td
                       className="border border-gray-300 px-2 py-1 text-left truncate"
                       style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                     >
-                      <a
-                        href={file.file_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
+                      <span
+                        // href={file.file_url}
+                        // target="_blank"
+                        // rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline cursor-pointer"
                         title={formatFilename(file.filename)} // Tooltip for full filename
+                        onClick={() => handleNavigate(index)}
                       >
                         {formatFilename(file.filename)}
-                      </a>
+                      </span>
                     </td>
                     <td
                       className={`border border-gray-300 px-2 py-1 hidden sm:table-cell ${

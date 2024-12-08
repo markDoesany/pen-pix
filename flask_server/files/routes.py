@@ -10,6 +10,7 @@ def serve_file(task_id, filename):
     TASK_FOLDER = os.path.join('static', 'images', str(task_id))
     return send_from_directory(TASK_FOLDER, filename)
     
+    
 @login_required
 @files_bp.route('/upload-files', methods=['POST'])
 def upload_files():
@@ -61,30 +62,46 @@ def upload_files():
         existing_file = UploadedFile.query.filter_by(
             filename=filename, task_id=task_id
         ).first()
-        
+
         if existing_file:
             existing_file.filepath = os.path.join('images', str(task_id), filename)
             existing_file.mimetype = file.mimetype
             existing_file.item_number = int(item_number)
+            existing_file.graded = False  
+            existing_file.total_grade = None  
+
+            existing_analysis = CircuitAnalysis.query.filter_by(uploaded_file_id=existing_file.id).first()
+            if existing_analysis:
+                existing_analysis.threshold_value = 128
+                existing_analysis.predictions = []
+                existing_analysis.boolean_expressions = []
+                existing_analysis.netlist = {}
+                existing_analysis.truth_table = []
+                existing_analysis.verilog_url_file = ''
+            else:
+                new_circuit_analysis = CircuitAnalysis(
+                    threshold_value=128,
+                    predictions=[],
+                    boolean_expressions=[],
+                    netlist={},
+                    truth_table=[],
+                    verilog_url_file='',
+                    uploaded_file_id=existing_file.id
+                )
+                db.session.add(new_circuit_analysis)
+
         else:
             new_file = UploadedFile(
                 filename=filename,
                 filepath=os.path.join('images', str(task_id), filename),
                 mimetype=file.mimetype,
                 task_id=task_id,
-                item_number=int(item_number)
+                item_number=int(item_number),
+                graded=False, 
+                total_grade=None 
             )
             db.session.add(new_file)
 
-        existing_analysis = CircuitAnalysis.query.filter_by(uploaded_file_id=existing_file.id if existing_file else new_file.id).first()
-        if existing_analysis:
-            existing_analysis.threshold_value = 128
-            existing_analysis.predictions = []
-            existing_analysis.boolean_expressions = []
-            existing_analysis.netlist = {}
-            existing_analysis.truth_table = []
-            existing_analysis.verilog_url_file = ''
-        else:
             new_circuit_analysis = CircuitAnalysis(
                 threshold_value=128,
                 predictions=[],
@@ -92,7 +109,7 @@ def upload_files():
                 netlist={},
                 truth_table=[],
                 verilog_url_file='',
-                uploaded_file_id=existing_file.id if existing_file else new_file.id
+                uploaded_file_id=new_file.id
             )
             db.session.add(new_circuit_analysis)
 
@@ -126,7 +143,6 @@ def upload_files():
     }
     
     return jsonify(response), 200
-
 
 @login_required
 @files_bp.route('/get-files/<int:task_id>', methods=['GET'])
