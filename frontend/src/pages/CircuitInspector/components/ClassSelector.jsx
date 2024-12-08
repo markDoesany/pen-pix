@@ -76,13 +76,13 @@ const ClassSelector = ({ prediction, position, onClassChange, onCancel }) => {
       </div>
       <div className="mt-3 flex justify-between gap-2">
         <button
-          className="px-2 py-1 bg-gray-600 text-xs rounded-lg hover:bg-gray-500 transition ease-in-out duration-200"
+          className="px-2 py-1 bg-gray-600 text-xs rounded-lg hover:bg-gray-500 transition ease-in-out duration-200 w-full"
           onClick={onCancel}
         >
           Cancel
         </button>
         <button
-          className="px-2 py-1 bg-blue-500 text-xs text-white rounded-lg hover:bg-blue-600 transition ease-in-out duration-200"
+          className="px-2 py-1 bg-primaryColor text-xs text-white rounded-lg hover:bg-transparent border border-transparent hover:border-primaryColor transition ease-in-out duration-200 w-full"
           onClick={handleSave}
         >
           Save

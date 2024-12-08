@@ -25,7 +25,7 @@ const FilterCreateNav = ({ onFilterChange }) => {
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-10 w-full justify-between">
-        <div className="flex flex-wrap gap-2 sm:gap-10 justify-between w-full sm:w-auto">
+        <div className="flex flex-wrap gap-2 sm:gap-10 justify-between w-full sm:w-auto h-full">
           <div className="flex items-center justify-between bg-gray-200 rounded-md text-sm font-light border-2 border-customGray2 overflow-hidden w-full sm:w-auto">
             <button
               className={`px-4 py-1 w-full sm:w-auto rounded-l-md ${selectedFilter === 'All' ? 'bg-white text-gray-900' : 'hover:bg-white text-gray-900'}`}

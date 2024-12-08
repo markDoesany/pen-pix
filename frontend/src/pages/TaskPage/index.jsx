@@ -167,7 +167,7 @@ const TaskPage = () => {
 
       {/* Files List Section */}
       <div className="w-full bg-white shadow-lg p-4 mt-4 md:mt-6 rounded-lg">
-        <FilesList files={files} refreshFiles={refreshFiles} />
+        <FilesList files={files} refreshFiles={refreshFiles} task={task}/>
       </div>
 
       {/* Modals */}

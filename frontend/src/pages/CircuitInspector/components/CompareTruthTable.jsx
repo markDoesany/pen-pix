@@ -1,7 +1,6 @@
 import { IoClose } from "react-icons/io5";
 
 const CompareTruthTable = ({ answerTable, circuitTruthTable, onClose }) => {
-  console.log(circuitTruthTable);
   const answerKeys = Object.keys(answerTable);
   const submittedKeys = Object.keys(circuitTruthTable);
   const allKeys = [...new Set([...answerKeys, ...submittedKeys])];
@@ -28,22 +27,37 @@ const CompareTruthTable = ({ answerTable, circuitTruthTable, onClose }) => {
   };
 
   const rows = generateRows();
-
-  const hasMismatch = (key, index) =>
-    rows[index].answers[key] !== rows[index].submissions[key];
-
   const inputHeaders = Object.values(answerTable)[0]?.[0]?.slice(0, -1) || [];
   const inputLabels = inputHeaders.map((_, index) => `X${index + 1}`);
+
+  const hasMismatch = (key, index) =>
+    rows[index]?.answers[key] !== rows[index]?.submissions[key];
+
+  if (!answerKeys.length && !submittedKeys.length) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 ">
+        <div className="bg-white rounded-lg shadow-lg w-[90vw] h-[30vh] p-6 flex flex-col items-center justify-center relative">
+          <IoClose
+            size={20}
+            className="absolute top-2 right-3 text-gray-600 hover:text-gray-800 cursor-pointer"
+            onClick={onClose}
+          />
+          <p className="text-lg font-semibold text-gray-700 text-center">
+            No valid boolean expressions detected.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-lg w-[90vw] h-[80vh] p-6 relative overflow-hidden">
-        <button
+        <IoClose
+          size={20}
+          className="absolute top-2 right-3 text-gray-600 hover:text-gray-800 cursor-pointer"
           onClick={onClose}
-          className="absolute top-2 right-3 text-gray-600 hover:text-gray-800 bg-gray-200 hover:bg-gray-300 rounded-full p-2"
-        >
-          <IoClose size={15} />
-        </button>
+        />
         <div className="overflow-auto max-h-full max-w-full mt-5">
           <table className="table-auto border-collapse border border-gray-400 w-full text-sm">
             <thead className="sticky top-0 bg-gray-100 z-10">

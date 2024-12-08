@@ -1,7 +1,7 @@
 const PreviewNetlist = ({ netlistContent, onClose, onDownload }) => {
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-[80vw] max-h-[80vh] overflow-auto shadow-lg">
+      <div className="bg-white rounded-lg p-6 w-[60vw] max-h-[80vh] overflow-auto shadow-lg">
         <h2 className="text-lg font-bold mb-4 text-center">Preview Netlist</h2>
         <pre className="bg-gray-100 p-4 rounded-md overflow-auto text-sm">
           {netlistContent}

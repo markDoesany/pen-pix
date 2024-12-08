@@ -1,18 +1,15 @@
-import AnswerKeys from "./AnswerKeys";
-import ExpressionsResult from "./ExpressionsResult";
 import CompareTruthTable from "./CompareTruthTable";
 import PreviewNetlist from "./PreviewNetlist";
+import UnifiedComponent from "./UnifiedComponent";
 import { FaTableColumns } from "react-icons/fa6";
 import { GiCircuitry } from "react-icons/gi";
 import { MdOutlineGrading } from "react-icons/md";
-import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
-import styles from './styles/component.module.css';
+// import styles from './styles/component.module.css';
 import { useState, useEffect } from "react";
 import axios from "axios";
 import GradeTableModal from "./GradeTableModal";  
 
 const RightSideBar = ({ task, file, circuitData, onGradeUpdate }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [showCompareTable, setShowCompareTable] = useState(false);
   const [expressions, setExpressions] = useState([]);
   const [answerTable, setAnswerTable] = useState([]);
@@ -133,10 +130,6 @@ const RightSideBar = ({ task, file, circuitData, onGradeUpdate }) => {
     setShowGradeModal(true);  
   };
 
-  const handleToggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
   const handleShowCompareTable = () => {
     setShowCompareTable(true); 
   };
@@ -153,46 +146,55 @@ const RightSideBar = ({ task, file, circuitData, onGradeUpdate }) => {
   }
 
   return (
-    <div className={`bg-white flex flex-col gap-5 relative ${isCollapsed ? 'w-20 bg-transparent' : 'w-[300px]'} h-full px-5 text-textGray transition-all duration-300 ease-in-out pb-10`}>
-      <div className="mt-5 cursor-pointer" onClick={handleToggleCollapse}>
-        {isCollapsed ? <GoSidebarExpand size={25} /> : <GoSidebarCollapse size={25} />}
+    <div className="bg-white flex flex-col gap-6 relative border-l border-gray-300 w-full h-full p-6 text-gray-700">
+      <div className="text-center mb-2">
+        <h1 className="text-xl font-bold text-gray-800">Assessment Tools</h1>
+        <p className="text-sm text-gray-500">
+          Use the tools below to assess and analyze the circuit data.
+        </p>
       </div>
 
-      {!isCollapsed && (
-        <>
-          <div><AnswerKeys relevantAnswerKey={relevantAnswerKey} /></div>
-          <div className="mt-5"><ExpressionsResult circuitData={circuitData} /></div>
-          <hr className="mt-8 border-borderGray" />
-          <div className="flex flex-col gap-3">
-            <h1 className="font-semibold text-center text-lg mt-3">Assessment Tools</h1>
-            <div className="grid grid-cols-2 grid-rows-2 gap-2">
-              <div className={`${styles.assessment_tool}`} onClick={handleShowCompareTable}>
-                <FaTableColumns size={40} />
-                <label>Compare Truth Tables</label>
-              </div>
-              <div className={styles.assessment_tool} onClick={handleGenerateNetlist}>
-                <GiCircuitry size={40} />
-                <label>Preview Netlist</label>
-              </div>
-              <div className={styles.assessment_tool} onClick={handleGradeSubmission}>
-                <MdOutlineGrading size={40} />
-                <label>Grade Submission</label>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      <div className="grid grid-cols-3 gap-4">
+        <div
+          className="flex flex-col items-center p-4 bg-white rounded-lg shadow hover:shadow-lg cursor-pointer transition"
+          onClick={handleShowCompareTable}
+        >
+          <FaTableColumns size={40} className="text-blue-500 mb-2" />
+          <span className="font-semibold text-gray-700 text-center text-sm ">Compare Tables</span>
+        </div>
+
+        <div
+          className="flex flex-col items-center p-4 bg-white rounded-lg shadow hover:shadow-lg cursor-pointer transition"
+          onClick={handleGenerateNetlist}
+        >
+          <GiCircuitry size={40} className="text-green-500 mb-2" />
+          <span className="font-semibold text-gray-700 text-center text-sm">Preview Netlist</span>
+        </div>
+
+        <div
+          className="flex flex-col items-center p-4 bg-white rounded-lg shadow hover:shadow-lg cursor-pointer transition"
+          onClick={handleGradeSubmission}
+        >
+          <MdOutlineGrading size={40} className="text-yellow-500 mb-2" />
+          <span className="font-semibold text-gray-700 text-center text-sm">Grade Submission</span>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-6">
+      <UnifiedComponent
+          relevantAnswerKey={task?.answer_keys?.find(
+            (key) => key.item === `Item ${file?.item_number}`
+          )}
+          circuitData={circuitData}
+        />
+      </div>
 
       {showCompareTable && (
-        <div className="bg-white p-4 rounded-lg shadow-lg max-h-[80vh] w-[80vw] overflow-auto">
-          <CompareTruthTable answerTable={answerTable} circuitTruthTable={circuitData.truth_table} onClose={handleCloseCompareTable}/>
-          <button
-            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700 mt-4"
-            onClick={handleCloseCompareTable}
-          >
-            Close
-          </button>
-        </div>
+        <CompareTruthTable
+          answerTable={answerTable}
+          circuitTruthTable={circuitData.truth_table}
+          onClose={handleCloseCompareTable}
+        />
       )}
 
       {showGradeModal && (

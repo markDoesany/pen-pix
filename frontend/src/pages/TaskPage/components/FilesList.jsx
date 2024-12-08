@@ -2,9 +2,21 @@ import { useState } from 'react';
 import axios from 'axios';
 import { FaTrash } from 'react-icons/fa';
 
-const FilesList = ({ files, refreshFiles }) => {
+const FilesList = ({ files, refreshFiles, task }) => {
   const [sortOption, setSortOption] = useState('desc');
   const [filterOption, setFilterOption] = useState('all');
+
+  // Calculate the total grade for each item in answer_keys
+  const calculateTotalGrade = () => {
+    const grades = {};
+    task?.answer_keys?.forEach((item) => {
+      const totalGrade = item.keys.reduce((sum, key) => sum + key.grade, 0);
+      grades[item.item] = totalGrade;
+    });
+    return grades;
+  };
+
+  const totalGrades = calculateTotalGrade();
 
   const handleDeleteFile = async (fileId) => {
     try {
@@ -81,19 +93,25 @@ const FilesList = ({ files, refreshFiles }) => {
       ) : (
         Object.entries(groupedFiles).map(([itemNumber, files]) => (
           <div key={itemNumber} className="mb-4">
-            <h3 className="text-md font-medium mb-2">Item {itemNumber}</h3>
+            <h3 className="text-md font-medium mb-2">
+              Item {itemNumber} - Total Grade: {totalGrades[`Item ${itemNumber}`] || 0}
+            </h3>
             <table className="table-auto w-full border-collapse border border-gray-300 text-sm">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="border border-gray-300 px-2 py-1 text-left w-[40%]">Filename</th>
-                  <th className="border border-gray-300 px-2 py-1 hidden sm:table-cell w-[30%]">Status</th>
+                  <th className="border border-gray-300 px-2 py-1 text-left w-[30%]">Filename</th>
+                  <th className="border border-gray-300 px-2 py-1 hidden sm:table-cell w-[20%]">Status</th>
+                  <th className="border border-gray-300 px-2 py-1 w-[20%]">Total Grade</th>
                   <th className="border border-gray-300 px-2 py-1 w-[30%]">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {files.map((file) => (
                   <tr key={file.id} className="text-center">
-                    <td className="border border-gray-300 px-2 py-1 text-left truncate" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <td
+                      className="border border-gray-300 px-2 py-1 text-left truncate"
+                      style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                    >
                       <a
                         href={file.file_url}
                         target="_blank"
@@ -104,8 +122,15 @@ const FilesList = ({ files, refreshFiles }) => {
                         {formatFilename(file.filename)}
                       </a>
                     </td>
-                    <td className={`border border-gray-300 px-2 py-1 hidden sm:table-cell ${file.graded ? 'text-green-600' : 'text-red-600'}`}>
+                    <td
+                      className={`border border-gray-300 px-2 py-1 hidden sm:table-cell ${
+                        file.graded ? 'text-green-600' : 'text-red-600'
+                      }`}
+                    >
                       {file.graded ? 'Graded' : 'Not graded'}
+                    </td>
+                    <td className="border border-gray-300 px-2 py-1">
+                      {file.graded ? `${file.total_grade} / ${totalGrades[`Item ${itemNumber}`] || 0}` : '—'}
                     </td>
                     <td className="border border-gray-300 px-2 py-1">
                       <button onClick={() => handleDeleteFile(file.id)} className="text-red-500 hover:text-red-700">

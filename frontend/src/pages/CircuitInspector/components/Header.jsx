@@ -49,6 +49,7 @@ const Header = ({ task, files, onCurrentFileChange }) => {
       <div className="cursor-pointer max-sm:hidden">
         <Link to={`/dashboard/${currentUser.id}`} className="flex gap-2 items-center">
           <span className="font-bold text-2xl">PenPix</span>
+          <span className="text-sm font-semibold max-lg:hidden text-customGray2">| Dashboard</span>
         </Link>
       </div>
 

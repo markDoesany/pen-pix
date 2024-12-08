@@ -11,6 +11,7 @@ const ImageDisplay = ({ img_url, predictions = [], isPredictionVisible, confiden
   const [selectedPrediction, setSelectedPrediction] = useState({})
   const [position, setPosition] = useState(0)
   const [isClassSelectorOpen, setIsClassSelectorOpen] = useState(false)
+  const [isUpdatedPrediction, setIsUpdatedPrediction] = useState(false)
   
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -103,7 +104,7 @@ const ImageDisplay = ({ img_url, predictions = [], isPredictionVisible, confiden
       canvas.removeEventListener('click', handleCanvasClick);
       window.removeEventListener('wheel', handleWheel);
     };
-  }, [img_url, scale, offset, isInside, isPredictionVisible, predictions, confidenceThreshold]);
+  }, [img_url, scale, offset, isInside, isPredictionVisible, confidenceThreshold, isUpdatedPrediction]);
 
   const handleCanvasClick = (e) => {
     const canvas = canvasRef.current;
@@ -172,7 +173,7 @@ const ImageDisplay = ({ img_url, predictions = [], isPredictionVisible, confiden
       if (response.status === 200) {
         console.log("Class updated successfully:", response.data);
         onSetPredictions(response.data.filtered_predictions);
-  
+        setIsUpdatedPrediction(!isUpdatedPrediction)
         setIsClassSelectorOpen(false);
       } else {
         console.error("Failed to update class:", response.statusText);
@@ -190,7 +191,7 @@ const ImageDisplay = ({ img_url, predictions = [], isPredictionVisible, confiden
 
   return (
     <div
-      className={`image-canvas w-full h-full flex justify-center items-center cursor-pointer ${
+      className={`image-canvas w-full h-full flex justify-center items-center cursor-pointer  ${
         startDrag ? 'cursor-grab' : ''
       }`}
       onMouseDown={handleMouseDown}
@@ -198,8 +199,10 @@ const ImageDisplay = ({ img_url, predictions = [], isPredictionVisible, confiden
       onMouseUp={handleMouseUp}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-    >
-      <canvas ref={canvasRef} width={1200} height={900} />
+    > 
+      <div className='w-full '>
+        <canvas ref={canvasRef} width={950} height={800} />
+      </div>
       {isClassSelectorOpen && (
         <ClassSelector prediction={selectedPrediction} onClassChange={handleClassChange} position={position} onCancel={handleCloseClassSelector} />
       )}
