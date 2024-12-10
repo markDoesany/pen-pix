@@ -52,7 +52,7 @@ const MessageForm = () => {
         data-aos-duration="1000"
       >
         <img
-          src="../../../../public/images/message_icon.png"
+          src="/images/message_icon.png"
           alt="message"
           className="max-w-full max-h-full object-contain"
         />
