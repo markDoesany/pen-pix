@@ -19,6 +19,7 @@ import NotificationPage from './pages/NotificationsPage/index.jsx';
 import SettingsPage from './pages/SettingsPage/index.jsx';
 import ContactPage from './pages/ContactPage/index.jsx'
 import ErrorPage from './components/ErrorPage.jsx';
+import PageTitle from './components/PageTitle.jsx';
 import { ToastProvider } from './contexts/ToastContext'; 
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -36,9 +37,8 @@ const App = () => {
 
   return (
     <ToastProvider> 
-      {/* <main className={`${showNavbar ? 'flex flex-col  w-full min-h-screen bg-white' : ''}`}> */}
+        <PageTitle />
         {showNavbar && <Header />}
-        {/* <div className={`${showNavbar ? 'flex flex-col w-full min-h-screen' : ''}`}> */}
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={user ? <Navigate to={`/dashboard/${user.id}`} /> : <Authentication />} />
