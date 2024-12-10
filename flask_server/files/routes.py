@@ -62,7 +62,7 @@ def upload_files():
         existing_file = UploadedFile.query.filter_by(
             filename=filename, task_id=task_id
         ).first()
-
+        
         if existing_file:
             existing_file.filepath = os.path.join('images', str(task_id), filename)
             existing_file.mimetype = file.mimetype
@@ -101,6 +101,7 @@ def upload_files():
                 total_grade=None 
             )
             db.session.add(new_file)
+            db.session.commit()
 
             new_circuit_analysis = CircuitAnalysis(
                 threshold_value=128,

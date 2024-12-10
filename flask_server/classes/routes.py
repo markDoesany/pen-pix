@@ -2,6 +2,8 @@ from flask import request, jsonify, session
 from model import db, Classes, Task
 from utils.auth_helpers import login_required
 from classes import classes_bp
+import shutil
+import os
 
 @login_required
 @classes_bp.route('/create-class', methods=['POST'])
@@ -69,7 +71,16 @@ def delete_class(class_id):
         return jsonify({"error": "Class not found"}), 404
 
     try:
-        Task.query.filter_by(class_id=class_id).delete() 
+        task = Task.query.filter_by(class_id=class_id).first()
+        db.session.commit()
+        if not task:
+            return jsonify({"message": "Task not found"}), 404
+
+        TASK_FOLDER = os.path.join('static', 'images', str(task.id))
+        if os.path.exists(TASK_FOLDER):
+            shutil.rmtree(TASK_FOLDER) 
+
+        db.session.delete(task)
         db.session.commit()
         
         db.session.delete(class_to_delete)
