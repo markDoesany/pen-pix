@@ -72,16 +72,13 @@ def delete_class(class_id):
 
     try:
         task = Task.query.filter_by(class_id=class_id).first()
-        db.session.commit()
-        if not task:
-            return jsonify({"message": "Task not found"}), 404
+        if task:
+            TASK_FOLDER = os.path.join('static', 'images', str(task.id))
+            if os.path.exists(TASK_FOLDER):
+                shutil.rmtree(TASK_FOLDER) 
 
-        TASK_FOLDER = os.path.join('static', 'images', str(task.id))
-        if os.path.exists(TASK_FOLDER):
-            shutil.rmtree(TASK_FOLDER) 
-
-        db.session.delete(task)
-        db.session.commit()
+            db.session.delete(task)
+            db.session.commit()
         
         db.session.delete(class_to_delete)
         db.session.commit()
