@@ -12,7 +12,7 @@ import Notifications from "./Notifications";
 import { NotificationsAtom } from "../atoms/Notifications";
 import { useRecoilState, useRecoilValue } from "recoil";
 import axios from "axios";
-import useErrorHandler from "../hooks/useErrorHandler";
+// import useErrorHandler from "../hooks/useErrorHandler";
 import { UserAtom } from "../atoms/UserAtom";
 
 const Header = () => {
@@ -23,7 +23,7 @@ const Header = () => {
   const { logout } = useLogout();
   const navigate = useNavigate()
   const [ isNotificationOpen, setIsNotificationOpen] = useState(false)
-  const { handleError } = useErrorHandler();
+  // const { handleError } = useErrorHandler();
 
   const handleLogout = async () => {
 
@@ -43,17 +43,17 @@ const Header = () => {
   useEffect(()=>{
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get('/notification/get-notifications'); // Adjust the URL if necessary
-        setNotifications(response.data.notifications);
+        const response = await axios.get('/notification/get-notifications'); 
+        setNotifications(response.data?.notifications);
         console.log(response.data)
       } catch (error) {
-        if (error.response?.status === 401) {
-          handleError('unauthorized', 'Unable to fetch notifications, please log in again.');
-        } else if (error.response?.status === 404) {
-          handleError('404', 'No notifications found.');
-        } else {
-          handleError('default', 'An error occurred while fetching notifications.');
-        }
+        // if (error.response?.status === 401) {
+        //   handleError('unauthorized', 'Unable to fetch notifications, please log in again.');
+        // } else if (error.response?.status === 404) {
+        //   handleError('404', 'No notifications found.');
+        // } else {
+        //   handleError('default', 'An error occurred while fetching notifications.');
+        // }
         console.log(error);
       }
     };
