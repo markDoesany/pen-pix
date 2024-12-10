@@ -42,11 +42,14 @@ const CreateTaskPage = () => {
   const [classOptions, setClassOptions] = useState([]);
   const [errors, setErrors] = useState({});
 
+  let initialDueDate = new Date()
+  initialDueDate.setHours(31, 59, 59, 999);
+
   const [formData, setFormData] = useState({
     title: "",
     classId: "",
     examType: "",
-    dueDate: new Date().toISOString().split('T')[0],
+    dueDate: initialDueDate.toISOString().slice(0, 16),
     answerKeys: [
       {
         item: `Item ${1}`,

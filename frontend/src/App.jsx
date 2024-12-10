@@ -36,9 +36,9 @@ const App = () => {
 
   return (
     <ToastProvider> 
-      <main className={`${showNavbar ? 'flex flex-col  w-full min-h-screen bg-white' : ''}`}>
+      {/* <main className={`${showNavbar ? 'flex flex-col  w-full min-h-screen bg-white' : ''}`}> */}
         {showNavbar && <Header />}
-        <div className={`${showNavbar ? 'flex flex-col w-full min-h-screen' : ''}`}>
+        {/* <div className={`${showNavbar ? 'flex flex-col w-full min-h-screen' : ''}`}> */}
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={user ? <Navigate to={`/dashboard/${user.id}`} /> : <Authentication />} />
@@ -60,8 +60,8 @@ const App = () => {
             <Route path="/error" element={<ErrorPage errorType={state.errorType} errorMessage={state.errorMessage} />} />
             <Route path="*" element={<ErrorPage errorType="404" errorMessage="Page not found!" />} />
           </Routes>
-        </div>
-      </main>
+        {/* </div> */}
+      {/* </main> */}
     </ToastProvider>
   );
 };

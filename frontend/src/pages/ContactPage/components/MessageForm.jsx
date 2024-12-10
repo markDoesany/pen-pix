@@ -46,7 +46,11 @@ const MessageForm = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white w-full rounded-md px-5 max-md:p-1">
-      <div className="w-1/2 flex justify-center items-center max-md:hidden">
+      <div
+        className="w-1/2 flex justify-center items-center max-md:hidden"
+        data-aos="fade-right"
+        data-aos-duration="1000"
+      >
         <img
           src="../../../../public/images/message_icon.png"
           alt="message"
@@ -54,16 +58,23 @@ const MessageForm = () => {
         />
       </div>
 
-      <div className="w-1/2 p-8 flex flex-col justify-between max-md:w-full">
+      <div
+        className="w-1/2 p-8 flex flex-col justify-between max-md:w-full"
+        data-aos="fade-left"
+        data-aos-duration="1000"
+      >
         <div>
-          <h1 className="text-3xl text-center font-semibold">Have some questions?</h1>
+          <h1 className="text-3xl text-center font-semibold animate-bounce">Have some questions?</h1>
           <div className="flex justify-evenly w-full px-5 mt-2 text-customGray2 font-medium text-sm">
             <p>Contact: 09995794343</p>
             <p>Email: penpixusc.edu.ph</p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-10">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 mt-10 animate-fade-in"
+        >
           <div className="flex justify-between gap-10">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-customGray2">First Name</label>
@@ -72,7 +83,7 @@ const MessageForm = () => {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className="w-full h-12 p-3 border border-customGray1 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 bg-[#EEEDF2]"
+                className="w-full h-12 p-3 border border-customGray1 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 bg-[#EEEDF2] transition-transform transform hover:scale-105"
                 required
               />
             </div>
@@ -83,7 +94,7 @@ const MessageForm = () => {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className="w-full h-12 p-3 border border-customGray1 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 bg-[#EEEDF2]"
+                className="w-full h-12 p-3 border border-customGray1 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 bg-[#EEEDF2] transition-transform transform hover:scale-105"
                 required
               />
             </div>
@@ -95,7 +106,7 @@ const MessageForm = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full h-12 p-3 border border-customGray1 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 bg-[#EEEDF2]"
+              className="w-full h-12 p-3 border border-customGray1 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 bg-[#EEEDF2] transition-transform transform hover:scale-105"
               required
             />
           </div>
@@ -105,16 +116,16 @@ const MessageForm = () => {
               name="message"
               value={formData.message}
               onChange={handleChange}
-              className="w-full h-60 p-3 border border-customGray1 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 bg-[#EEEDF2]"
+              className="w-full h-60 p-3 border border-customGray1 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400 bg-[#EEEDF2] transition-transform transform hover:scale-105"
               required
             ></textarea>
           </div>
 
           <button
             type="submit"
-            className="w-fit py-3 px-5 bg-gray-200 text-black rounded-lg flex items-center justify-center hover:bg-primaryColor hover:text-white focus:outline-none ml-auto"
+            className="w-fit py-3 px-5 bg-gray-200 text-black rounded-lg flex items-center justify-center hover:bg-primaryColor hover:text-white focus:outline-none ml-auto transition-all duration-200 transform hover:scale-110"
           >
-            Send <IoSend className="ml-2" />
+            Send <IoSend className="ml-2 animate-spin-on-hover" />
           </button>
         </form>
       </div>

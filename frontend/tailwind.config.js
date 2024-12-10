@@ -18,7 +18,7 @@ export default {
         customGray2: "#828282",
         customGray3: "#686868",
         customBlack1: "#1E1E1E",
-      }
+      },
     },
   },
   plugins: [

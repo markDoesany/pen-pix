@@ -89,8 +89,8 @@ const SettingsPage = () => {
           <IoIosClose size={35} onClick={() => navigate(`/dashboard/${profile.id}`)}/>
         </div>
         <h2 className="text-customGray2 text-3xl font-medium">Settings</h2>
-        <div className="flex h-full w-full gap-4 max-md:flex-col max-md:gap-2">
-          <div className="w-[600px] ml-5 h-full overflow-y-auto pr-20 pb-10 pt-5 flex flex-col max-md:overflow-y-hidden max-md:h-fit max-md:w-[420px]">
+        <div className="flex h-full w-full gap-4 max-md:flex-col max-md:gap-10">
+          <div className="w-[700px] ml-5 h-full overflow-y-auto pr-20 pb-10 pt-5 flex flex-col max-md:overflow-y-hidden max-md:h-fit max-md:w-[420px]">
             <div>
               <ProfileSection profile={profile} onSave={handleSetProfile} />
             </div>

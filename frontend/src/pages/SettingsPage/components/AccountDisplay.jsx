@@ -30,9 +30,9 @@ const AccountDisplay = ({ profile, onUploadProfileImage }) => {
         <div className="relative group w-fit cursor-pointer">
           <label className="cursor-pointer">
             {imageUrl ? <img 
-              src={imageUrl} // Use the uploaded image or a default image
+              src={imageUrl} 
               alt="Profile"
-              className="relative z-10 rounded-full w-32 h-32 object-cover" // Add styling for the image
+              className="relative z-10 rounded-full w-32 h-32 object-cover"
             /> : 
               <FaUserCircle size={120} color="gray"/>
             }

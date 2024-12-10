@@ -10,7 +10,8 @@ const SubmissionPage = () => {
   const [task, setTask] = useState(null); 
   const [files, setFiles] = useState({}); 
   const [isUploaded, setIsUploaded] = useState(false); 
-  const [isPastDue, setIsPastDue] = useState(false); // Track if due date has passed
+  const [isPastDue, setIsPastDue] = useState(false);
+  const [isTaskNotFound, setIsTaskNotFound] = useState(false); // New state to track task not found
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -18,16 +19,18 @@ const SubmissionPage = () => {
         const response = await axios.get(`/task/get-task/${taskId}`);
         if (response.data) {
           setTask(response.data);
+          const dueDate = new Date(response.data.due_date); 
+          const currentDate = new Date();
 
-          // Check if the due date has passed
-          const dueDate = new Date(response.data.due_date);
-          if (new Date() > dueDate) {
-            setIsPastDue(true);
+          if (currentDate > dueDate) {
+            setIsPastDue(true); 
           }
         } else {
-          console.error('No task data received or incorrect data format');
+          setIsTaskNotFound(true); // Set the flag if task data is missing
+          console.error('Task not found or incorrect data format');
         }
       } catch (error) {
+        setIsTaskNotFound(true); // Set the flag if there is an error fetching task
         console.error('Error fetching task:', error);
       }
     };
@@ -72,6 +75,26 @@ const SubmissionPage = () => {
     }
   };
 
+  if (isTaskNotFound) {
+    return (
+      <div className="p-10 w-full">
+        <div className="flex items-center mb-5">
+          <Link to="/"><img src="/icons/PenPix-txt.png" alt="Logo" /></Link>
+        </div>
+        <h1 className="text-lg font-bold text-center">Submission Page</h1>
+        <div className={`${styles.app} bg-white p-6 rounded-lg shadow-md`}>
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-red-500">Task Not Found</h2>
+            <p className="text-gray-600 mt-2">The task has been removed or is no longer available.</p>
+            {/* <Link to="/" className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+              Go to Home
+            </Link> */}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!task) {
     return <div>Loading...</div>;
   }
@@ -87,9 +110,9 @@ const SubmissionPage = () => {
           <div className="text-center">
             <h2 className="text-xl font-semibold text-red-500">Submission Closed</h2>
             <p className="text-gray-600 mt-2">The due date for this task has passed. You can no longer submit files.</p>
-            <Link to="/" className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+            {/* <Link to="/" className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
               Go to Home
-            </Link>
+            </Link> */}
           </div>
         ) : !isUploaded ? (
           <>
@@ -126,10 +149,10 @@ const SubmissionPage = () => {
           <div className="text-center">
             <FiCheckCircle className="text-green-500 text-6xl mb-4" />
             <h2 className="text-2xl font-bold text-green-500">Files uploaded successfully!</h2>
-            <p className="text-gray-600 mt-2">Ask the teacher to double check your submission.</p>
-            <Link to="/" className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+            <p className="text-gray-600 mt-2">Ask the teacher to double-check your submission.</p>
+            {/* <Link to="/" className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
               Go to Home
-            </Link>
+            </Link> */}
           </div>
         )}
       </div>

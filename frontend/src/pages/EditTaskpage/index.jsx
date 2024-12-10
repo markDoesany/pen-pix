@@ -44,7 +44,7 @@ const EditTaskPage = () => {
     title: "",
     classId: "",
     examType: "",
-    dueDate: new Date().toISOString().split('T')[0],
+    dueDate: new Date().toISOString(),
     answerKeys: [
       {
         item: `Item ${1}`,

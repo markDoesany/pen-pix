@@ -11,6 +11,7 @@ import useDeleteTask from '../../hooks/useDeleteTask';
 import useClassData from '../../hooks/useClassData';
 import TaskLinkModal from './components/TaskLinkModal'; 
 import UploadModal from "./components/UploadModal";
+import useToast from "../../hooks/useToast";
 
 const TaskPage = () => {
   const [task, setTask] = useState({});
@@ -23,6 +24,7 @@ const TaskPage = () => {
   const navigate = useNavigate();
   const { classData, loading } = useClassData(taskId);
   const { handleDeleteTask: deleteTask } = useDeleteTask();
+  const {toastSuccess, toastError} = useToast()
 
   const items = task.answer_keys?.map((key) => key.item) || [];
   
@@ -71,8 +73,12 @@ const TaskPage = () => {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true, 
       });
-  
-      console.log("Files uploaded successfully:", response.data);
+      
+      if(response.data.invalid_files.length > 0){
+        toastError(`Student Id(s) not enrolled in the class: ${response.data.invalid_files} `)
+      }else{
+        toastSuccess("Files Uploaded Successfully.")
+      }
       fetchFiles();
     } catch (error) {
       console.error("Error uploading files:", error);
