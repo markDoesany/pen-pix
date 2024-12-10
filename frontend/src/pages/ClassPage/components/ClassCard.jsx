@@ -16,6 +16,7 @@ const ClassCard = ({ classData, onDelete, recentTasks }) => {
       if (response.status === 200) {
         alert(`Class ${classData.class_code} deleted successfully.`);
         onDelete(classData.id); 
+        console.log("Class deleted successfully.")
       }
     } catch (error) {
       console.error("Error deleting class:", error);
